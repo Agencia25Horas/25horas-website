@@ -1,0 +1,28 @@
+# deps
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+
+# next
+.next
+out
+build
+
+# env
+.env*.local
+
+# misc
+.DS_Store
+*.log
+*.tsbuildinfo
+next-env.d.ts
+
+# editor / agents
+.vscode
+.idea
+.claude
+*.swp
+
+# media — local-only large files. CI / production fetches from CDN.
+public/media/raw

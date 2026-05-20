@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --canvas-black: #0a0a0a;
+  --canvas-white: #f4f0e8;
+  --accent-grade: #c7572b;
+  --signal-live: #4f9d58;
+  --type-neutral: #b7b0a4;
+  --type-dim: #66615a;
+  --chrome-line: #1f1d1a;
+
+  --chrome-h: 11vh;
+  --chrome-h-mobile: 14vh;
+}
+
+html,
+body {
+  background: var(--canvas-black);
+  color: var(--type-neutral);
+}
+
+/* Native cursor stays. We do not own the user's pointer. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Respect reduced motion across the board. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* The single typographic micro-flex: the colon in 25:HORAS sits slightly raised. */
+.wordmark-colon {
+  display: inline-block;
+  transform: translateY(-0.07em);
+  letter-spacing: 0.02em;
+}
+
+/* Slate "table" — used by Slate component, kept here so unused props don't bloat JS. */
+.slate-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1.5rem;
+  row-gap: 0.35rem;
+}
+
+/* Frame-corner notches on the slate. Pure CSS, no extra DOM. */
+.slate-frame {
+  position: relative;
+  padding: 1.5rem 1.75rem;
+}
+.slate-frame::before,
+.slate-frame::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--type-dim);
+}
+.slate-frame::before {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+.slate-frame::after {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+.slate-frame > .corner-tr,
+.slate-frame > .corner-bl {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--type-dim);
+}
+.slate-frame > .corner-tr {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+.slate-frame > .corner-bl {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+
+/* REC indicator — slow pulse, very subtle. */
+@keyframes rec-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+.rec-dot {
+  animation: rec-pulse 1.6s ease-in-out infinite;
+}
+
+/* Audio hint pulse — only on first visit, on the SOM dot ring. */
+@keyframes som-hint-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(183, 176, 164, 0.45); }
+  70%  { box-shadow: 0 0 0 6px rgba(183, 176, 164, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(183, 176, 164, 0); }
+}
+.som-hint {
+  animation: som-hint-pulse 1.8s ease-out infinite;
+  border-radius: 9999px;
+}
+
+@keyframes hint-fade {
+  0%   { opacity: 0; transform: translateY(-2px); }
+  20%  { opacity: 1; transform: translateY(0); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-2px); }
+}
+.hint-fade {
+  animation: hint-fade 4s ease-out forwards;
+}
