@@ -173,6 +173,7 @@ export function HeroSequence() {
   return (
     <section
       ref={sectionRef}
+      data-reel="1"
       className="relative h-[100svh] overflow-hidden bg-canvas-black"
       aria-label="Rolo 01 — Hero"
     >

@@ -1,6 +1,7 @@
 "use client";
 
-import { forwardRef, useEffect, type Ref } from "react";
+import { forwardRef, type Ref } from "react";
+import { GradedVideo } from "@/components/effects/GradedVideo";
 
 type Props = {
   src?: string;
@@ -8,49 +9,30 @@ type Props = {
   videoRef?: Ref<HTMLVideoElement>;
 };
 
-// The full-bleed hero film. Plays muted. Real audio (room tone) lives on
-// the global audio layer, not here.
+// The full-bleed hero film. Plays muted, runs through the Atlântico grade
+// shader. Room tone lives on the global audio layer, not here.
 export const HeroReel = forwardRef<HTMLDivElement, Props>(function HeroReel(
   { src, poster, videoRef },
   wrapperRef,
 ) {
-  useEffect(() => {
-    if (!videoRef || typeof videoRef === "function") return;
-    const v = videoRef.current;
-    if (!v) return;
-    const tryPlay = async () => {
-      try {
-        await v.play();
-      } catch {
-        // ignored — poster covers the silent gap
-      }
-    };
-    void tryPlay();
-  }, [src, videoRef]);
+  if (!src) {
+    return (
+      <div ref={wrapperRef} className="absolute inset-0 flex items-center justify-center">
+        <Standin />
+      </div>
+    );
+  }
 
   return (
-    <div ref={wrapperRef} className="absolute inset-0 flex items-center justify-center">
-      {src ? (
-        <video
-          ref={videoRef}
-          src={src}
-          poster={poster}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        />
-      ) : (
-        <Standin />
-      )}
-    </div>
+    <GradedVideo
+      ref={wrapperRef}
+      src={src}
+      poster={poster}
+      videoRef={videoRef}
+    />
   );
 });
 
-// Placeholder when no source has been wired yet. Doesn't ship to production —
-// the real reel always lands before launch.
 function Standin() {
   return (
     <div className="relative w-full h-full overflow-hidden">

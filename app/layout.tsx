@@ -3,6 +3,8 @@ import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AudioProvider } from "@/lib/audio-context";
 import { LenisProvider } from "@/lib/lenis-provider";
+import { NavProvider } from "@/lib/nav-context";
+import { NavOverlay } from "@/components/chrome/NavOverlay";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -49,7 +51,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         <LenisProvider>
-          <AudioProvider>{children}</AudioProvider>
+          <NavProvider>
+            <AudioProvider>
+              {children}
+              <NavOverlay />
+            </AudioProvider>
+          </NavProvider>
         </LenisProvider>
       </body>
     </html>
