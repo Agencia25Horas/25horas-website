@@ -151,7 +151,9 @@ export function createGradeShader(
 
   let rafId = 0;
   let start = 0;
-  let dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+  // DPR = 1.0 — the video is 1920×802 max; rendering at higher DPR just
+  // oversamples the same texels and burns GPU for no visible gain.
+  const dpr = 1.0;
 
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
@@ -164,6 +166,9 @@ export function createGradeShader(
       gl.uniform2f(uRes, w, h);
     }
   };
+  // Initial sizing + observe future changes. NO per-frame resize call —
+  // getBoundingClientRect() per RAF is a layout-thrash that tanks perf.
+  resize();
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
 
@@ -180,8 +185,6 @@ export function createGradeShader(
     if (!start) start = now;
     rafId = requestAnimationFrame(tick);
     if (paused) return;
-
-    resize();
 
     if (video.readyState >= 2 && video.videoWidth > 0) {
       // Only re-upload texture when the video frame has actually advanced.

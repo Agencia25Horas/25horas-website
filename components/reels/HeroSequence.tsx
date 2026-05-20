@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap-setup";
 import { Slate } from "@/components/primitives/Slate";
 import { HeroReel } from "@/components/reels/HeroReel";
 import { useAudio } from "@/lib/audio-context";
@@ -11,6 +10,10 @@ import { heroSequence } from "@/lib/tokens";
 
 const HERO_VIDEO_SRC = "/media/hero.mp4";
 const HERO_VIDEO_POSTER = "/media/hero-poster.jpg";
+
+// Flip to false for an instant A/B against the Atlântico shader. Useful for
+// diagnosing playback issues. Set via env at build time for a permanent off.
+const GRADED = process.env.NEXT_PUBLIC_GRADED !== "false";
 
 // Scroll-as-playhead config. 600px of pinned scroll maps to SCRUB_SECONDS of
 // reel time, per the cinema-cadence spec.
@@ -119,7 +122,11 @@ export function HeroSequence() {
     ).matches;
     if (prefersReduced) return;
 
-    let entered = false;
+    // Scrubbing engages only after the user has actually scrolled.
+    // Before that, the video autoplays freely. Without this guard,
+    // pin's onEnter would fire on mount (since start: "top top" matches
+    // the initial scroll position) and freeze the video at frame 0.
+    let scrubbing = false;
 
     const trigger = ScrollTrigger.create({
       trigger: section,
@@ -127,39 +134,30 @@ export function HeroSequence() {
       end: `+=${SCRUB_DISTANCE_PX}`,
       pin: true,
       pinSpacing: true,
-      scrub: 0.4, // small lag for a film-projector feel, not buttery
-      onEnter: () => {
-        if (entered) return;
-        entered = true;
-        // Take over playback: pause and reset to frame 0 so the scrub
-        // doesn't snap from a random loop position.
-        video.pause();
-        try {
-          video.currentTime = 0;
-        } catch {
-          // browsers occasionally throw if metadata isn't ready yet
-        }
-      },
-      onLeaveBack: () => {
-        // Scrolled back above the hero — let it autoplay again.
-        entered = false;
-        const tryPlay = async () => {
-          try {
-            await video.play();
-          } catch {
-            // muted-autoplay should always succeed; ignore otherwise
-          }
-        };
-        void tryPlay();
-      },
       onUpdate: (self) => {
-        if (!entered) return;
-        const t = self.progress * SCRUB_SECONDS;
-        if (Number.isFinite(t)) {
-          try {
-            video.currentTime = t;
-          } catch {
-            // ignore transient seek errors
+        const p = self.progress;
+
+        if (p > 0 && !scrubbing) {
+          scrubbing = true;
+          video.pause();
+        }
+
+        if (p === 0 && scrubbing) {
+          scrubbing = false;
+          void video.play().catch(() => {
+            // muted autoplay should always succeed; ignore otherwise
+          });
+          return;
+        }
+
+        if (scrubbing) {
+          const t = p * SCRUB_SECONDS;
+          if (Number.isFinite(t)) {
+            try {
+              video.currentTime = t;
+            } catch {
+              // ignore transient seek errors
+            }
           }
         }
       },
@@ -182,6 +180,7 @@ export function HeroSequence() {
         videoRef={videoRef}
         src={HERO_VIDEO_SRC}
         poster={HERO_VIDEO_POSTER}
+        graded={GRADED}
       />
 
       <div

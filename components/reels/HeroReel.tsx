@@ -7,12 +7,14 @@ type Props = {
   src?: string;
   poster?: string;
   videoRef?: Ref<HTMLVideoElement>;
+  /** Toggle the Atlântico shader off — useful for A/B perf comparison. */
+  graded?: boolean;
 };
 
 // The full-bleed hero film. Plays muted, runs through the Atlântico grade
 // shader. Room tone lives on the global audio layer, not here.
 export const HeroReel = forwardRef<HTMLDivElement, Props>(function HeroReel(
-  { src, poster, videoRef },
+  { src, poster, videoRef, graded = true },
   wrapperRef,
 ) {
   if (!src) {
@@ -29,6 +31,7 @@ export const HeroReel = forwardRef<HTMLDivElement, Props>(function HeroReel(
       src={src}
       poster={poster}
       videoRef={videoRef}
+      graded={graded}
     />
   );
 });

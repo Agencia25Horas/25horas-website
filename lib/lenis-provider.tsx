@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap-setup";
 
 // Tune for a film-cut feel: shorter duration, tight exponential easing.
 // The default Lenis 1.2s "lazy" ease is the cliché we explicitly refuse.
@@ -12,8 +11,6 @@ const easeOutExpoTight = (t: number) =>
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
