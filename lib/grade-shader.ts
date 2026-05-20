@@ -179,29 +179,20 @@ export function createGradeShader(
   };
   document.addEventListener("visibilitychange", onVisibility);
 
-  let lastUploadedTime = -1;
-
   const tick = (now: number) => {
     if (!start) start = now;
     rafId = requestAnimationFrame(tick);
     if (paused) return;
 
+    // Upload every RAF tick. The previous `currentTime !== lastUploadedTime`
+    // gate was broken: HTMLVideoElement.currentTime is updated by the browser
+    // asynchronously (via `timeupdate`, ~4Hz) — NOT once per decoded frame.
+    // Gating uploads on it caused the canvas to freeze on a stale frame.
+    // A 1920×802 RGB upload is ~2–3ms on integrated GPUs; cheap enough every frame.
     if (video.readyState >= 2 && video.videoWidth > 0) {
-      // Only re-upload texture when the video frame has actually advanced.
-      // For 25fps content this caps texture uploads at 25/s instead of 60/s.
-      if (video.currentTime !== lastUploadedTime) {
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          0,
-          gl.RGB,
-          gl.RGB,
-          gl.UNSIGNED_BYTE,
-          video,
-        );
-        lastUploadedTime = video.currentTime;
-      }
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
     }
 
     gl.uniform1f(uTime, (now - start) / 1000);

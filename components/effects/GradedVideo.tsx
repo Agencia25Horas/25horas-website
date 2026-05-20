@@ -69,18 +69,22 @@ export const GradedVideo = forwardRef<HTMLDivElement, Props>(function GradedVide
     };
   }, [src, videoRef, grain, vignette, intensity, graded]);
 
-  // Kick off playback. Muted autoplay is allowed across all browsers.
+  // Kick off playback. Muted autoplay is allowed across all browsers,
+  // but some setups still refuse without an explicit .muted = true.
   useEffect(() => {
     const video =
       videoRef && typeof videoRef !== "function"
         ? videoRef.current
         : localVideoRef.current;
     if (!video) return;
+    video.muted = true;
+    video.playsInline = true;
     const tryPlay = async () => {
       try {
         await video.play();
-      } catch {
-        // ignored
+      } catch (err) {
+        // surface so we know if autoplay is the issue, not silently swallow
+        console.warn("[GradedVideo] video.play() rejected:", err);
       }
     };
     void tryPlay();
@@ -100,7 +104,9 @@ export const GradedVideo = forwardRef<HTMLDivElement, Props>(function GradedVide
         loop
         playsInline
         preload="auto"
-        crossOrigin="anonymous"
+        onError={(e) =>
+          console.warn("[GradedVideo] video error:", e.currentTarget.error)
+        }
       />
       {graded && (
         <canvas
