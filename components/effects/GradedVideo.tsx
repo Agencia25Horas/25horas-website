@@ -19,7 +19,7 @@ type Props = {
 // itself is invisible — the canvas displays the graded result. Caller can
 // still access the video via `videoRef` for currentTime / play / pause.
 export const GradedVideo = forwardRef<HTMLDivElement, Props>(function GradedVideo(
-  { src, poster, videoRef, className, grain, vignette, intensity, graded = true },
+  { src, poster, videoRef, className, grain, vignette, intensity, graded = false },
   wrapperRef,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

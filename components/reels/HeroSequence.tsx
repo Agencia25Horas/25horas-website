@@ -11,14 +11,19 @@ import { heroSequence } from "@/lib/tokens";
 const HERO_VIDEO_SRC = "/media/hero.mp4";
 const HERO_VIDEO_POSTER = "/media/hero-poster.jpg";
 
-// Flip to false for an instant A/B against the Atlântico shader. Useful for
-// diagnosing playback issues. Set via env at build time for a permanent off.
-const GRADED = process.env.NEXT_PUBLIC_GRADED !== "false";
+// Atlântico grade is baked into the source mp4 via the ffmpeg pipeline.
+// The live WebGL shader (lib/grade-shader.ts) is left in place but disabled
+// here for playback perf. Flip on with NEXT_PUBLIC_GRADED=true for an A/B.
+const GRADED = process.env.NEXT_PUBLIC_GRADED === "true";
 
-// Scroll-as-playhead config. 600px of pinned scroll maps to SCRUB_SECONDS of
-// reel time, per the cinema-cadence spec.
+// Scroll-as-playhead config. 600px of pinned scroll maps to SCRUB_SECONDS
+// of reel time. Scrubbing engages on the very first scroll — there's no
+// deadzone. This is intentional: the "scroll IS the playhead" feeling lands
+// harder when the takeover is immediate.
 const SCRUB_DISTANCE_PX = 600;
-const SCRUB_SECONDS = 2;
+// Tune to match the hero clip's duration. Slightly under is safer than over
+// — scrubbing past the end clamps to the last frame and feels broken.
+const SCRUB_SECONDS = 1.5;
 
 const today = () =>
   new Date().toISOString().slice(0, 10).replaceAll("-", ".");
@@ -122,10 +127,10 @@ export function HeroSequence() {
     ).matches;
     if (prefersReduced) return;
 
-    // Scrubbing engages only after the user has actually scrolled.
-    // Before that, the video autoplays freely. Without this guard,
-    // pin's onEnter would fire on mount (since start: "top top" matches
-    // the initial scroll position) and freeze the video at frame 0.
+    // Scrubbing engages on the first non-zero scroll progress. The video
+    // autoplays freely until then. (Pin's onEnter would otherwise fire on
+    // mount because start: "top top" matches the initial scroll position —
+    // gating on progress avoids that.)
     let scrubbing = false;
 
     const trigger = ScrollTrigger.create({
@@ -144,9 +149,7 @@ export function HeroSequence() {
 
         if (p === 0 && scrubbing) {
           scrubbing = false;
-          void video.play().catch(() => {
-            // muted autoplay should always succeed; ignore otherwise
-          });
+          void video.play().catch(() => {});
           return;
         }
 

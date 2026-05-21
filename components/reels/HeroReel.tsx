@@ -14,7 +14,7 @@ type Props = {
 // The full-bleed hero film. Plays muted, runs through the Atlântico grade
 // shader. Room tone lives on the global audio layer, not here.
 export const HeroReel = forwardRef<HTMLDivElement, Props>(function HeroReel(
-  { src, poster, videoRef, graded = true },
+  { src, poster, videoRef, graded = false },
   wrapperRef,
 ) {
   if (!src) {

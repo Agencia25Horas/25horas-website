@@ -26,3 +26,4 @@ next-env.d.ts
 
 # media — local-only large files. CI / production fetches from CDN.
 public/media/raw
+public/media/source.*

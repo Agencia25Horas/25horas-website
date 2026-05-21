@@ -48,9 +48,9 @@ export const CASES: Case[] = [
     date: "2026.03",
     videoSrc: "/media/hero.mp4",
     bts: [
-      { src: "/media/bts-02.jpg", caption: "Dia 1 · 04:14 · primeira luz" },
-      { src: "/media/bts-06.jpg", caption: "Set · sala dos tetos" },
-      { src: "/media/bts-11.jpg", caption: "Última take, 22:30" },
+      { src: "/media/bts-03.jpg", caption: "Dia 1 · 04:14 · primeira luz" },
+      { src: "/media/bts-08.jpg", caption: "Set · sala dos tetos" },
+      { src: "/media/bts-13.jpg", caption: "Última take, 22:30" },
     ],
     tagline: "Um filme curto sobre hotéis que duram.",
   },
