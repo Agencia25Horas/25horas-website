@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ManifestoPage() {
   return (
-    <main className="relative bg-canvas-white">
+    <main className="relative bg-canvas-black">
       <ChromeTop />
       <ManifestoReel />
       <ChromeBottom chapter={2} total={9} showCue={false} />

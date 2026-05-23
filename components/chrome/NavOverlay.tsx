@@ -6,7 +6,7 @@ import { useNav } from "@/lib/nav-context";
 import { useAudio } from "@/lib/audio-context";
 import { playSlateClap } from "@/lib/audio";
 
-const PROGRAMA: Array<[code: string, label: string, href: string]> = [
+const PORTFOLIO: Array<[code: string, label: string, href: string]> = [
   ["01", "HOSPITALIDADE", "/programa/hospitalidade"],
   ["02", "MÚSICA", "/programa/musica"],
   ["03", "DESPORTO", "/programa/desporto"],
@@ -15,15 +15,11 @@ const PROGRAMA: Array<[code: string, label: string, href: string]> = [
   ["06", "EVENTOS", "/programa/eventos"],
 ];
 
-const ESTUDIO: Array<[label: string, href: string]> = [
-  ["MANIFESTO", "/manifesto"],
-  ["SOBRE", "/estudio"],
-  ["CONTACTO", "/contacto"],
-];
-
 const ATENDIMENTO: Array<[label: string, href: string]> = [
+  ["SOBRE", "/manifesto"],
+  ["SERVIÇOS", "/servicos"],
+  ["CONTACTO", "/contacto"],
   ["PEDIR ORÇAMENTO", "/orcamento"],
-  ["MARCAR REUNIÃO", "/marcar"],
 ];
 
 export function NavOverlay() {
@@ -90,11 +86,11 @@ export function NavOverlay() {
         className="absolute inset-x-0 top-[var(--chrome-h-mobile)] bottom-[var(--chrome-h-mobile)] md:top-[var(--chrome-h)] md:bottom-[var(--chrome-h)] overflow-y-auto"
       >
         <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
-          {/* PROGRAMA */}
-          <section aria-label="Programa">
-            <Heading>PROGRAMA</Heading>
+          {/* PORTFOLIO */}
+          <section aria-label="Portfolio">
+            <Heading>PORTFOLIO</Heading>
             <ul className="space-y-2 md:space-y-3">
-              {PROGRAMA.map(([code, label, href]) => (
+              {PORTFOLIO.map(([code, label, href]) => (
                 <li key={code}>
                   <NavLink href={href} onClick={handleClose}>
                     <span className="text-type-dim mr-4 inline-block w-6 tabular-nums">
@@ -107,19 +103,8 @@ export function NavOverlay() {
             </ul>
           </section>
 
-          {/* ESTÚDIO + ATENDIMENTO */}
-          <section aria-label="Estúdio">
-            <Heading>ESTÚDIO</Heading>
-            <ul className="space-y-2 md:space-y-3 mb-10">
-              {ESTUDIO.map(([label, href]) => (
-                <li key={href}>
-                  <NavLink href={href} onClick={handleClose}>
-                    {label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-
+          {/* ATENDIMENTO */}
+          <section aria-label="Atendimento">
             <Heading>ATENDIMENTO</Heading>
             <ul className="space-y-2 md:space-y-3">
               {ATENDIMENTO.map(([label, href]) => (

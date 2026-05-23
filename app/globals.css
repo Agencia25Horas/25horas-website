@@ -126,3 +126,184 @@ body {
 .hint-fade {
   animation: hint-fade 4s ease-out forwards;
 }
+
+/* ─── Accordion panel ─── */
+.accordion-panel {
+  flex: 1;
+  transition: flex 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.accordion-panel:hover,
+.accordion-panel.is-active {
+  flex: 5;
+}
+.accordion-panel .panel-bg {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.accordion-panel:hover .panel-bg,
+.accordion-panel.is-active .panel-bg {
+  transform: scale(1.06);
+}
+
+/* Collapsed label — vertical mono text running up the panel */
+.accordion-panel .panel-label-collapsed {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transition: opacity 0.3s;
+}
+.accordion-panel:hover .panel-label-collapsed,
+.accordion-panel.is-active .panel-label-collapsed {
+  opacity: 0;
+}
+
+/* Expanded body — fades up on activate */
+.accordion-panel .panel-body {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+.accordion-panel:hover .panel-body,
+.accordion-panel.is-active .panel-body {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stacked vertical layout on mobile — same expand mechanic, different axis */
+@media (max-width: 768px) {
+  .accordion-wrap {
+    flex-direction: column;
+  }
+  .accordion-panel {
+    flex: none !important;
+    height: 64px;
+    transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .accordion-panel:hover,
+  .accordion-panel.is-active {
+    height: 320px;
+  }
+  .accordion-panel .panel-label-collapsed {
+    writing-mode: horizontal-tb;
+    top: 50%;
+    left: 1.25rem;
+    transform: translateY(-50%);
+    bottom: auto;
+  }
+}
+
+/* ─── Vertical accordion-slider — reference: items/accordion-slider.html
+   lines 117-170 (CSS), 252-293 (HTML). Hover is CSS-only; .active is
+   toggled by React for click-lock. ───────────────────────────────────── */
+
+.v-acc-bounded {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: auto;
+  margin-right: auto;
+  width: clamp(220px, 30vw, 420px);
+}
+.v-acc-bounded > .v-panel {
+  height: 52px;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.v-acc-bounded:not(.has-active) > .v-panel:hover,
+.v-acc-bounded > .v-panel.active {
+  height: 240px;
+}
+.v-acc-bounded.has-active > .v-panel:not(.active) {
+  pointer-events: none;
+}
+
+.v-acc-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 0.5rem;
+}
+.v-acc-flow > .v-panel {
+  height: 52px;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.v-acc-flow > .v-panel:hover,
+.v-acc-flow > .v-panel.active {
+  height: 240px;
+}
+
+.v-panel {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.v-panel .v-bg {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.5s ease;
+}
+.v-panel:hover .v-bg,
+.v-panel.active .v-bg {
+  transform: scale(1.03);
+}
+.v-panel .v-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(10, 10, 11, 0.85) 0%,
+    rgba(10, 10, 11, 0.3) 50%,
+    transparent 80%
+  );
+  pointer-events: none;
+}
+.v-panel .v-collapsed {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--canvas-white);
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.v-panel:hover .v-collapsed,
+.v-panel.active .v-collapsed {
+  opacity: 0;
+}
+.v-panel .v-expanded {
+  position: absolute;
+  inset: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+  pointer-events: none;
+}
+.v-panel:hover .v-expanded,
+.v-panel.active .v-expanded {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.v-panel .v-expanded h3 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--canvas-white);
+  margin-bottom: 6px;
+}
+.v-panel .v-expanded p {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(234, 231, 226, 0.8);
+  line-height: 1.5;
+  max-width: 40ch;
+}

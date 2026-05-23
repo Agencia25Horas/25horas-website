@@ -24,6 +24,13 @@ next-env.d.ts
 .claude
 *.swp
 
-# media — local-only large files. CI / production fetches from CDN.
-public/media/raw
-public/media/source.*
+# media — ignore everything in public/media/ except the encoded outputs and
+# the logos folder. Source clips (any name, any format) stay local; only the
+# pipeline outputs are committed.
+public/media/*
+!public/media/hero.mp4
+!public/media/hero-poster.jpg
+!public/media/bts-*.jpg
+!public/media/bg-*.jpg
+!public/media/logos
+!public/media/logos/**

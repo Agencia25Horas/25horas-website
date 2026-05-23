@@ -4,19 +4,25 @@ import { useEffect, useState } from "react";
 import { Timecode } from "./Timecode";
 import { ChapterTag } from "./ChapterTag";
 import { ScrollCue } from "./ScrollCue";
+import { ChromeThemeProvider, type ChromeTheme } from "@/lib/chrome-theme";
 
 type Props = {
   /** Hard-code the chapter (e.g. on a single-reel route). Omit to auto-track. */
   chapter?: number;
   total?: number;
   showCue?: boolean;
+  theme?: ChromeTheme;
 };
 
-export function ChromeBottom({ chapter, total = 9, showCue = true }: Props) {
+export function ChromeBottom({
+  chapter,
+  total = 9,
+  showCue = true,
+  theme = "dark",
+}: Props) {
   const [active, setActive] = useState(chapter ?? 1);
 
   useEffect(() => {
-    // If caller pinned the chapter, respect it and skip the observer entirely.
     if (chapter !== undefined) {
       setActive(chapter);
       return;
@@ -28,7 +34,6 @@ export function ChromeBottom({ chapter, total = 9, showCue = true }: Props) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Pick the reel with the largest visible area.
         const top = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
@@ -43,16 +48,23 @@ export function ChromeBottom({ chapter, total = 9, showCue = true }: Props) {
     return () => observer.disconnect();
   }, [chapter]);
 
+  const surface =
+    theme === "light"
+      ? "bg-canvas-white border-t border-black/10"
+      : "bg-canvas-black border-t border-chrome-line";
+
   return (
-    <footer
-      className="fixed bottom-0 inset-x-0 z-50 h-[var(--chrome-h-mobile)] md:h-[var(--chrome-h)] bg-canvas-black border-t border-chrome-line flex items-center justify-between px-4 md:px-6"
-      role="contentinfo"
-    >
-      <Timecode />
-      <div className="absolute inset-x-0 flex justify-center pointer-events-none">
-        {showCue && <ScrollCue />}
-      </div>
-      <ChapterTag current={active} total={total} />
-    </footer>
+    <ChromeThemeProvider theme={theme}>
+      <footer
+        className={`fixed bottom-0 inset-x-0 z-50 h-[var(--chrome-h-mobile)] md:h-[var(--chrome-h)] ${surface} flex items-center justify-between px-4 md:px-6`}
+        role="contentinfo"
+      >
+        <Timecode />
+        <div className="absolute inset-x-0 flex justify-center pointer-events-none">
+          {showCue && <ScrollCue />}
+        </div>
+        <ChapterTag current={active} total={total} />
+      </footer>
+    </ChromeThemeProvider>
   );
 }

@@ -101,6 +101,7 @@ export const GradedVideo = forwardRef<HTMLDivElement, Props>(function GradedVide
         }`}
         autoPlay
         muted
+        loop
         playsInline
         preload="auto"
         onError={(e) =>

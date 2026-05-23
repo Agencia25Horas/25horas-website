@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap-setup";
 
@@ -9,13 +15,30 @@ import { gsap, ScrollTrigger } from "@/lib/gsap-setup";
 const easeOutExpoTight = (t: number) =>
   Math.min(1, 1.001 - Math.pow(2, -8 * t));
 
-export function LenisProvider({ children }: { children: React.ReactNode }) {
+const LenisContext = createContext<Lenis | null>(null);
+
+/**
+ * Returns the active Lenis instance, or null before mount / after unmount /
+ * when prefers-reduced-motion disabled the smooth scroll.
+ *
+ * Used by components that need to lock the page (e.g. the SplitScrollReel
+ * accordion) — call `lenis.stop()` to pause smooth scroll, `lenis.start()`
+ * to resume. Disabling ScrollTrigger alone is NOT enough — Lenis still
+ * processes wheel events independently.
+ */
+export function useLenis() {
+  return useContext(LenisContext);
+}
+
+export function LenisProvider({ children }: { children: ReactNode }) {
+  const [lenis, setLenis] = useState<Lenis | null>(null);
+
   useEffect(() => {
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    const lenis = new Lenis({
+    const instance = new Lenis({
       duration: prefersReduced ? 0 : 0.8,
       easing: easeOutExpoTight,
       smoothWheel: !prefersReduced,
@@ -23,18 +46,23 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     });
 
     const onScroll = () => ScrollTrigger.update();
-    lenis.on("scroll", onScroll);
+    instance.on("scroll", onScroll);
 
-    const tick = (time: number) => lenis.raf(time * 1000);
+    const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    setLenis(instance);
+
     return () => {
-      lenis.off("scroll", onScroll);
+      instance.off("scroll", onScroll);
       gsap.ticker.remove(tick);
-      lenis.destroy();
+      instance.destroy();
+      setLenis(null);
     };
   }, []);
 
-  return <>{children}</>;
+  return (
+    <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>
+  );
 }

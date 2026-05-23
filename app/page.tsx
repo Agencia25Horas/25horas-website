@@ -1,15 +1,17 @@
 import { ChromeTop } from "@/components/chrome/ChromeTop";
-import { ChromeBottom } from "@/components/chrome/ChromeBottom";
 import { HeroSequence } from "@/components/reels/HeroSequence";
-import { ManifestoReel } from "@/components/reels/ManifestoReel";
+import { SplitScrollReel } from "@/components/reels/SplitScrollReel";
+import { GaleriaReel } from "@/components/reels/GaleriaReel";
 
 export default function HeroPage() {
   return (
     <main className="relative bg-canvas-black">
       <ChromeTop />
       <HeroSequence />
-      <ManifestoReel />
-      <ChromeBottom total={9} showCue={false} />
+      {/* SplitScrollReel passa a ser o showcase oficial dos 6 nichos +
+          2 sub-marcas (AGENCY, PRODUÇÕES). Cada slide leva a /servicos/[nicho]. */}
+      <SplitScrollReel />
+      <GaleriaReel />
     </main>
   );
 }
