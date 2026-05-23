@@ -1,8 +1,11 @@
 // Source of truth for the SERVIÇOS map.
-// Base transversal (gestão de redes) is shared across every niche.
-// Each niche then adds its own VÍDEO / FOTOGRAFIA / DESIGN specialisation.
+// Used by:
+//   • SplitScrollReel (8 slides, agency/producoes first, then 6 nichos)
+//   • /servicos and /servicos/[nicho] pages (deep listing)
 
 export type NichoSlug =
+  | "agency"
+  | "producoes"
   | "restaurantes"
   | "desporto"
   | "real-estate"
@@ -19,13 +22,29 @@ export type Nicho = {
   image: string;
   video: string[];
   fotografia: string[];
-  /**
-   * Optional. Brief só listou Design para Restaurantes, Desporto e Real Estate.
-   * Travel, Corporate e Saúde herdam a linguagem visual transversal (DESIGN_TRANSVERSAL).
-   */
+  /** Optional — Travel, Corporate, Saúde don't offer Design as a service. */
   design?: string[];
 };
 
+// Shared across every slide — "GESTÃO DE REDES SOCIAIS" appears as the
+// last (3rd or 4th) panel in every slide's accordion.
+export const GESTAO_REDES = {
+  label: "GESTÃO DE REDES SOCIAIS",
+  emoji: "📲",
+  items: [
+    "Planeamento mensal",
+    "Copywriting",
+    "Agendamento",
+    "Instagram",
+    "Facebook",
+    "TikTok",
+    "15 posts",
+    "60 stories",
+  ],
+} as const;
+
+// Legacy structure kept for /servicos and /servicos/[nicho] pages which
+// render pillars/channels/cadence as separate blocks.
 export const BASE_TRANSVERSAL = {
   code: "00",
   label: "GESTÃO DE REDES SOCIAIS",
@@ -45,6 +64,59 @@ export const BASE_TRANSVERSAL = {
 export const NICHOS: Nicho[] = [
   {
     code: "01",
+    slug: "agency",
+    label: "AGENCY",
+    emoji: "🏛️",
+    tagline: "A casa-mãe. Estratégia, marca, narrativa.",
+    image: "/media/nichos/restaurantes.jpg", // placeholder
+    video: [
+      "Brand films",
+      "Institucional",
+      "Storytelling",
+      "Cobertura 360",
+      "Documentário",
+    ],
+    fotografia: [
+      "Editorial",
+      "Brand campaigns",
+      "Lifestyle",
+      "Reportagem",
+    ],
+    design: [
+      "Identidade visual",
+      "Direcção de arte",
+      "Sistemas de design",
+      "Estratégia visual",
+    ],
+  },
+  {
+    code: "02",
+    slug: "producoes",
+    label: "PRODUÇÕES",
+    emoji: "🎬",
+    tagline: "Execução técnica. Do plate ao master.",
+    image: "/media/nichos/desporto.jpg", // placeholder
+    video: [
+      "Produção",
+      "Pós-produção",
+      "Color grading",
+      "Sound design",
+      "Motion graphics",
+    ],
+    fotografia: [
+      "Estúdio",
+      "Localização",
+      "Retoque",
+      "Look-book",
+    ],
+    design: [
+      "Storyboards",
+      "Concept art",
+      "Mood boards",
+    ],
+  },
+  {
+    code: "03",
     slug: "restaurantes",
     label: "RESTAURANTES",
     emoji: "🍽️",
@@ -52,11 +124,11 @@ export const NICHOS: Nicho[] = [
     image: "/media/nichos/restaurantes.jpg",
     video: [
       "Reels gastronómicos",
-      "Highlights de restaurante",
-      "Vídeos de pratos premium",
+      "Highlights restaurante",
+      "Vídeos pratos premium",
       "Behind the scenes",
       "Chef videos",
-      "Cobertura de eventos",
+      "Eventos",
       "TikTok vertical",
       "Drone cinematic",
       "UGC style content",
@@ -79,7 +151,7 @@ export const NICHOS: Nicho[] = [
     ],
   },
   {
-    code: "02",
+    code: "04",
     slug: "desporto",
     label: "DESPORTO",
     emoji: "⚽",
@@ -92,7 +164,7 @@ export const NICHOS: Nicho[] = [
       "Hype videos",
       "Bastidores",
       "TikTok sports",
-      "Drone de estádio",
+      "Drone estádio",
     ],
     fotografia: [
       "Jogo",
@@ -105,11 +177,11 @@ export const NICHOS: Nicho[] = [
       "Matchday",
       "Resultados",
       "Escalações",
-      "Campanhas de jogadores",
+      "Campanhas jogadores",
     ],
   },
   {
-    code: "03",
+    code: "05",
     slug: "real-estate",
     label: "REAL ESTATE",
     emoji: "🏠",
@@ -135,7 +207,7 @@ export const NICHOS: Nicho[] = [
     ],
   },
   {
-    code: "04",
+    code: "06",
     slug: "travel",
     label: "TRAVEL",
     emoji: "✈️",
@@ -153,9 +225,10 @@ export const NICHOS: Nicho[] = [
       "Experiência",
       "Lifestyle",
     ],
+    // NO design — Travel não oferece design como serviço.
   },
   {
-    code: "05",
+    code: "07",
     slug: "corporate",
     label: "CORPORATE",
     emoji: "🏢",
@@ -173,26 +246,31 @@ export const NICHOS: Nicho[] = [
       "Office lifestyle",
       "Eventos",
     ],
+    // NO design — Corporate não oferece design como serviço.
   },
   {
-    code: "06",
+    code: "08",
     slug: "saude",
-    label: "SAÚDE & BEM-ESTAR",
+    label: "SAÚDE & FAMÍLIA",
     emoji: "💆",
-    tagline: "Clínicas e profissionais — com tom e confiança.",
+    tagline: "Clínicas, profissionais e momentos de família — com tom e confiança.",
     image: "/media/nichos/saude.jpg",
     video: [
       "Procedimentos",
       "Reels informativos",
       "Branding clinic",
       "Testemunhos",
+      "Família",
+      "Lifestyle clínico",
     ],
     fotografia: [
       "Espaço",
       "Equipa",
       "Procedimentos",
       "Branding",
+      "Retratos de família",
     ],
+    // NO design — Saúde & Família não oferece design como serviço.
   },
 ];
 

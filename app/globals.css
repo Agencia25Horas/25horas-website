@@ -286,6 +286,7 @@ body {
   transform: translateY(10px);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
   pointer-events: none;
+  overflow-y: auto;
 }
 .v-panel:hover .v-expanded,
 .v-panel.active .v-expanded {
@@ -306,4 +307,14 @@ body {
   color: rgba(234, 231, 226, 0.8);
   line-height: 1.5;
   max-width: 40ch;
+}
+.v-panel .v-expanded .v-items {
+  font-size: 13px;
+  color: rgba(234, 231, 226, 0.85);
+  line-height: 1.7;
+  max-width: 100%;
+}
+.v-panel .v-expanded .v-sep {
+  color: rgba(234, 231, 226, 0.35);
+  margin: 0 6px;
 }
