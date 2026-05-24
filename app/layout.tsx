@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Nunito, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AudioProvider } from "@/lib/audio-context";
 import { LenisProvider } from "@/lib/lenis-provider";
 import { NavProvider } from "@/lib/nav-context";
 import { NavOverlay } from "@/components/chrome/NavOverlay";
 
-const serif = Cormorant_Garamond({
+// Fraunces stands in for Adobe's Ivypresto Text (the serif Tomatino uses for
+// titles). Modern high-contrast serif with optical sizing — closest free match.
+const serif = Fraunces({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-serif",
   display: "swap",
 });
 
-const body = Inter({
+// Nunito stands in for Adobe's Atten Round New (the rounded sans Tomatino uses
+// for body / UI). Rounded geometric sans — closest free match.
+const body = Nunito({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-body",
   display: "swap",
 });

@@ -333,6 +333,32 @@ body {
   );
 }
 
+/* Split text colour — adapts to viewport position via fixed gradient.
+   Text on the LEFT half of the viewport renders as canvas-white (cream),
+   text on the RIGHT half renders as canvas-black. Text that crosses the
+   divider renders split — cream on the left part, black on the right part.
+
+   Uses background-clip: text with a fixed-attachment gradient so the
+   colour transition is locked to viewport centre (50vw), not to the
+   text element's own width. Works for any text regardless of its
+   horizontal position. */
+.split-text {
+  background: linear-gradient(
+    to right,
+    var(--canvas-white) 0%,
+    var(--canvas-white) 50%,
+    var(--canvas-black) 50%,
+    var(--canvas-black) 100%
+  );
+  background-size: 100vw 100%;
+  background-attachment: fixed;
+  background-position: 0 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Vertical hairline fixed at viewport center, runs full height of viewport.
    Sits above the background, below the chrome and content (z-index 1). */
 .split-divider::after {

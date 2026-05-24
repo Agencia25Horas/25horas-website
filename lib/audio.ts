@@ -4,7 +4,6 @@
 // Each function returns the AudioContext currentTime when scheduled.
 
 let ctx: AudioContext | null = null;
-let roomToneNode: AudioBufferSourceNode | null = null;
 let masterGain: GainNode | null = null;
 
 const dbToGain = (db: number) => Math.pow(10, db / 20);
@@ -30,58 +29,7 @@ export async function enableAudio() {
 }
 
 export function disableAudio() {
-  stopRoomTone();
   if (ctx && ctx.state === "running") void ctx.suspend();
-}
-
-// ---- Room tone: filtered pink noise loop, 4s, very quiet ----
-
-function buildPinkNoiseBuffer(c: AudioContext, seconds = 4): AudioBuffer {
-  const length = c.sampleRate * seconds;
-  const buf = c.createBuffer(1, length, c.sampleRate);
-  const data = buf.getChannelData(0);
-  // Voss-McCartney pink noise approximation
-  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-  for (let i = 0; i < length; i++) {
-    const w = Math.random() * 2 - 1;
-    b0 = 0.99886 * b0 + w * 0.0555179;
-    b1 = 0.99332 * b1 + w * 0.0750759;
-    b2 = 0.96900 * b2 + w * 0.1538520;
-    b3 = 0.86650 * b3 + w * 0.3104856;
-    b4 = 0.55000 * b4 + w * 0.5329522;
-    b5 = -0.7616 * b5 - w * 0.0168980;
-    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11;
-    b6 = w * 0.115926;
-  }
-  return buf;
-}
-
-export function startRoomTone(db = -24) {
-  const c = ensureCtx();
-  if (roomToneNode) return;
-  const src = c.createBufferSource();
-  src.buffer = buildPinkNoiseBuffer(c, 4);
-  src.loop = true;
-  const lp = c.createBiquadFilter();
-  lp.type = "lowpass";
-  lp.frequency.value = 1400;
-  lp.Q.value = 0.6;
-  const gain = c.createGain();
-  gain.gain.value = 0;
-  src.connect(lp).connect(gain).connect(masterGain!);
-  src.start();
-  gain.gain.linearRampToValueAtTime(dbToGain(db), c.currentTime + 1.2);
-  roomToneNode = src;
-}
-
-export function stopRoomTone() {
-  if (!roomToneNode || !ctx) return;
-  try {
-    roomToneNode.stop();
-  } catch {
-    // already stopped
-  }
-  roomToneNode = null;
 }
 
 // ---- Shutter click: 80ms noise burst, sharp envelope ----

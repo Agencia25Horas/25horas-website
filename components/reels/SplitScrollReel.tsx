@@ -2,13 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { gsap, ScrollTrigger } from "@/lib/gsap-setup";
 import { useLenis } from "@/lib/lenis-provider";
 import { LOGOS } from "@/lib/logos";
 import { NICHOS, GESTAO_REDES } from "@/lib/servicos";
 
-// Phase 2 — content from lib/servicos.ts. 8 slides; each accordion has
-// VÍDEO / FOTOGRAFIA / (DESIGN?) / GESTÃO DE REDES SOCIAIS panels.
+// Phase 2 — content from lib/servicos.ts. Each accordion has VÍDEO /
+// FOTOGRAFIA / (DESIGN?) / GESTÃO DE REDES SOCIAIS panels + a final
+// PORTFOLIO link that navigates to /servicos/[nicho]/portfolio.
 
 // Fallback imagery — Phase 3 swaps for niche-specific imagery.
 const PANEL_IMAGES: Record<string, string> = {
@@ -20,6 +22,8 @@ const PANEL_IMAGES: Record<string, string> = {
     "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&h=600&fit=crop",
   "GESTÃO DE REDES SOCIAIS":
     "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&h=600&fit=crop",
+  "PORTFOLIO":
+    "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=600&fit=crop",
 };
 
 type OpenState = { slide: number; entry: number } | null;
@@ -245,18 +249,31 @@ function SlidePanel({ index, open, setOpen, locked }: SlidePanelProps) {
   const nicho = NICHOS[index];
   if (!nicho) return null;
 
-  // 3 or 4 panels — DESIGN only when the niche offers it. GESTÃO is always last.
-  const entries: Array<{ label: string; emoji: string; items: readonly string[] }> = [
-    { label: "VÍDEO", emoji: "🎥", items: nicho.video },
-    { label: "FOTOGRAFIA", emoji: "📸", items: nicho.fotografia },
+  // 4 or 5 panels — DESIGN only when the niche offers it. GESTÃO is always
+  // present. PORTFOLIO is always the last panel and is a navigation link
+  // (not an expandable accordion) to the niche's portfolio page.
+  type Entry =
+    | { kind: "accordion"; label: string; emoji: string; items: readonly string[] }
+    | { kind: "link"; label: string; emoji: string; href: string };
+
+  const entries: Entry[] = [
+    { kind: "accordion", label: "VÍDEO", emoji: "🎥", items: nicho.video },
+    { kind: "accordion", label: "FOTOGRAFIA", emoji: "📸", items: nicho.fotografia },
   ];
   if (nicho.design) {
-    entries.push({ label: "DESIGN", emoji: "🎨", items: nicho.design });
+    entries.push({ kind: "accordion", label: "DESIGN", emoji: "🎨", items: nicho.design });
   }
   entries.push({
+    kind: "accordion",
     label: GESTAO_REDES.label,
     emoji: GESTAO_REDES.emoji,
     items: GESTAO_REDES.items,
+  });
+  entries.push({
+    kind: "link",
+    label: "PORTFOLIO",
+    emoji: "🎞️",
+    href: `/servicos/${nicho.slug}/portfolio`,
   });
 
   return (
@@ -290,8 +307,37 @@ function SlidePanel({ index, open, setOpen, locked }: SlidePanelProps) {
         } ${open?.slide === index ? "has-active" : ""}`}
       >
         {entries.map((entry, eIdx) => {
-          const isActive = open?.slide === index && open?.entry === eIdx;
           const img = PANEL_IMAGES[entry.label];
+
+          if (entry.kind === "link") {
+            // Navigation panel — clicking goes to the portfolio page rather
+            // than toggling an accordion. No v-expanded content; the v-bg
+            // and v-collapsed styles still apply (defined in globals.css).
+            return (
+              <Link
+                key={entry.label}
+                href={entry.href}
+                className="v-panel block"
+                aria-label={entry.label}
+              >
+                <div
+                  className="v-bg"
+                  style={{
+                    backgroundImage: `url('${img}')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                  aria-hidden
+                />
+                <div className="v-overlay" aria-hidden />
+                <div className="v-collapsed">
+                  {String(eIdx + 1).padStart(2, "0")} — {entry.label} →
+                </div>
+              </Link>
+            );
+          }
+
+          const isActive = open?.slide === index && open?.entry === eIdx;
 
           return (
             <div

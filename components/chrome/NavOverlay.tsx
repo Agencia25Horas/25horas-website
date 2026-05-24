@@ -5,20 +5,21 @@ import { useEffect, useRef } from "react";
 import { useNav } from "@/lib/nav-context";
 import { useAudio } from "@/lib/audio-context";
 import { playSlateClap } from "@/lib/audio";
+import { NICHOS } from "@/lib/servicos";
 
-const PORTFOLIO: Array<[code: string, label: string, href: string]> = [
-  ["01", "HOSPITALIDADE", "/programa/hospitalidade"],
-  ["02", "MÚSICA", "/programa/musica"],
-  ["03", "DESPORTO", "/programa/desporto"],
-  ["04", "INSTITUCIONAL", "/programa/institucional"],
-  ["05", "IMOBILIÁRIO", "/programa/imobiliario"],
-  ["06", "EVENTOS", "/programa/eventos"],
-];
+// Derived from NICHOS so the nav stays in lock-step with the SplitScrollReel
+// slides — same six niches, same order, same labels, same destination pages.
+const PORTFOLIO: Array<[code: string, label: string, href: string]> = NICHOS.map(
+  (n) => [n.code, n.label, `/servicos/${n.slug}`],
+);
 
+// Mirrors the four posters in GaleriaReel so the menu and the home gallery
+// stay in sync. CONTACTOS uses mailto: (same as the gallery card) — Next/Link
+// handles mailto URLs natively.
 const ATENDIMENTO: Array<[label: string, href: string]> = [
   ["SOBRE", "/manifesto"],
-  ["SERVIÇOS", "/servicos"],
-  ["CONTACTO", "/contacto"],
+  ["PORTFOLIO", "/programa"],
+  ["CONTACTOS", "mailto:atendimento@25horasagency.com"],
   ["PEDIR ORÇAMENTO", "/orcamento"],
 ];
 

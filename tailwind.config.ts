@@ -15,9 +15,11 @@ const config: Config = {
         "chrome-line": "#1F1D1A",
       },
       fontFamily: {
-        // wired in app/layout.tsx via next/font CSS variables
-        serif: ["var(--font-serif)", "Cormorant Garamond", "Georgia", "serif"],
-        body: ["var(--font-body)", "Inter", "system-ui", "sans-serif"],
+        // wired in app/layout.tsx via next/font CSS variables.
+        // Fraunces / Nunito stand in for Adobe's Ivypresto Text / Atten Round
+        // New (the pair used on tomatino.pt). Closest free Google equivalents.
+        serif: ["var(--font-serif)", "Fraunces", "Georgia", "serif"],
+        body: ["var(--font-body)", "Nunito", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "Menlo", "monospace"],
       },
       letterSpacing: {

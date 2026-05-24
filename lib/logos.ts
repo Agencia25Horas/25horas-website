@@ -34,7 +34,7 @@ export const LOGOS: LogoEntry[] = [
   },
   {
     src: "/media/logos/realstate.png",
-    label: "REAL ESTATE",
+    label: "REAL STATE",
     desc: "Tours imobiliários, drone cinematic, walkthroughs.",
     href: "/servicos/real-estate",
   },

@@ -8,6 +8,7 @@ import {
   DESIGN_TRANSVERSAL,
   NICHOS,
 } from "@/lib/servicos";
+import { LOGOS } from "@/lib/logos";
 
 export const metadata: Metadata = {
   title: "Serviços — 25 Horas",
@@ -139,57 +140,59 @@ export default function ServicosIndex() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-              {NICHOS.map((n) => (
-                <Link
-                  key={n.slug}
-                  href={`/servicos/${n.slug}`}
-                  className="group block focus:outline-none focus:ring-1 focus:ring-accent-grade"
-                  aria-label={n.label}
-                >
-                  <div className="relative aspect-scope overflow-hidden bg-chrome-line/40">
-                    <Image
-                      src={n.image}
-                      alt=""
-                      fill
-                      sizes="(min-width: 768px) 48vw, 92vw"
-                      className="object-cover scale-[1.02] group-hover:scale-[1.05] transition-transform duration-f-25 ease-cinema"
-                    />
-                    <div
-                      className="absolute inset-0 bg-gradient-to-t from-canvas-black/85 via-canvas-black/30 to-transparent"
-                      aria-hidden
-                    />
-                    <div className="absolute inset-x-0 bottom-0 p-5 md:p-7">
-                      <div className="font-mono text-[10px] tracking-mono-wider text-canvas-white/55">
-                        {n.code} / {String(NICHOS.length).padStart(2, "0")} ·{" "}
-                        {n.emoji}
+              {NICHOS.map((n) => {
+                // Match by label so we keep using the LOGOS array as the
+                // single source of truth for logo files.
+                const logo = LOGOS.find((l) => l.label === n.label);
+                const logoSrc = logo?.src ?? n.image;
+                return (
+                  <Link
+                    key={n.slug}
+                    href={`/servicos/${n.slug}`}
+                    className="group block focus:outline-none focus:ring-1 focus:ring-accent-grade"
+                    aria-label={n.label}
+                  >
+                    <div className="relative aspect-scope overflow-hidden bg-canvas-white">
+                      <Image
+                        src={logoSrc}
+                        alt=""
+                        fill
+                        sizes="(min-width: 768px) 48vw, 92vw"
+                        className="object-contain p-8 md:p-12 scale-[1.0] group-hover:scale-[1.03] transition-transform duration-f-25 ease-cinema"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 p-5 md:p-7">
+                        <div className="font-mono text-[10px] tracking-mono-wider text-canvas-black/55">
+                          {n.code} / {String(NICHOS.length).padStart(2, "0")} ·{" "}
+                          {n.emoji}
+                        </div>
+                        <h3
+                          lang="pt"
+                          className="mt-1 font-serif font-light text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] text-canvas-black group-hover:text-accent-grade transition-colors duration-f-12"
+                        >
+                          {n.label}
+                        </h3>
                       </div>
-                      <h3
-                        lang="pt"
-                        className="mt-1 font-serif font-light text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] text-canvas-white group-hover:text-accent-grade transition-colors duration-f-12"
-                      >
-                        {n.label}
-                      </h3>
                     </div>
-                  </div>
-                  <div className="mt-5 flex items-end justify-between gap-4">
-                    <p
-                      lang="pt"
-                      className="font-body text-[14px] leading-snug text-type-neutral/90 max-w-md"
-                    >
-                      {n.tagline}
-                    </p>
-                    <span className="shrink-0 inline-flex items-center font-mono text-[10px] tracking-mono-wider text-canvas-white/65 group-hover:text-accent-grade transition-colors duration-f-12">
-                      ABRIR
-                      <span
-                        className="ml-2 inline-block translate-x-0 group-hover:translate-x-1 transition-transform duration-f-12"
-                        aria-hidden
+                    <div className="mt-5 flex items-end justify-between gap-4">
+                      <p
+                        lang="pt"
+                        className="font-body text-[14px] leading-snug text-type-neutral/90 max-w-md"
                       >
-                        →
+                        {n.tagline}
+                      </p>
+                      <span className="shrink-0 inline-flex items-center font-mono text-[10px] tracking-mono-wider text-canvas-white/65 group-hover:text-accent-grade transition-colors duration-f-12">
+                        ABRIR
+                        <span
+                          className="ml-2 inline-block translate-x-0 group-hover:translate-x-1 transition-transform duration-f-12"
+                          aria-hidden
+                        >
+                          →
+                        </span>
                       </span>
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </section>
 

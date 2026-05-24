@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { FPS } from "./tokens";
 
 // Returns a string `HH:MM:SS:FF` advancing at FPS from a base offset.
-// Default offset is one hour (01:00:00:00) — broadcast convention for "first
-// frame of programme."
-export function useTimecode(baseFrames = FPS * 60 * 60) {
+// Default offset is 25 hours (25:00:00:00) — the brand counter convention.
+export function useTimecode(baseFrames = FPS * 60 * 60 * 25) {
   const [tc, setTc] = useState(() => formatFrames(baseFrames));
 
   useEffect(() => {
