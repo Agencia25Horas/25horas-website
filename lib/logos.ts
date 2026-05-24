@@ -21,18 +21,6 @@ export type LogoEntry = {
 
 export const LOGOS: LogoEntry[] = [
   {
-    src: "/media/logos/agency.png",
-    label: "AGENCY",
-    desc: "A casa criativa por trás dos nichos.",
-    href: "/manifesto",
-  },
-  {
-    src: "/media/logos/producoes.png",
-    label: "PRODUÇÕES",
-    desc: "Produção audiovisual completa.",
-    href: "/programa",
-  },
-  {
     src: "/media/logos/restaurantes.png",
     label: "RESTAURANTES",
     desc: "Reels gastronómicos, chef videos, drone cinematic.",

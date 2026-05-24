@@ -4,7 +4,7 @@
 
 :root {
   --canvas-black: #0a0a0a;
-  --canvas-white: #f4f0e8;
+  --canvas-white: #f5f0e8;
   --accent-grade: #c7572b;
   --signal-live: #4f9d58;
   --type-neutral: #b7b0a4;
@@ -317,4 +317,37 @@ body {
 .v-panel .v-expanded .v-sep {
   color: rgba(234, 231, 226, 0.35);
   margin: 0 6px;
+}
+
+/* Page-wide split background: canvas-black left, canvas-white right.
+   AgencyIntro uses mix-blend-mode (screen left, multiply right) on the PNG
+   so the PNG's solid #000/#FFF backgrounds dissolve into these warmer tokens
+   instead of leaving a visible seam. */
+.split-bg {
+  background: linear-gradient(
+    to right,
+    var(--canvas-black) 0%,
+    var(--canvas-black) 50%,
+    var(--canvas-white) 50%,
+    var(--canvas-white) 100%
+  );
+}
+
+/* Vertical hairline fixed at viewport center, runs full height of viewport.
+   Sits above the background, below the chrome and content (z-index 1). */
+.split-divider::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--chrome-line);
+  pointer-events: none;
+  z-index: 1;
+  /* Center the 1px line visually on the 50% mark.
+     Without this, the line occupies 50% → 50%+1px and visually sits
+     0.5px to the right of true centre, misaligning with image seams
+     that sit at exact 50%. */
+  transform: translateX(-0.5px);
 }

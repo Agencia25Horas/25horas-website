@@ -98,7 +98,7 @@ export function GaleriaReel() {
     <section
       ref={sectionRef}
       data-reel="8"
-      className="relative bg-canvas-white py-28 md:py-40"
+      className="relative py-28 md:py-40"
       aria-label="Rolo 08 — Atalhos"
     >
       <div className="max-w-6xl mx-auto px-6 md:px-12">

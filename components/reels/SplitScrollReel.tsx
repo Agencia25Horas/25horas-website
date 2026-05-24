@@ -33,8 +33,10 @@ export function SplitScrollReel() {
   const lenis = useLenis();
   const [open, setOpen] = useState<OpenState>(null);
 
-  // Counter-scroll com leading enter — left sobe de baixo, right desce de topo.
-  // Section 900vh dá 100vh inicial para os slides 0/7 entrarem na viewport.
+  // Counter-scroll com enter + exit — left sobe (de baixo p/ cima), right
+  // desce (de cima p/ baixo). Both columns travel 9 × innerHeight: 1 slide
+  // of enter, 7 slide-to-slide transitions, 1 slide of exit. Sync condition
+  // matches at p = (k + 1) / 9 for slide k.
   // Reference: items/split-scroll.html lines 70-71.
   useEffect(() => {
     const section = sectionRef.current;
@@ -56,7 +58,7 @@ export function SplitScrollReel() {
       left,
       { y: window.innerHeight },
       {
-        y: -(count - 1) * window.innerHeight,
+        y: -count * window.innerHeight,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -73,7 +75,7 @@ export function SplitScrollReel() {
       right,
       { y: -count * window.innerHeight },
       {
-        y: 0,
+        y: window.innerHeight,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -120,7 +122,9 @@ export function SplitScrollReel() {
     <section
       ref={sectionRef}
       data-reel="3"
-      className="relative md:h-[900vh] bg-canvas-black"
+      // Section height = (LOGOS.length + 1) × SCROLL_PER_SLIDE + 100vh (sticky).
+      // 7 × 70 + 100 = 590vh. Tune the 70vh value to change scroll pace.
+      className="relative md:h-[590vh] bg-canvas-black"
       aria-label="Rolo 03 — Nichos"
     >
       {/* MOBILE — vertical stack, no sticky */}

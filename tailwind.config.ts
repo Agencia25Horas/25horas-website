@@ -7,7 +7,7 @@ const config: Config = {
     extend: {
       colors: {
         "canvas-black": "#0A0A0A",
-        "canvas-white": "#F4F0E8",
+        "canvas-white": "#F5F0E8",
         "accent-grade": "#C7572B",
         "signal-live": "#4F9D58",
         "type-neutral": "#B7B0A4",

@@ -4,8 +4,6 @@
 //   • /servicos and /servicos/[nicho] pages (deep listing)
 
 export type NichoSlug =
-  | "agency"
-  | "producoes"
   | "restaurantes"
   | "desporto"
   | "real-estate"
@@ -64,59 +62,6 @@ export const BASE_TRANSVERSAL = {
 export const NICHOS: Nicho[] = [
   {
     code: "01",
-    slug: "agency",
-    label: "AGENCY",
-    emoji: "🏛️",
-    tagline: "A casa-mãe. Estratégia, marca, narrativa.",
-    image: "/media/nichos/restaurantes.jpg", // placeholder
-    video: [
-      "Brand films",
-      "Institucional",
-      "Storytelling",
-      "Cobertura 360",
-      "Documentário",
-    ],
-    fotografia: [
-      "Editorial",
-      "Brand campaigns",
-      "Lifestyle",
-      "Reportagem",
-    ],
-    design: [
-      "Identidade visual",
-      "Direcção de arte",
-      "Sistemas de design",
-      "Estratégia visual",
-    ],
-  },
-  {
-    code: "02",
-    slug: "producoes",
-    label: "PRODUÇÕES",
-    emoji: "🎬",
-    tagline: "Execução técnica. Do plate ao master.",
-    image: "/media/nichos/desporto.jpg", // placeholder
-    video: [
-      "Produção",
-      "Pós-produção",
-      "Color grading",
-      "Sound design",
-      "Motion graphics",
-    ],
-    fotografia: [
-      "Estúdio",
-      "Localização",
-      "Retoque",
-      "Look-book",
-    ],
-    design: [
-      "Storyboards",
-      "Concept art",
-      "Mood boards",
-    ],
-  },
-  {
-    code: "03",
     slug: "restaurantes",
     label: "RESTAURANTES",
     emoji: "🍽️",
@@ -151,7 +96,7 @@ export const NICHOS: Nicho[] = [
     ],
   },
   {
-    code: "04",
+    code: "02",
     slug: "desporto",
     label: "DESPORTO",
     emoji: "⚽",
@@ -181,7 +126,7 @@ export const NICHOS: Nicho[] = [
     ],
   },
   {
-    code: "05",
+    code: "03",
     slug: "real-estate",
     label: "REAL ESTATE",
     emoji: "🏠",
@@ -207,7 +152,7 @@ export const NICHOS: Nicho[] = [
     ],
   },
   {
-    code: "06",
+    code: "04",
     slug: "travel",
     label: "TRAVEL",
     emoji: "✈️",
@@ -228,7 +173,7 @@ export const NICHOS: Nicho[] = [
     // NO design — Travel não oferece design como serviço.
   },
   {
-    code: "07",
+    code: "05",
     slug: "corporate",
     label: "CORPORATE",
     emoji: "🏢",
@@ -249,7 +194,7 @@ export const NICHOS: Nicho[] = [
     // NO design — Corporate não oferece design como serviço.
   },
   {
-    code: "08",
+    code: "06",
     slug: "saude",
     label: "SAÚDE & FAMÍLIA",
     emoji: "💆",
