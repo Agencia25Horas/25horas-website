@@ -1,46 +1,97 @@
 import type { Metadata } from "next";
-import { Fraunces, Nunito, JetBrains_Mono } from "next/font/google";
+import { Anton, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AudioProvider } from "@/lib/audio-context";
+import { LanguageProvider } from "@/lib/language-context";
 import { LenisProvider } from "@/lib/lenis-provider";
-import { NavProvider } from "@/lib/nav-context";
-import { NavOverlay } from "@/components/chrome/NavOverlay";
+import { Analytics } from "@/components/chrome/Analytics";
+import { StickyCTA } from "@/components/chrome/StickyCTA";
+import { SeamlessLoop } from "@/components/chrome/SeamlessLoop";
 
-// Fraunces stands in for Adobe's Ivypresto Text (the serif Tomatino uses for
-// titles). Modern high-contrast serif with optical sizing — closest free match.
-const serif = Fraunces({
+// Display — Anton 400 (heavy condensed). Tomatino-Heavy stand-in.
+const fontDisplay = Anton({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-serif",
+  weight: ["400"],
+  variable: "--font-display",
   display: "swap",
 });
 
-// Nunito stands in for Adobe's Atten Round New (the rounded sans Tomatino uses
-// for body / UI). Rounded geometric sans — closest free match.
-const body = Nunito({
+// Body — Source Serif 4. Editorial serif para tagline/corpo.
+const fontBody = Source_Serif_4({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
   display: "swap",
 });
 
+const SITE_URL = "https://25horasagency.com";
+
 export const metadata: Metadata = {
-  title: "25 Horas — Cinema para marcas",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "25 Horas — Cinema para marcas",
+    template: "%s — 25 Horas",
+  },
   description:
-    "Não fazemos vídeos. Fazemos filmes para marcas. 25 frames por segundo, 25 horas por dia.",
-  metadataBase: new URL("https://25horasagency.com"),
+    "Não fazemos vídeos. Fazemos filmes para marcas. 25 frames por segundo, 25 horas por dia. Lisboa, Portugal.",
+  applicationName: "25 Horas Agency",
+  keywords: [
+    "agência audiovisual",
+    "produção vídeo Lisboa",
+    "vídeo de marca",
+    "fotografia comercial",
+    "gestão redes sociais",
+    "restaurantes",
+    "desporto",
+    "imobiliário",
+    "travel",
+    "corporate",
+    "saúde",
+  ],
+  authors: [{ name: "25 Horas Agency" }],
+  creator: "25 Horas Agency",
+  publisher: "25 Horas Agency",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "25 Horas",
-    description: "Cinema para marcas.",
-    locale: "pt_PT",
     type: "website",
+    url: SITE_URL,
+    siteName: "25 Horas Agency",
+    title: "25 Horas — Cinema para marcas",
+    description:
+      "Não fazemos vídeos. Fazemos filmes para marcas. Lisboa, Portugal.",
+    locale: "pt_PT",
+    alternateLocale: ["en_US"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "25 Horas — Cinema para marcas",
+    description:
+      "Não fazemos vídeos. Fazemos filmes para marcas. Lisboa, Portugal.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 
@@ -48,21 +99,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="pt"
-      className={`${serif.variable} ${body.variable} ${mono.variable}`}
+      className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}
       suppressHydrationWarning
     >
       <body
-        className="font-body bg-canvas-black text-type-neutral antialiased"
+        className="font-body bg-canvas-black text-canvas-white antialiased"
         suppressHydrationWarning
       >
+        <a href="#main" className="skip-link">
+          Saltar para o conteúdo
+        </a>
         <LenisProvider>
-          <NavProvider>
+          <LanguageProvider>
             <AudioProvider>
               {children}
-              <NavOverlay />
+              <StickyCTA />
+              <SeamlessLoop />
             </AudioProvider>
-          </NavProvider>
+          </LanguageProvider>
         </LenisProvider>
+        <Analytics />
       </body>
     </html>
   );

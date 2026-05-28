@@ -7,19 +7,24 @@ const config: Config = {
     extend: {
       colors: {
         "canvas-black": "#0A0A0A",
-        "canvas-white": "#F5F0E8",
-        "accent-grade": "#C7572B",
+        "canvas-white": "#FFFFFF",
+        "canvas-cream": "#F5F0E8",
+        // Accent grade — Tomatino-tomate (warm vermelho/laranja). Used for
+        // CTAs, links em estado activo, e qualquer destaque pontual.
+        "accent-grade": "#E85D3A",
         "signal-live": "#4F9D58",
-        "type-neutral": "#B7B0A4",
-        "type-dim": "#66615A",
-        "chrome-line": "#1F1D1A",
+        "type-neutral": "#4A4A4A",
+        "type-dim": "#8A8A8A",
+        "chrome-line": "#E5E5E5",
       },
       fontFamily: {
-        // wired in app/layout.tsx via next/font CSS variables.
-        // Fraunces / Nunito stand in for Adobe's Ivypresto Text / Atten Round
-        // New (the pair used on tomatino.pt). Closest free Google equivalents.
-        serif: ["var(--font-serif)", "Fraunces", "Georgia", "serif"],
-        body: ["var(--font-body)", "Nunito", "system-ui", "sans-serif"],
+        // Anton 400 = heavy condensed display. Tomatino-Heavy stand-in.
+        // Source Serif 4 = editorial body serif.
+        // `serif` alias mapped a `display` para que legacy `font-serif`
+        // continue a renderizar como heavy display (consistente com a home).
+        display: ["var(--font-display)", "Anton", "Impact", "sans-serif"],
+        body: ["var(--font-body)", "Source Serif 4", "Georgia", "serif"],
+        serif: ["var(--font-display)", "Anton", "Impact", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "Menlo", "monospace"],
       },
       letterSpacing: {

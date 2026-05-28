@@ -18,6 +18,12 @@ export type Nicho = {
   emoji: string;
   tagline: string;
   image: string;
+  /** Hex código da cor de marca do sub-logo do nicho. Aplica-se ao
+   *  título do nicho na home e na deep page, CTAs específicos da
+   *  niche, bordas de cards highlighted, linhas decorativas. */
+  accentColor: string;
+  /** Fotos extra (moody/Unsplash) para intercalar na deep page do nicho. */
+  photos?: string[];
   video: string[];
   fotografia: string[];
   /** Optional — Travel, Corporate, Saúde don't offer Design as a service. */
@@ -67,6 +73,11 @@ export const NICHOS: Nicho[] = [
     emoji: "🍽️",
     tagline: "Pratos, ambiente e equipa — em forma de cinema.",
     image: "/media/nichos/restaurantes.jpg",
+    accentColor: "#FED40D",
+    photos: [
+      "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
     video: [
       "Reels gastronómicos",
       "Highlights restaurante",
@@ -102,6 +113,11 @@ export const NICHOS: Nicho[] = [
     emoji: "⚽",
     tagline: "Atletas, equipas e estádios — em movimento.",
     image: "/media/nichos/desporto.jpg",
+    accentColor: "#37a138",
+    photos: [
+      "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
     video: [
       "Highlights",
       "Jogos completos",
@@ -132,6 +148,11 @@ export const NICHOS: Nicho[] = [
     emoji: "🏠",
     tagline: "Espaços que se vendem em sessenta segundos.",
     image: "/media/nichos/real-estate.jpg",
+    accentColor: "#e7071f",
+    photos: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
     video: [
       "Tours imobiliários",
       "Drone cinematic",
@@ -158,6 +179,11 @@ export const NICHOS: Nicho[] = [
     emoji: "✈️",
     tagline: "Hotéis, paisagens e experiências em loop cinematográfico.",
     image: "/media/nichos/travel.jpg",
+    accentColor: "#314599",
+    photos: [
+      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
     video: [
       "Cinematic travel",
       "Hotel reels",
@@ -179,6 +205,11 @@ export const NICHOS: Nicho[] = [
     emoji: "🏢",
     tagline: "Marcas, fundadores e cultura — em registo institucional.",
     image: "/media/nichos/corporate.jpg",
+    accentColor: "#8f41b9",
+    photos: [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
     video: [
       "Institucional",
       "Entrevistas",
@@ -196,10 +227,15 @@ export const NICHOS: Nicho[] = [
   {
     code: "06",
     slug: "saude",
-    label: "SAÚDE & FAMÍLIA",
+    label: "FAMÍLIA",
     emoji: "💆",
     tagline: "Clínicas, profissionais e momentos de família — com tom e confiança.",
     image: "/media/nichos/saude.jpg",
+    accentColor: "#ce9a2e",
+    photos: [
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
     video: [
       "Procedimentos",
       "Reels informativos",

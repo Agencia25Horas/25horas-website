@@ -4,29 +4,52 @@
 
 :root {
   --canvas-black: #0a0a0a;
-  --canvas-white: #f5f0e8;
-  --accent-grade: #c7572b;
+  --canvas-white: #ffffff;
+  --canvas-cream: #f5f0e8;
+  --accent-grade: #e85d3a;
   --signal-live: #4f9d58;
-  --type-neutral: #b7b0a4;
-  --type-dim: #66615a;
-  --chrome-line: #1f1d1a;
-
-  --chrome-h: 11vh;
-  --chrome-h-mobile: 14vh;
+  --type-neutral: #4a4a4a;
+  --type-dim: #8a8a8a;
+  --chrome-line: #e5e5e5;
 }
 
 html,
 body {
   background: var(--canvas-black);
-  color: var(--type-neutral);
+  color: var(--canvas-white);
 }
 
-/* Native cursor stays. We do not own the user's pointer. */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Respect reduced motion across the board. */
+/* ─── A11y: focus visível para navegação por teclado ─────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent-grade);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Skip-link — invisível até receber foco (Tab key). */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 100;
+  background: var(--canvas-black);
+  color: var(--canvas-white);
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: top 0.18s ease-out;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -37,358 +60,44 @@ body {
   }
 }
 
-/* The single typographic micro-flex: the colon in 25:HORAS sits slightly raised. */
-.wordmark-colon {
-  display: inline-block;
-  transform: translateY(-0.07em);
-  letter-spacing: 0.02em;
+/* ─── Text reveal on scroll — Tomatino-style fade up ──────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Slate "table" — used by Slate component, kept here so unused props don't bloat JS. */
-.slate-grid {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: 1.5rem;
-  row-gap: 0.35rem;
+/* SeamlessLoop: forçar elementos do clone visíveis sem re-animar */
+#main-clone [data-reveal],
+#main-clone [data-reveal="in"] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
 }
 
-/* Frame-corner notches on the slate. Pure CSS, no extra DOM. */
-.slate-frame {
-  position: relative;
-  padding: 1.5rem 1.75rem;
-}
-.slate-frame::before,
-.slate-frame::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--type-dim);
-}
-.slate-frame::before {
-  top: 0;
-  left: 0;
-  border-right: none;
-  border-bottom: none;
-}
-.slate-frame::after {
-  bottom: 0;
-  right: 0;
-  border-left: none;
-  border-top: none;
-}
-.slate-frame > .corner-tr,
-.slate-frame > .corner-bl {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--type-dim);
-}
-.slate-frame > .corner-tr {
-  top: 0;
-  right: 0;
-  border-left: none;
-  border-bottom: none;
-}
-.slate-frame > .corner-bl {
-  bottom: 0;
-  left: 0;
-  border-right: none;
-  border-top: none;
-}
 
-/* REC indicator — slow pulse, very subtle. */
-@keyframes rec-pulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
-}
-.rec-dot {
-  animation: rec-pulse 1.6s ease-in-out infinite;
-}
-
-/* Audio hint pulse — only on first visit, on the SOM dot ring. */
-@keyframes som-hint-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(183, 176, 164, 0.45); }
-  70%  { box-shadow: 0 0 0 6px rgba(183, 176, 164, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(183, 176, 164, 0); }
-}
-.som-hint {
-  animation: som-hint-pulse 1.8s ease-out infinite;
+/* ─── btn-primary — CTA pill rounded ──────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
   border-radius: 9999px;
-}
-
-@keyframes hint-fade {
-  0%   { opacity: 0; transform: translateY(-2px); }
-  20%  { opacity: 1; transform: translateY(0); }
-  85%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-2px); }
-}
-.hint-fade {
-  animation: hint-fade 4s ease-out forwards;
-}
-
-/* Ken-burns slow continuous zoom for full-bleed background stills.
-   Alternates direction so the image breathes instead of just creeping. */
-@keyframes kenburns {
-  0%   { transform: scale(1.04) translate3d(0, 0, 0); }
-  50%  { transform: scale(1.10) translate3d(-1%, -1%, 0); }
-  100% { transform: scale(1.04) translate3d(0, 0, 0); }
-}
-.kenburns {
-  animation: kenburns 24s ease-in-out infinite;
-  will-change: transform;
-}
-@media (prefers-reduced-motion: reduce) {
-  .kenburns { animation: none; }
-}
-
-/* ─── Accordion panel ─── */
-.accordion-panel {
-  flex: 1;
-  transition: flex 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.accordion-panel:hover,
-.accordion-panel.is-active {
-  flex: 5;
-}
-.accordion-panel .panel-bg {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.accordion-panel:hover .panel-bg,
-.accordion-panel.is-active .panel-bg {
-  transform: scale(1.06);
-}
-
-/* Collapsed label — vertical mono text running up the panel */
-.accordion-panel .panel-label-collapsed {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transition: opacity 0.3s;
-}
-.accordion-panel:hover .panel-label-collapsed,
-.accordion-panel.is-active .panel-label-collapsed {
-  opacity: 0;
-}
-
-/* Expanded body — fades up on activate */
-.accordion-panel .panel-body {
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
-    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
-}
-.accordion-panel:hover .panel-body,
-.accordion-panel.is-active .panel-body {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Stacked vertical layout on mobile — same expand mechanic, different axis */
-@media (max-width: 768px) {
-  .accordion-wrap {
-    flex-direction: column;
-  }
-  .accordion-panel {
-    flex: none !important;
-    height: 64px;
-    transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .accordion-panel:hover,
-  .accordion-panel.is-active {
-    height: 320px;
-  }
-  .accordion-panel .panel-label-collapsed {
-    writing-mode: horizontal-tb;
-    top: 50%;
-    left: 1.25rem;
-    transform: translateY(-50%);
-    bottom: auto;
-  }
-}
-
-/* ─── Vertical accordion-slider — reference: items/accordion-slider.html
-   lines 117-170 (CSS), 252-293 (HTML). Hover is CSS-only; .active is
-   toggled by React for click-lock. ───────────────────────────────────── */
-
-.v-acc-bounded {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-left: auto;
-  margin-right: auto;
-  width: clamp(220px, 30vw, 420px);
-}
-.v-acc-bounded > .v-panel {
-  height: 52px;
-  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.v-acc-bounded:not(.has-active) > .v-panel:hover,
-.v-acc-bounded > .v-panel.active {
-  height: 240px;
-}
-.v-acc-bounded.has-active > .v-panel:not(.active) {
-  pointer-events: none;
-}
-
-.v-acc-flow {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 0.5rem;
-}
-.v-acc-flow > .v-panel {
-  height: 52px;
-  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.v-acc-flow > .v-panel:hover,
-.v-acc-flow > .v-panel.active {
-  height: 240px;
-}
-
-.v-panel {
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  border-radius: 8px;
-}
-.v-panel .v-bg {
-  position: absolute;
-  inset: 0;
-  transition: transform 0.5s ease;
-}
-.v-panel:hover .v-bg,
-.v-panel.active .v-bg {
-  transform: scale(1.03);
-}
-.v-panel .v-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    rgba(10, 10, 11, 0.85) 0%,
-    rgba(10, 10, 11, 0.3) 50%,
-    transparent 80%
-  );
-  pointer-events: none;
-}
-.v-panel .v-collapsed {
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  transform: translateY(-50%);
-  z-index: 2;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  background: var(--accent-grade);
   color: var(--canvas-white);
-  transition: opacity 0.3s;
-  pointer-events: none;
+  font-family: var(--font-display), Anton, Impact, sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.v-panel:hover .v-collapsed,
-.v-panel.active .v-collapsed {
-  opacity: 0;
-}
-.v-panel .v-expanded {
-  position: absolute;
-  inset: 0;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  z-index: 2;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
-  pointer-events: none;
-  overflow-y: auto;
-}
-.v-panel:hover .v-expanded,
-.v-panel.active .v-expanded {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-.v-panel .v-expanded h3 {
-  font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--canvas-white);
-  margin-bottom: 6px;
-}
-.v-panel .v-expanded p {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: rgba(234, 231, 226, 0.8);
-  line-height: 1.5;
-  max-width: 40ch;
-}
-.v-panel .v-expanded .v-items {
-  font-size: 13px;
-  color: rgba(234, 231, 226, 0.85);
-  line-height: 1.7;
-  max-width: 100%;
-}
-.v-panel .v-expanded .v-sep {
-  color: rgba(234, 231, 226, 0.35);
-  margin: 0 6px;
-}
-
-/* Page-wide split background: canvas-black left, canvas-white right.
-   AgencyIntro uses mix-blend-mode (screen left, multiply right) on the PNG
-   so the PNG's solid #000/#FFF backgrounds dissolve into these warmer tokens
-   instead of leaving a visible seam. */
-.split-bg {
-  background: linear-gradient(
-    to right,
-    var(--canvas-black) 0%,
-    var(--canvas-black) 50%,
-    var(--canvas-white) 50%,
-    var(--canvas-white) 100%
-  );
-}
-
-/* Split text colour — adapts to viewport position via fixed gradient.
-   Text on the LEFT half of the viewport renders as canvas-white (cream),
-   text on the RIGHT half renders as canvas-black. Text that crosses the
-   divider renders split — cream on the left part, black on the right part.
-
-   Uses background-clip: text with a fixed-attachment gradient so the
-   colour transition is locked to viewport centre (50vw), not to the
-   text element's own width. Works for any text regardless of its
-   horizontal position. */
-.split-text {
-  background: linear-gradient(
-    to right,
-    var(--canvas-white) 0%,
-    var(--canvas-white) 50%,
-    var(--canvas-black) 50%,
-    var(--canvas-black) 100%
-  );
-  background-size: 100vw 100%;
-  background-attachment: fixed;
-  background-position: 0 0;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Vertical hairline fixed at viewport center, runs full height of viewport.
-   Sits above the background, below the chrome and content (z-index 1). */
-.split-divider::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background: var(--chrome-line);
-  pointer-events: none;
-  z-index: 1;
-  /* Center the 1px line visually on the 50% mark.
-     Without this, the line occupies 50% → 50%+1px and visually sits
-     0.5px to the right of true centre, misaligning with image seams
-     that sit at exact 50%. */
-  transform: translateX(-0.5px);
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
 }

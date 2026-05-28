@@ -9,6 +9,10 @@ node_modules
 out
 build
 
+# sanity (sanity deploy outputs)
+dist
+.sanity
+
 # env
 .env*.local
 

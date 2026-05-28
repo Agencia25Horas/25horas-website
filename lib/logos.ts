@@ -21,38 +21,38 @@ export type LogoEntry = {
 
 export const LOGOS: LogoEntry[] = [
   {
-    src: "/media/logos/restaurantes.png",
+    src: "/media/logos/b25restaurantes.png",
     label: "RESTAURANTES",
     desc: "Reels gastronómicos, chef videos, drone cinematic.",
     href: "/servicos/restaurantes",
   },
   {
-    src: "/media/logos/sports.png",
+    src: "/media/logos/b25sports.png",
     label: "DESPORTO",
     desc: "Highlights, hype videos e fotografia de jogo.",
     href: "/servicos/desporto",
   },
   {
-    src: "/media/logos/realstate.png",
+    src: "/media/logos/b25realstate.png",
     label: "REAL STATE",
     desc: "Tours imobiliários, drone cinematic, walkthroughs.",
     href: "/servicos/real-estate",
   },
   {
-    src: "/media/logos/travel.png",
+    src: "/media/logos/b25travel.png",
     label: "TRAVEL",
     desc: "Hotéis, destinos e lifestyle em loop cinematográfico.",
     href: "/servicos/travel",
   },
   {
-    src: "/media/logos/corporate.png",
+    src: "/media/logos/b25corporate.png",
     label: "CORPORATE",
     desc: "Institucional, podcast, eventos e recrutamento.",
     href: "/servicos/corporate",
   },
   {
-    src: "/media/logos/family.png",
-    label: "SAÚDE & FAMÍLIA",
+    src: "/media/logos/b25family.png",
+    label: "FAMÍLIA",
     desc: "Clínicas, profissionais e momentos de família — com tom e confiança.",
     href: "/servicos/saude",
   },

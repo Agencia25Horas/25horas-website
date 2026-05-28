@@ -1,18 +1,27 @@
 "use client";
 
-import { useTimecode } from "@/lib/timecode";
-import { useChromeTheme } from "@/lib/chrome-theme";
+import { useEffect, useState } from "react";
 
+/**
+ * Counter sempre fixo em "25:00:SS" — segundos correm de 00→59 e voltam a 00.
+ * Reflecte o conceito da marca: são sempre 25 horas.
+ */
 export function Timecode() {
-  const tc = useTimecode();
-  const theme = useChromeTheme();
-  const color = theme === "light" ? "text-canvas-black/70" : "text-type-neutral";
+  const [s, setS] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setS((prev) => (prev + 1) % 60);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <span
-      className={`font-mono text-[11px] tracking-mono-wide ${color} tabular-nums`}
-      aria-label="Timecode"
+      className="font-mono text-[11px] tracking-[0.05em] text-canvas-white/70 tabular-nums"
+      aria-label="Timecode 25 horas"
     >
-      {tc}
+      25:00:{String(s).padStart(2, "0")}
     </span>
   );
 }
