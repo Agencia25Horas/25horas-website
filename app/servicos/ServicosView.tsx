@@ -52,7 +52,7 @@ export function ServicosView() {
                 <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-white/5">
                   <Image
                     src={nicho.image}
-                    alt={label}
+                    alt={`${label} — sub-marca 25 Horas Agency`}
                     fill
                     sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
                     className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
@@ -60,7 +60,7 @@ export function ServicosView() {
                 </div>
                 <div className="mt-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-type-dim">
-                    {nicho.code} / 06
+                    {nicho.code} / {String(NICHOS.length).padStart(2, "0")}
                   </p>
                   <h2 className="mt-2 font-display uppercase text-[clamp(1.5rem,2.5vw,2.25rem)] leading-[1] text-canvas-black">
                     {label}

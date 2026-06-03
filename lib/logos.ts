@@ -53,7 +53,14 @@ export const LOGOS: LogoEntry[] = [
   {
     src: "/media/logos/b25family.png",
     label: "FAMÍLIA",
-    desc: "Clínicas, profissionais e momentos de família — com tom e confiança.",
+    desc: "Pais, filhos e momentos — em forma de cinema.",
     href: "/servicos/saude",
+  },
+  {
+    // Placeholder — substituir por b25saude.png quando o cliente enviar o logo.
+    src: "/media/logos/b25saude.png",
+    label: "SAÚDE E BEM ESTAR",
+    desc: "Clínicas, profissionais e procedimentos — em registo de confiança.",
+    href: "/servicos/saude-bem-estar",
   },
 ];

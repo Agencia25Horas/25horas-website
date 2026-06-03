@@ -378,30 +378,58 @@ export const PACKS_BY_NICHE: Record<NichoSlug, NichePack> = {
     },
   }),
 
-  saude: makeNichePack({
-    logoSrc: "/media/logos/b25family.png",
+  "saude-bem-estar": makeNichePack({
+    // Placeholder — substituir por b25saude.png quando o cliente enviar o logo.
+    logoSrc: "/media/logos/b25saude.png",
     visitCadence: {
-      title: { pt: "1 sessão semanal", en: "Weekly session" },
+      title: { pt: "1 visita semanal", en: "Weekly visit" },
       desc: {
-        pt: "Dia e horário acordados com a clínica ou família.",
-        en: "Day and time arranged with the clinic or family.",
+        pt: "Dia e horário acordados com a clínica.",
+        en: "Day and time arranged with the clinic.",
       },
     },
     packACapture: {
-      pt: "vídeo, fotografia e conteúdo vertical, clínica, profissionais, procedimentos e momentos de família.",
-      en: "video, photography and vertical content, clinic, professionals, procedures and family moments.",
+      pt: "vídeo, fotografia e conteúdo vertical, clínica, profissionais, procedimentos e testemunhos.",
+      en: "video, photography and vertical content, clinic, professionals, procedures and testimonials.",
     },
     objective: {
       pt: "Marcar consultas, criar confiança e encher agendas.",
       en: "Book appointments, build trust and fill calendars.",
     },
     tagline: {
+      l1: { pt: "A vossa saúde.", en: "Your health." },
+      l2: { pt: "A nossa câmara.", en: "Our camera." },
+    },
+    whatsappText: {
+      pt: "Olá! Quero saber mais sobre os packs para clínicas e saúde.",
+      en: "Hi! I'd like to know more about your clinic/health packs.",
+    },
+  }),
+
+  saude: makeNichePack({
+    logoSrc: "/media/logos/b25family.png",
+    visitCadence: {
+      title: { pt: "1 sessão semanal", en: "Weekly session" },
+      desc: {
+        pt: "Dia e horário acordados com a família.",
+        en: "Day and time arranged with the family.",
+      },
+    },
+    packACapture: {
+      pt: "vídeo, fotografia e conteúdo vertical, momentos de família, retratos, eventos e lifestyle.",
+      en: "video, photography and vertical content, family moments, portraits, events and lifestyle.",
+    },
+    objective: {
+      pt: "Preservar memórias, criar legado e contar histórias de família.",
+      en: "Preserve memories, build legacy and tell family stories.",
+    },
+    tagline: {
       l1: { pt: "A vossa história.", en: "Your story." },
       l2: { pt: "A nossa câmara.", en: "Our camera." },
     },
     whatsappText: {
-      pt: "Olá! Quero saber mais sobre os packs para família e clínicas.",
-      en: "Hi! I'd like to know more about your family/clinic packs.",
+      pt: "Olá! Quero saber mais sobre os packs para sessões de família.",
+      en: "Hi! I'd like to know more about your family session packs.",
     },
   }),
 };

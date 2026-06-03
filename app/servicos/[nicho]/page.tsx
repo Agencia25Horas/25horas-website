@@ -18,9 +18,36 @@ export async function generateMetadata({
   const { nicho } = await params;
   const n = findNicho(nicho);
   if (!n) return { title: "Serviços — 25 Horas" };
+
+  const title = `${n.label} — 25 Horas Agency`;
+  const description = `${n.tagline} Vídeo, fotografia e gestão de redes para ${n.label.toLowerCase()} em Portugal.`;
+
   return {
-    title: `${n.label.toLowerCase()} — 25 Horas`,
-    description: n.tagline,
+    title,
+    description,
+    keywords: [
+      n.label.toLowerCase(),
+      `vídeo ${n.label.toLowerCase()}`,
+      `fotografia ${n.label.toLowerCase()}`,
+      "gestão redes sociais",
+      "agência audiovisual",
+      "Lisboa",
+      "25 Horas",
+    ],
+    alternates: { canonical: `/servicos/${n.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/servicos/${n.slug}`,
+      type: "website",
+      locale: "pt_PT",
+      siteName: "25 Horas Agency",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

@@ -50,7 +50,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l3": "AS IMAGENS SÃO NOSSAS.",
 
     // /servicos (índice)
-    "servicos.eyebrow": "06 Nichos",
+    "servicos.eyebrow": "07 Nichos",
     "servicos.title": "Onde fazemos magia.",
     "servicos.subtitle":
       "Seis sectores, um vocabulário cinematográfico. Carrega num para ver o que fazemos em cada.",
@@ -171,7 +171,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l2": "BELONG TO THE BRANDS.",
     "home.hero.title.l3": "THE IMAGES ARE OURS.",
 
-    "servicos.eyebrow": "06 Sectors",
+    "servicos.eyebrow": "07 Sectors",
     "servicos.title": "Where we make magic.",
     "servicos.subtitle":
       "Six sectors, one cinematic vocabulary. Click one to see what we do for each.",
@@ -279,8 +279,11 @@ export const NICHE_CONTENT: Record<
     },
     saude: {
       label: "FAMÍLIA",
-      tagline:
-        "Clínicas, profissionais e momentos de família — com tom e confiança.",
+      tagline: "Pais, filhos e momentos — em forma de cinema.",
+    },
+    "saude-bem-estar": {
+      label: "SAÚDE E BEM ESTAR",
+      tagline: "Clínicas, profissionais e procedimentos — em registo de confiança.",
     },
   },
   en: {
@@ -306,8 +309,11 @@ export const NICHE_CONTENT: Record<
     },
     saude: {
       label: "FAMILY",
-      tagline:
-        "Clinics, professionals and family moments — with tone and trust.",
+      tagline: "Parents, children and moments — in cinema form.",
+    },
+    "saude-bem-estar": {
+      label: "HEALTH & WELLNESS",
+      tagline: "Clinics, professionals and procedures — in tone of trust.",
     },
   },
 };
@@ -372,13 +378,22 @@ export const SERVICE_ITEMS_EN: Record<string, string> = {
   "Recrutamento": "Recruitment",
   "Portraits": "Portraits",
   "Office": "Office",
-  // Saúde
+  // Família
+  "Família": "Family",
+  "Reels familiares": "Family reels",
+  "Eventos familiares": "Family events",
+  "Memórias": "Memories",
+  "Crianças": "Children",
+  "Casais": "Couples",
+  "Retratos": "Portraits",
+  // Saúde e Bem Estar
   "Procedimentos": "Procedures",
   "Reels informativos": "Informational reels",
+  "Branding clínico": "Clinical branding",
   "Testemunhos": "Testimonials",
-  "Família": "Family",
+  "Equipa clínica": "Clinical team",
   "Espaço": "Space",
-  "Retratos": "Portraits",
+  "Retratos profissionais": "Professional portraits",
   // Gestão de Redes
   "Planeamento mensal": "Monthly planning",
   "Copywriting": "Copywriting",

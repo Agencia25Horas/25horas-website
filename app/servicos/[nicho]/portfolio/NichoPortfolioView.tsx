@@ -6,7 +6,7 @@ import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
 import { useLang } from "@/lib/language-context";
-import type { Nicho } from "@/lib/servicos";
+import { NICHOS, type Nicho } from "@/lib/servicos";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
 
 export function NichoPortfolioView({
@@ -40,7 +40,7 @@ export function NichoPortfolioView({
               className="font-mono text-[11px] uppercase tracking-[0.2em]"
               style={{ color: accent }}
             >
-              {t("portfolio.eyebrow")} · {nicho.code} / 06
+              {t("portfolio.eyebrow")} · {nicho.code} / {String(NICHOS.length).padStart(2, "0")}
             </p>
           </RevealOnScroll>
           <RevealOnScroll delay={140}>

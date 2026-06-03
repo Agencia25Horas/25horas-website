@@ -15,9 +15,14 @@ import {
   NICHE_BY_SLUG_QUERY,
   PORTFOLIO_ALL_QUERY,
   PORTFOLIO_BY_NICHE_QUERY,
+  SITE_CONTENT_QUERY,
 } from "./queries";
 import { adaptSanityNiche } from "./adapter";
-import type { SanityNiche, SanityPortfolioItem } from "./types";
+import type {
+  SanityNiche,
+  SanityPortfolioItem,
+  SanitySiteContent,
+} from "./types";
 
 /** Devolve o NichePack para um slug, do Sanity ou fallback estático. */
 export async function fetchNichePack(slug: NichoSlug): Promise<NichePack> {
@@ -53,6 +58,21 @@ export async function fetchPortfolioByNiche(
   } catch (err) {
     console.warn(`[sanity] fetchPortfolioByNiche(${slug}) falhou`, err);
     return [];
+  }
+}
+
+/** Singleton com textos da home / sobre / contactos. Null se erro/desligado. */
+export async function fetchSiteContent(): Promise<SanitySiteContent | null> {
+  if (!sanityEnabled || !sanityClient) return null;
+  try {
+    return await sanityClient.fetch<SanitySiteContent | null>(
+      SITE_CONTENT_QUERY,
+      {},
+      { next: { revalidate: 60, tags: ["siteContent"] } },
+    );
+  } catch (err) {
+    console.warn("[sanity] fetchSiteContent falhou", err);
+    return null;
   }
 }
 

@@ -9,7 +9,8 @@ export type NichoSlug =
   | "real-estate"
   | "travel"
   | "corporate"
-  | "saude";
+  | "saude"
+  | "saude-bem-estar";
 
 export type Nicho = {
   code: string;
@@ -229,7 +230,7 @@ export const NICHOS: Nicho[] = [
     slug: "saude",
     label: "FAMÍLIA",
     emoji: "💆",
-    tagline: "Clínicas, profissionais e momentos de família — com tom e confiança.",
+    tagline: "Pais, filhos e momentos — em forma de cinema.",
     image: "/media/nichos/saude.jpg",
     accentColor: "#ce9a2e",
     photos: [
@@ -237,21 +238,51 @@ export const NICHOS: Nicho[] = [
       "https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?w=1200&h=800&fit=crop&auto=format&q=80",
     ],
     video: [
+      "Família",
+      "Retratos de família",
+      "Reels familiares",
+      "Eventos familiares",
+      "Lifestyle",
+      "Memórias",
+    ],
+    fotografia: [
+      "Retratos de família",
+      "Crianças",
+      "Eventos",
+      "Lifestyle",
+      "Casais",
+    ],
+    // NO design — Família não oferece design como serviço.
+  },
+  {
+    code: "07",
+    slug: "saude-bem-estar",
+    label: "SAÚDE E BEM ESTAR",
+    emoji: "🩺",
+    tagline: "Clínicas, profissionais e procedimentos — em registo de confiança.",
+    image:
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1920&h=1080&fit=crop&auto=format&q=80",
+    accentColor: "#6a8eaf",
+    photos: [
+      "https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
+    video: [
       "Procedimentos",
       "Reels informativos",
-      "Branding clinic",
+      "Branding clínico",
       "Testemunhos",
-      "Família",
       "Lifestyle clínico",
+      "Equipa clínica",
     ],
     fotografia: [
       "Espaço",
       "Equipa",
       "Procedimentos",
       "Branding",
-      "Retratos de família",
+      "Retratos profissionais",
     ],
-    // NO design — Saúde & Família não oferece design como serviço.
+    // NO design — Saúde e Bem Estar não oferece design como serviço.
   },
 ];
 

@@ -64,5 +64,17 @@ export const PORTFOLIO_ALL_QUERY = groq`*[_type == "portfolioItem"] | order(orde
   featured
 }`;
 
-/** Singleton do conteúdo geral do site. */
-export const SITE_CONTENT_QUERY = groq`*[_type == "siteContent"][0]`;
+/** Singleton do conteúdo geral do site (hero da home, sobre, contactos). */
+export const SITE_CONTENT_QUERY = groq`*[_type == "siteContent"][0]{
+  homeHero_l1_pt, homeHero_l1_en,
+  homeHero_l2_pt, homeHero_l2_en,
+  homeHero_l3_pt, homeHero_l3_en,
+  sobre_title_pt, sobre_title_en,
+  sobre_subtitle_pt, sobre_subtitle_en,
+  sobre_quemSomosBody_pt, sobre_quemSomosBody_en,
+  sobre_comoTrabalhamosBody_pt, sobre_comoTrabalhamosBody_en,
+  contact_email,
+  contact_phone,
+  contact_whatsapp,
+  contact_address
+}`;

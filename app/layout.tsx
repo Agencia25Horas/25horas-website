@@ -95,6 +95,34 @@ export const metadata: Metadata = {
   },
 };
 
+// JSON-LD LocalBusiness — schema.org markup para SEO local. Aparece no
+// <head> em todas as páginas. Ajuda Google a apresentar rich snippets
+// (knowledge panel, mapa, etc.).
+const LOCAL_BUSINESS_LD = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "25 Horas Agency",
+  description:
+    "Agência audiovisual em Lisboa. Cinema para marcas — vídeo, fotografia, design e gestão de redes sociais.",
+  url: SITE_URL,
+  logo: `${SITE_URL}/media/logos/b25agency.png`,
+  image: `${SITE_URL}/opengraph-image`,
+  email: "agencia25horas@gmail.com",
+  telephone: "+351928059855",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Avenida da Siderurgia Nacional Nº1, Sala 105",
+    addressLocality: "Aldeia de Paio Pires",
+    postalCode: "2840-075",
+    addressCountry: "PT",
+  },
+  sameAs: [
+    "https://instagram.com/25horas.agency",
+    "https://facebook.com/25horas.agency",
+  ],
+  areaServed: { "@type": "Country", name: "Portugal" },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -102,6 +130,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Preconnect a domínios que servem assets críticos. Reduz handshake
+            TLS antes da primeira request de imagem. */}
+        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(LOCAL_BUSINESS_LD) }}
+        />
+      </head>
       <body
         className="font-body bg-canvas-black text-canvas-white antialiased"
         suppressHydrationWarning

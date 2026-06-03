@@ -133,7 +133,7 @@ export function NichePackView({
       <section className="relative w-full overflow-hidden min-h-[80svh] flex items-center">
         <Image
           src={nicho.image}
-          alt={nicho.label}
+          alt={`Produção audiovisual para ${nicho.label.toLowerCase()} — 25 Horas Agency`}
           fill
           sizes="100vw"
           priority

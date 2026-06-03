@@ -65,7 +65,7 @@ export function PortfolioView({
                       className="font-mono text-[11px] uppercase tracking-[0.2em]"
                       style={{ color: accent }}
                     >
-                      {nicho.code} / 06
+                      {nicho.code} / {String(NICHOS.length).padStart(2, "0")}
                     </p>
                   </RevealOnScroll>
                   <RevealOnScroll delay={60}>
