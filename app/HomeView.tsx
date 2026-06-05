@@ -10,6 +10,14 @@ import { LOGOS } from "@/lib/logos";
 import { NICHOS } from "@/lib/servicos";
 import type { SanitySiteContent } from "@/lib/sanity/types";
 
+/** Fotos de fundo (depth) estáticas por nicho — fallback quando o nicho não
+ *  tem foto no Sanity. O cliente pode sobrepor qualquer uma no Studio. */
+const STATIC_NICHE_PHOTOS: Record<string, string> = {
+  restaurantes: "/media/nichos/restauranteop.jpeg",
+  desporto: "/media/nichos/desportoop.jpg",
+  "real-estate": "/media/nichos/realestateop.jpg",
+};
+
 export function HomeView({
   siteContent,
   nichePhotos,
@@ -91,10 +99,7 @@ export function HomeView({
               logo={logo}
               alignment={i % 2 === 0 ? "text-left" : "text-right"}
               photoSrc={
-                nichePhotos?.[nicho.slug] ??
-                (nicho.slug === "restaurantes"
-                  ? "/media/nichos/restauranteop.jpeg"
-                  : undefined)
+                nichePhotos?.[nicho.slug] ?? STATIC_NICHE_PHOTOS[nicho.slug]
               }
             />
           );
