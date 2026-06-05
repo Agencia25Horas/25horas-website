@@ -49,10 +49,13 @@ export function NichoBlock({
   nicho,
   logo,
   alignment,
+  photoSrc,
 }: {
   nicho: Nicho;
   logo?: LogoEntry;
   alignment: "text-left" | "text-right";
+  /** Foto de fundo opcional (com depth/parallax) — usada só nalguns nichos. */
+  photoSrc?: string;
 }) {
   const textOnLeft = alignment === "text-left";
   const { t, tNiche } = useLang();
@@ -65,7 +68,30 @@ export function NichoBlock({
       aria-label={label}
       className="relative w-full overflow-hidden bg-canvas-black min-h-[80svh] md:min-h-[90svh] border-b-[5px] border-canvas-white/10 last:border-b-0"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 min-h-[80svh] md:min-h-[90svh]">
+      {/* Foto de fundo com DEPTH (parallax + zoom no scroll) — só quando passada.
+          Scrim escuro para legibilidade + fade de opacidade em baixo. */}
+      {photoSrc && (
+        <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+          <ParallaxImage
+            src={photoSrc}
+            alt=""
+            sizes="100vw"
+            strength={0.22}
+            zoom={1.16}
+          />
+          {/* scrim para o texto/heading se manterem legíveis sobre a foto */}
+          <div className="absolute inset-0 bg-canvas-black/55" />
+          {/* "opacidade em baixo": a foto desvanece para preto no rodapé */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent 32%, rgba(10,10,10,0.6) 76%, var(--canvas-black) 100%)",
+            }}
+          />
+        </div>
+      )}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 min-h-[80svh] md:min-h-[90svh]">
         {/* TEXT half — centrado em ambos os lados (esq/dir) */}
         <div
           className={`flex flex-col items-center justify-center text-center gap-5 px-10 md:px-16 py-12 ${
@@ -101,9 +127,9 @@ export function NichoBlock({
 
         {/* LOGO half — sub-marca centrada com leve parallax depth */}
         <div
-          className={`relative w-full h-[55svh] md:h-full overflow-hidden flex items-center justify-center bg-canvas-black ${
-            textOnLeft ? "md:order-2" : "md:order-1"
-          }`}
+          className={`relative w-full h-[55svh] md:h-full overflow-hidden flex items-center justify-center ${
+            photoSrc ? "" : "bg-canvas-black"
+          } ${textOnLeft ? "md:order-2" : "md:order-1"}`}
         >
           {/* Glow accent radial (subtil) */}
           <div

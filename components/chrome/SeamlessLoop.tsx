@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useLenis } from "@/lib/lenis-provider";
+import { useLang } from "@/lib/language-context";
 
 /**
  * Loop visualmente infinito por CLONAGEM do DOM.
@@ -23,6 +24,11 @@ import { useLenis } from "@/lib/lenis-provider";
  */
 export function SeamlessLoop() {
   const lenis = useLenis();
+  // O clone é um snapshot estático do #main no momento do efeito. Se a língua
+  // mudar, o #main real re-renderiza mas o clone não — ficaria preso na língua
+  // antiga (bug: PT selecionado mas o clone mostra EN no scroll infinito).
+  // Depender de `lang` força o efeito a recriar o clone na língua atual.
+  const { lang } = useLang();
   const cloneRef = useRef<HTMLElement | null>(null);
   const origHRef = useRef(0);
 
@@ -132,7 +138,7 @@ export function SeamlessLoop() {
       clone.remove();
       cloneRef.current = null;
     };
-  }, [lenis]);
+  }, [lenis, lang]);
 
   return null;
 }

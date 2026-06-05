@@ -87,6 +87,11 @@ export function HomeView({
               nicho={nicho}
               logo={logo}
               alignment={i % 2 === 0 ? "text-left" : "text-right"}
+              photoSrc={
+                nicho.slug === "restaurantes"
+                  ? "/media/nichos/restauranteop.jpeg"
+                  : undefined
+              }
             />
           );
         })}
