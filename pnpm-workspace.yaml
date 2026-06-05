@@ -1,7 +1,15 @@
+# Configuração do pnpm (pnpm 10/11 lê settings daqui, NÃO do package.json#pnpm).
+# Build scripts: sem allowBuilds=true, o pnpm 11 ignora-os e o `pnpm install`
+# sai com exit 1 no Vercel ("Command pnpm install exited with 1"). Estes ANTES
+# estavam com placeholders ("set this to true or false") deixados pelo
+# `pnpm approve-builds` → inválido → builds ignorados.
+#   - sharp:   binários nativos p/ a otimização de imagens do Next.
+#   - esbuild: binário de plataforma (usado por dependências do Sanity).
 allowBuilds:
-  esbuild: set this to true or false
-  sharp: set this to true or false
+  esbuild: true
+  sharp: true
 onlyBuiltDependencies:
+  - esbuild
   - sharp
 ignoredBuildsThrow: false
 verifyDepsBeforeRun: false
