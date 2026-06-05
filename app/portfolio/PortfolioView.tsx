@@ -42,7 +42,6 @@ export function PortfolioView({
 
       {NICHOS.map((nicho, i) => {
         const items = itemsByNiche[nicho.slug] ?? [];
-        const hasContent = items.length > 0;
         const isLast = i === NICHOS.length - 1;
         const { label } = tNiche(nicho.slug);
         const accent = nicho.accentColor;
@@ -76,23 +75,11 @@ export function PortfolioView({
                 </RevealOnScroll>
               </div>
 
-              {hasContent ? (
-                <PortfolioCarousel items={items} />
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-                  {Array.from({ length: 3 }).map((_, idx) => (
-                    <div
-                      key={`scaffold-${nicho.slug}-${idx}`}
-                      className="relative aspect-[4/5] rounded-lg bg-canvas-white/5 border border-canvas-white/10 flex items-center justify-center"
-                      aria-hidden
-                    >
-                      <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/50">
-                        {t("common.emBreve")} · {String(idx + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <PortfolioCarousel
+                items={items}
+                placeholderCount={6}
+                emptyLabel={t("common.emBreve")}
+              />
             </div>
           </section>
         );

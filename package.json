@@ -15,7 +15,7 @@
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^5.28.0",
-    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "gsap": "^3.12.5",
     "howler": "^2.2.4",

@@ -79,19 +79,11 @@ export function NichoPortfolioView({
                   </p>
                 </div>
               </RevealOnScroll>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-[4/5] rounded-lg bg-canvas-white/5 border border-canvas-white/10 flex items-center justify-center"
-                    aria-hidden
-                  >
-                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/50">
-                      {t("common.emBreve")} · {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <PortfolioCarousel
+                items={[]}
+                placeholderCount={6}
+                emptyLabel={t("common.emBreve")}
+              />
             </>
           ) : (
             <PortfolioCarousel items={items} />

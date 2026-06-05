@@ -1,8 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useLenis } from "@/lib/lenis-provider";
 import { useLang } from "@/lib/language-context";
+
+// Rotas onde o loop infinito NÃO se aplica (forms / conteúdo curto destination).
+// Em /orcamento o loop não faz sentido e atrapalhava o form. Acrescentar aqui
+// outras se preciso (ex.: "/contactos").
+const NO_LOOP_ROUTES = ["/orcamento"];
+
+function shouldSkip(pathname: string) {
+  return NO_LOOP_ROUTES.some(
+    (r) => pathname === r || pathname.startsWith(r + "/"),
+  );
+}
 
 /**
  * Loop visualmente infinito por CLONAGEM do DOM.
@@ -29,11 +41,16 @@ export function SeamlessLoop() {
   // antiga (bug: PT selecionado mas o clone mostra EN no scroll infinito).
   // Depender de `lang` força o efeito a recriar o clone na língua atual.
   const { lang } = useLang();
+  const pathname = usePathname();
   const cloneRef = useRef<HTMLElement | null>(null);
   const origHRef = useRef(0);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
+    // (#9) Skip em rotas destination (ex.: /orcamento) — loop não se aplica.
+    // Como `pathname` está nas deps, ao navegar PARA cá o cleanup do efeito
+    // anterior já correu e removeu o clone da página de onde viemos.
+    if (shouldSkip(pathname)) return;
     const original = document.getElementById("main");
     if (!original) return;
 
@@ -138,7 +155,11 @@ export function SeamlessLoop() {
       clone.remove();
       cloneRef.current = null;
     };
-  }, [lenis, lang]);
+    // (#13) `pathname` na dep array → o efeito re-corre em cada navegação
+    // client-side: o cleanup remove o clone antigo e recria-se um fresco para
+    // a nova página (ou salta, se for rota destination). Acaba com o bug do
+    // "bloqueia depois de navegar entre várias páginas" (clone fantasma stale).
+  }, [lenis, lang, pathname]);
 
   return null;
 }

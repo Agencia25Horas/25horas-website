@@ -1,22 +1,37 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
+import AutoScroll from "embla-carousel-auto-scroll";
 import { useCallback, useEffect, useState } from "react";
 import { PortfolioCard } from "@/components/sections/PortfolioCard";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
 
+const SLIDE_CLASS =
+  "flex-[0_0_calc(100%-1rem)] md:flex-[0_0_calc(33.333%-1rem)] min-w-0";
+
 /**
- * Carrossel de portfolio com loop + auto-play subtil.
+ * Carrossel de portfolio com scroll contínuo lento (marquee), loop infinito.
  *   Mobile = 1 slide (swipe) · Desktop = 3 slides (setas + drag).
  * Cada slide é um PortfolioCard, que mantém o comportamento:
  *   link → nova tab · sem link → lightbox.
+ *
+ * Quando ainda não há items, mostra `placeholderCount` slides "Em breve" a
+ * rodar (loop demo) — para o carrossel já ter movimento antes de haver conteúdo.
  */
 export function PortfolioCarousel({
   items,
+  placeholderCount = 0,
+  emptyLabel = "Em breve",
 }: {
   items: SanityPortfolioItem[];
+  /** Nº de slides "Em breve" a rodar quando não há items. 0 = não renderiza nada. */
+  placeholderCount?: number;
+  /** Texto dos placeholders (traduzido pelo chamador). */
+  emptyLabel?: string;
 }) {
+  const hasItems = items != null && items.length > 0;
+  const count = hasItems ? items.length : placeholderCount;
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
@@ -25,10 +40,13 @@ export function PortfolioCarousel({
       slidesToScroll: 1,
     },
     [
-      Autoplay({
-        delay: 6000,
-        stopOnInteraction: true,
-        stopOnMouseEnter: true,
+      // Scroll contínuo lento (marquee), direita→esquerda, infinito.
+      // speed baixo = devagarinho; não pausa sozinho (stopOn* a false).
+      AutoScroll({
+        speed: 1,
+        startDelay: 0,
+        stopOnInteraction: false,
+        stopOnMouseEnter: false,
       }),
     ],
   );
@@ -55,20 +73,30 @@ export function PortfolioCarousel({
   void canPrev;
   void canNext;
 
-  if (!items || items.length === 0) return null;
+  if (count === 0) return null;
 
   return (
     <div className="relative">
       <div ref={emblaRef} className="overflow-hidden">
         <div className="flex gap-4 md:gap-6">
-          {items.map((item) => (
-            <div
-              key={item._id}
-              className="flex-[0_0_calc(100%-1rem)] md:flex-[0_0_calc(33.333%-1rem)] min-w-0"
-            >
-              <PortfolioCard item={item} />
-            </div>
-          ))}
+          {hasItems
+            ? items.map((item) => (
+                <div key={item._id} className={SLIDE_CLASS}>
+                  <PortfolioCard item={item} />
+                </div>
+              ))
+            : Array.from({ length: placeholderCount }).map((_, idx) => (
+                <div key={`ph-${idx}`} className={SLIDE_CLASS}>
+                  <div
+                    className="relative aspect-[4/5] rounded-lg bg-canvas-white/5 border border-canvas-white/10 flex items-center justify-center"
+                    aria-hidden
+                  >
+                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/50">
+                      {emptyLabel} · {String(idx + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                </div>
+              ))}
         </div>
       </div>
 
