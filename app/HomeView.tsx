@@ -103,6 +103,9 @@ export function HomeView({
               photoSrc={
                 nichePhotos?.[nicho.slug] ?? STATIC_NICHE_PHOTOS[nicho.slug]
               }
+              photoPosition={
+                nicho.slug === "saude" ? "object-[center_20%]" : undefined
+              }
             />
           );
         })}

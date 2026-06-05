@@ -9,6 +9,10 @@ type Props = Omit<ImageProps, "ref"> & {
   strength?: number;
   /** Optional zoom-on-scroll factor. 1 = none, 1.15 = zooms 15% over scroll range. */
   zoom?: number;
+  /** Extends the layer beyond its container top+bottom by this % so the parallax
+   *  translate never reveals a gap (needed for full-bleed cover backgrounds).
+   *  Default 0 = exact inset-0 (used by contained images like logos). */
+  overscan?: number;
   /** Optional wrapper className (positioning, rounding). */
   wrapperClassName?: string;
   /** Optional inner <Image> className. Overrides default `object-cover`. */
@@ -25,6 +29,7 @@ type Props = Omit<ImageProps, "ref"> & {
 export function ParallaxImage({
   strength = 0.3,
   zoom = 1,
+  overscan = 0,
   wrapperClassName = "",
   imgClassName,
   className,
@@ -67,7 +72,8 @@ export function ParallaxImage({
   return (
     <div
       ref={wrapRef}
-      className={`absolute inset-0 will-change-transform ${wrapperClassName}`}
+      className={`absolute inset-x-0 will-change-transform ${wrapperClassName}`}
+      style={{ top: `${-overscan}%`, bottom: `${-overscan}%` }}
     >
       <Image
         {...imgProps}

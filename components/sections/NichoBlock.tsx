@@ -50,12 +50,15 @@ export function NichoBlock({
   logo,
   alignment,
   photoSrc,
+  photoPosition,
 }: {
   nicho: Nicho;
   logo?: LogoEntry;
   alignment: "text-left" | "text-right";
   /** Foto de fundo opcional (com depth/parallax) — usada só nalguns nichos. */
   photoSrc?: string;
+  /** Classe object-position da foto (ex.: "object-[center_25%]" p/ mostrar o topo). Default centro. */
+  photoPosition?: string;
 }) {
   const textOnLeft = alignment === "text-left";
   const { t, tNiche } = useLang();
@@ -78,6 +81,8 @@ export function NichoBlock({
             sizes="100vw"
             strength={0.22}
             zoom={1.16}
+            overscan={20}
+            imgClassName={`object-cover ${photoPosition ?? "object-center"}`}
           />
           {/* scrim para o texto/heading se manterem legíveis sobre a foto */}
           <div className="absolute inset-0 bg-canvas-black/55" />
