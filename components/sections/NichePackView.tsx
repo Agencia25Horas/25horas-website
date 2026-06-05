@@ -197,7 +197,7 @@ export function NichePackView({
                     Instagram
                   </a>
                   <a
-                    href="https://facebook.com/25horas.agency"
+                    href="https://www.facebook.com/25horasaudiovisuais/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] hover:opacity-70 transition-opacity"

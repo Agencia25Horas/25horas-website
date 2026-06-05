@@ -9,7 +9,7 @@ import type { SanitySiteContent } from "@/lib/sanity/types";
 
 const FALLBACK = {
   email: "atendimento@25horasagency.com",
-  phone: "+351 963 869 519",
+  phone: "+351 912 707 015",
   address: "Lisboa, Portugal",
 };
 
@@ -118,7 +118,7 @@ export function ContactosView({
                 </li>
                 <li>
                   <a
-                    href="https://facebook.com/25horas.agency"
+                    href="https://www.facebook.com/25horasaudiovisuais/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline underline-offset-4 text-canvas-white hover:opacity-60 transition-opacity"

@@ -118,7 +118,7 @@ const LOCAL_BUSINESS_LD = {
   },
   sameAs: [
     "https://instagram.com/25horas.agency",
-    "https://facebook.com/25horas.agency",
+    "https://www.facebook.com/25horasaudiovisuais/",
   ],
   areaServed: { "@type": "Country", name: "Portugal" },
 };
