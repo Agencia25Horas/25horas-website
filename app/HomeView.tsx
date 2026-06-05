@@ -16,6 +16,7 @@ const STATIC_NICHE_PHOTOS: Record<string, string> = {
   restaurantes: "/media/nichos/restauranteop.jpeg",
   desporto: "/media/nichos/desportoop.jpg",
   "real-estate": "/media/nichos/realestateop.jpg",
+  travel: "/media/nichos/travelop.png",
 };
 
 export function HomeView({
