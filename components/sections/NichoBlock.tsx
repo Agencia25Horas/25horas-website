@@ -81,7 +81,7 @@ export function NichoBlock({
             sizes="100vw"
             strength={0.22}
             zoom={1.16}
-            overscan={20}
+            overscan={16}
             imgClassName={`object-cover ${photoPosition ?? "object-center"}`}
           />
           {/* scrim para o texto/heading se manterem legíveis sobre a foto */}
