@@ -10,8 +10,9 @@
 import type { NichePack } from "@/lib/packs";
 import { getNichePack as staticGetNichePack } from "@/lib/packs";
 import type { NichoSlug } from "@/lib/servicos";
-import { sanityClient, sanityEnabled } from "./client";
+import { sanityClient, sanityEnabled, urlForImage } from "./client";
 import {
+  ALL_NICHES_QUERY,
   NICHE_BY_SLUG_QUERY,
   PORTFOLIO_ALL_QUERY,
   PORTFOLIO_BY_NICHE_QUERY,
@@ -73,6 +74,33 @@ export async function fetchSiteContent(): Promise<SanitySiteContent | null> {
   } catch (err) {
     console.warn("[sanity] fetchSiteContent falhou", err);
     return null;
+  }
+}
+
+/**
+ * Mapa slug → URL da foto do nicho (campo `image` no Sanity). Vazio se
+ * Sanity desligado / erro / sem fotos. Usado na home como foto de fundo
+ * (depth) — EDITÁVEL pelo cliente: basta carregar uma imagem no nicho no
+ * Studio e ela aparece automaticamente. Sem imagem → fallback estático.
+ */
+export async function fetchNichePhotos(): Promise<Record<string, string>> {
+  if (!sanityEnabled || !sanityClient) return {};
+  try {
+    const niches = await sanityClient.fetch<SanityNiche[] | null>(
+      ALL_NICHES_QUERY,
+      {},
+      { next: { revalidate: 60, tags: ["niche:photos"] } },
+    );
+    const map: Record<string, string> = {};
+    for (const n of niches ?? []) {
+      if (!n.slug || !n.image) continue;
+      const url = urlForImage(n.image)?.width(1600).quality(80).auto("format").url();
+      if (url) map[n.slug] = url;
+    }
+    return map;
+  } catch (err) {
+    console.warn("[sanity] fetchNichePhotos falhou", err);
+    return {};
   }
 }
 

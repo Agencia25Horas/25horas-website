@@ -12,8 +12,11 @@ import type { SanitySiteContent } from "@/lib/sanity/types";
 
 export function HomeView({
   siteContent,
+  nichePhotos,
 }: {
   siteContent: SanitySiteContent | null;
+  /** Mapa slug → URL da foto do nicho (Sanity). Editável pelo cliente no Studio. */
+  nichePhotos?: Record<string, string>;
 }) {
   const { lang } = useLang();
 
@@ -88,9 +91,10 @@ export function HomeView({
               logo={logo}
               alignment={i % 2 === 0 ? "text-left" : "text-right"}
               photoSrc={
-                nicho.slug === "restaurantes"
+                nichePhotos?.[nicho.slug] ??
+                (nicho.slug === "restaurantes"
                   ? "/media/nichos/restauranteop.jpeg"
-                  : undefined
+                  : undefined)
               }
             />
           );

@@ -85,7 +85,9 @@ export const niche = defineType({
     }),
     defineField({
       name: "image",
-      title: "Hero image (deep page)",
+      title: "Foto do nicho (Home + página)",
+      description:
+        "Foto deste nicho: aparece como fundo (com depth/parallax) no bloco da Home e como hero da página do nicho. Sem foto → fundo preto. Sugestão: foto vertical/retrato com boa densidade.",
       type: "image",
       options: { hotspot: true },
       group: "identity",
