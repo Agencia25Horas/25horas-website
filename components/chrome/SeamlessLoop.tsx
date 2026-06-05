@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLenis } from "@/lib/lenis-provider";
 import { useLang } from "@/lib/language-context";
 
@@ -42,6 +42,7 @@ export function SeamlessLoop() {
   // Depender de `lang` força o efeito a recriar o clone na língua atual.
   const { lang } = useLang();
   const pathname = usePathname();
+  const router = useRouter();
   const cloneRef = useRef<HTMLElement | null>(null);
   const origHRef = useRef(0);
 
@@ -73,15 +74,23 @@ export function SeamlessLoop() {
     // Remover UI stateful que não deve aparecer no clone (CookieBanner,
     // toasts, etc). Marca-se com data-no-clone na componente original.
     clone.querySelectorAll("[data-no-clone]").forEach((el) => el.remove());
-    // Re-activar pointer events nas âncoras do clone para que cliques no
-    // "Ver mais" naveguem (navegação nativa via href, full reload aceite).
-    // Sem isto, o utilizador clica num NichoBlock no clone, nada acontece, e
-    // o teleporte de scroll manda-o p'ra o topo — parece "voltou à home".
+    // Re-activar pointer events nas âncoras do clone para que cliques naveguem.
+    // (#19) Para LINKS INTERNOS usamos router.push em vez do <a> nativo: a
+    // navegação nativa do clone competia com o teleport de scroll → a 1ª
+    // clicada "voltava ao topo da home" e só a 2ª funcionava. O router.push
+    // navega de forma determinística, sem corrida com o teleport.
     // tabIndex=-1 mantém-nas fora da ordem do Tab (acessibilidade).
     clone.querySelectorAll("a[href]").forEach((a) => {
       const el = a as HTMLAnchorElement;
       el.style.pointerEvents = "auto";
       el.tabIndex = -1;
+      const href = el.getAttribute("href");
+      if (href && href.startsWith("/") && !href.startsWith("//")) {
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          router.push(href);
+        });
+      }
     });
     original.parentNode?.insertBefore(clone, original.nextSibling);
     cloneRef.current = clone;
@@ -159,7 +168,7 @@ export function SeamlessLoop() {
     // client-side: o cleanup remove o clone antigo e recria-se um fresco para
     // a nova página (ou salta, se for rota destination). Acaba com o bug do
     // "bloqueia depois de navegar entre várias páginas" (clone fantasma stale).
-  }, [lenis, lang, pathname]);
+  }, [lenis, lang, pathname, router]);
 
   return null;
 }
