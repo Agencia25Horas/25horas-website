@@ -379,8 +379,7 @@ export const PACKS_BY_NICHE: Record<NichoSlug, NichePack> = {
   }),
 
   "saude-bem-estar": makeNichePack({
-    // Placeholder — substituir por b25saude.png quando o cliente enviar o logo.
-    logoSrc: "/media/logos/b25saude.png",
+    logoSrc: "/media/logos/25saude.png",
     visitCadence: {
       title: { pt: "1 visita semanal", en: "Weekly visit" },
       desc: {
@@ -430,6 +429,33 @@ export const PACKS_BY_NICHE: Record<NichoSlug, NichePack> = {
     whatsappText: {
       pt: "Olá! Quero saber mais sobre os packs para sessões de família.",
       en: "Hi! I'd like to know more about your family session packs.",
+    },
+  }),
+
+  educacao: makeNichePack({
+    logoSrc: "/media/logos/25education.png",
+    visitCadence: {
+      title: { pt: "1 sessão semanal", en: "Weekly session" },
+      desc: {
+        pt: "Dia e horário acordados com a escola ou formador.",
+        en: "Day and time arranged with the school or educator.",
+      },
+    },
+    packACapture: {
+      pt: "vídeo, fotografia e conteúdo vertical, campus, formadores, alunos, aulas e eventos.",
+      en: "video, photography and vertical content, campus, educators, students, classes and events.",
+    },
+    objective: {
+      pt: "Atrair inscrições, valorizar o ensino e construir comunidade.",
+      en: "Drive enrolments, raise teaching value and build community.",
+    },
+    tagline: {
+      l1: { pt: "O conhecimento.", en: "The knowledge." },
+      l2: { pt: "A nossa lente.", en: "Our lens." },
+    },
+    whatsappText: {
+      pt: "Olá! Quero saber mais sobre os packs para escolas e formação.",
+      en: "Hi! I'd like to know more about your education/training packs.",
     },
   }),
 };

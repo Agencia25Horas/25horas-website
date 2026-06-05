@@ -282,8 +282,12 @@ export const NICHE_CONTENT: Record<
       tagline: "Pais, filhos e momentos — em forma de cinema.",
     },
     "saude-bem-estar": {
-      label: "SAÚDE E BEM ESTAR",
+      label: "SAÚDE",
       tagline: "Clínicas, profissionais e procedimentos — em registo de confiança.",
+    },
+    educacao: {
+      label: "EDUCAÇÃO",
+      tagline: "Escolas, formadores e conhecimento — em forma de cinema.",
     },
   },
   en: {
@@ -312,8 +316,12 @@ export const NICHE_CONTENT: Record<
       tagline: "Parents, children and moments — in cinema form.",
     },
     "saude-bem-estar": {
-      label: "HEALTH & WELLNESS",
+      label: "HEALTH",
       tagline: "Clinics, professionals and procedures — in tone of trust.",
+    },
+    educacao: {
+      label: "EDUCATION",
+      tagline: "Schools, educators and knowledge — in cinema form.",
     },
   },
 };

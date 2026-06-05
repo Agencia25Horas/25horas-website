@@ -17,7 +17,10 @@ const STATIC_NICHE_PHOTOS: Record<string, string> = {
   desporto: "/media/nichos/desportoop.jpg",
   "real-estate": "/media/nichos/realestateop.jpg",
   travel: "/media/nichos/travelop.png",
+  corporate: "/media/nichos/corporateop.png",
   saude: "/media/nichos/familyop.png", // slug "saude" = nicho FAMÍLIA
+  "saude-bem-estar": "/media/nichos/saudeop.png", // slug "saude-bem-estar" = nicho SAÚDE
+  educacao: "/media/nichos/testeop.png",
 };
 
 export function HomeView({
@@ -104,7 +107,21 @@ export function HomeView({
                 nichePhotos?.[nicho.slug] ?? STATIC_NICHE_PHOTOS[nicho.slug]
               }
               photoPosition={
-                nicho.slug === "saude" ? "object-[center_20%]" : undefined
+                nicho.slug === "saude" ? "object-top" : undefined
+              }
+              photoOverscan={
+                nicho.slug === "saude"
+                  ? 0
+                  : nicho.slug === "educacao"
+                    ? 6
+                    : undefined
+              }
+              photoZoom={
+                nicho.slug === "saude"
+                  ? 1
+                  : nicho.slug === "educacao"
+                    ? 1.06
+                    : undefined
               }
             />
           );

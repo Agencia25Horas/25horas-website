@@ -10,7 +10,8 @@ export type NichoSlug =
   | "travel"
   | "corporate"
   | "saude"
-  | "saude-bem-estar";
+  | "saude-bem-estar"
+  | "educacao";
 
 export type Nicho = {
   code: string;
@@ -257,12 +258,12 @@ export const NICHOS: Nicho[] = [
   {
     code: "07",
     slug: "saude-bem-estar",
-    label: "SAÚDE E BEM ESTAR",
+    label: "SAÚDE",
     emoji: "🩺",
     tagline: "Clínicas, profissionais e procedimentos — em registo de confiança.",
     image:
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1920&h=1080&fit=crop&auto=format&q=80",
-    accentColor: "#6a8eaf",
+    accentColor: "#ec588c",
     photos: [
       "https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?w=1200&h=800&fit=crop&auto=format&q=80",
       "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&h=800&fit=crop&auto=format&q=80",
@@ -283,6 +284,40 @@ export const NICHOS: Nicho[] = [
       "Retratos profissionais",
     ],
     // NO design — Saúde e Bem Estar não oferece design como serviço.
+  },
+  {
+    code: "08",
+    slug: "educacao",
+    label: "EDUCAÇÃO",
+    emoji: "🎓",
+    tagline: "Escolas, formadores e conhecimento — em forma de cinema.",
+    image: "/media/nichos/educationop.png",
+    accentColor: "#1bb3e2",
+    photos: [
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=800&fit=crop&auto=format&q=80",
+      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&h=800&fit=crop&auto=format&q=80",
+    ],
+    video: [
+      "Vídeos institucionais",
+      "Cursos online",
+      "Depoimentos de alunos",
+      "Aulas em destaque",
+      "Eventos académicos",
+      "Reels educativos",
+    ],
+    fotografia: [
+      "Campus",
+      "Formadores",
+      "Alunos",
+      "Eventos",
+      "Lifestyle académico",
+    ],
+    design: [
+      "Materiais de curso",
+      "Stories",
+      "Campanhas de inscrição",
+      "Apresentações",
+    ],
   },
 ];
 

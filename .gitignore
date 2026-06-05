@@ -38,3 +38,5 @@ public/media/*
 !public/media/bg-*.jpg
 !public/media/logos
 !public/media/logos/**
+!public/media/nichos
+!public/media/nichos/**

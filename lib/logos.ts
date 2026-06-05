@@ -57,10 +57,15 @@ export const LOGOS: LogoEntry[] = [
     href: "/servicos/saude",
   },
   {
-    // Placeholder — substituir por b25saude.png quando o cliente enviar o logo.
-    src: "/media/logos/b25saude.png",
-    label: "SAÚDE E BEM ESTAR",
+    src: "/media/logos/25saude.png",
+    label: "SAÚDE",
     desc: "Clínicas, profissionais e procedimentos — em registo de confiança.",
     href: "/servicos/saude-bem-estar",
+  },
+  {
+    src: "/media/logos/25education.png",
+    label: "EDUCAÇÃO",
+    desc: "Escolas, formadores e conhecimento — em forma de cinema.",
+    href: "/servicos/educacao",
   },
 ];

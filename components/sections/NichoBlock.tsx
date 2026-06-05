@@ -51,14 +51,26 @@ export function NichoBlock({
   alignment,
   photoSrc,
   photoPosition,
+  photoOverscan,
+  photoZoom,
+  photoFit,
 }: {
   nicho: Nicho;
   logo?: LogoEntry;
   alignment: "text-left" | "text-right";
   /** Foto de fundo opcional (com depth/parallax) — usada só nalguns nichos. */
   photoSrc?: string;
-  /** Classe object-position da foto (ex.: "object-[center_25%]" p/ mostrar o topo). Default centro. */
+  /** Classe object-position da foto (ex.: "object-top" p/ mostrar o topo). Default centro. */
   photoPosition?: string;
+  /** Overscan da foto (% que a camada estica além do bloco). Menor = mostra mais do topo/fundo.
+   *  Default 16. Útil baixar p/ fotos landscape onde o topo (ex.: cabeças) seria escondido. */
+  photoOverscan?: number;
+  /** Zoom-no-scroll da foto. Default 1.16. Pôr 1 desliga o zoom (a escala do parallax
+   *  cresce a partir do centro e empurra o topo p/ fora — 1 mantém o topo no sítio). */
+  photoZoom?: number;
+  /** Ajuste da foto. Default "cover" (preenche, corta). "contain" mostra a foto
+   *  inteira (zoom-out total) — útil p/ fotos portrait num bloco landscape. */
+  photoFit?: "cover" | "contain";
 }) {
   const textOnLeft = alignment === "text-left";
   const { t, tNiche } = useLang();
@@ -80,9 +92,9 @@ export function NichoBlock({
             alt=""
             sizes="100vw"
             strength={0.22}
-            zoom={1.16}
-            overscan={16}
-            imgClassName={`object-cover ${photoPosition ?? "object-center"}`}
+            zoom={photoZoom ?? 1.16}
+            overscan={photoOverscan ?? 16}
+            imgClassName={`${photoFit === "contain" ? "object-contain" : "object-cover"} ${photoPosition ?? "object-center"}`}
           />
           {/* scrim para o texto/heading se manterem legíveis sobre a foto */}
           <div className="absolute inset-0 bg-canvas-black/55" />
