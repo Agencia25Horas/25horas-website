@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
+import { PortfolioCarousel } from "@/components/sections/PortfolioCarousel";
 import { useLang } from "@/lib/language-context";
 import { NICHOS, type Nicho } from "@/lib/servicos";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
@@ -16,7 +16,7 @@ export function NichoPortfolioView({
   nicho: Nicho;
   items: SanityPortfolioItem[];
 }) {
-  const { lang, t, tNiche } = useLang();
+  const { t, tNiche } = useLang();
   const { label, tagline } = tNiche(nicho.slug);
   const accent = nicho.accentColor;
 
@@ -25,7 +25,7 @@ export function NichoPortfolioView({
       <TomatinoHeader />
       <div className="h-[104px] md:h-[112px]" />
 
-      <section className="px-6 md:px-12 pt-12 md:pt-16 pb-10 md:pb-14">
+      <section className="px-6 md:px-16 pt-12 md:pt-16 pb-10 md:pb-14">
         <div className="max-w-[1320px] mx-auto">
           <RevealOnScroll>
             <Link
@@ -59,7 +59,7 @@ export function NichoPortfolioView({
         </div>
       </section>
 
-      <section className="px-6 md:px-12 pb-24 md:pb-32">
+      <section className="px-6 md:px-16 pb-24 md:pb-32">
         <div className="max-w-[1320px] mx-auto">
           {items.length === 0 ? (
             <>
@@ -94,16 +94,7 @@ export function NichoPortfolioView({
               </div>
             </>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-              {items.map((item) => (
-                <PortfolioCard
-                  key={item._id}
-                  item={item}
-                  lang={lang}
-                  accent={accent}
-                />
-              ))}
-            </div>
+            <PortfolioCarousel items={items} />
           )}
         </div>
       </section>
@@ -111,53 +102,4 @@ export function NichoPortfolioView({
       <SiteFooter />
     </main>
   );
-}
-
-function PortfolioCard({
-  item,
-  lang,
-  accent,
-}: {
-  item: SanityPortfolioItem;
-  lang: "pt" | "en";
-  accent: string;
-}) {
-  const title = (lang === "pt" ? item.title_pt : item.title_en) ?? item.title_pt ?? "";
-
-  const card = (
-    <figure className="space-y-3 group">
-      <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-canvas-white/5">
-        {item.imageUrl && (
-          <Image
-            src={item.imageUrl}
-            alt={title}
-            fill
-            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        )}
-      </div>
-      {title && (
-        <figcaption className="font-mono text-[11px] uppercase tracking-[0.15em] text-canvas-white/75 group-hover:text-canvas-white transition-colors">
-          {title}
-        </figcaption>
-      )}
-    </figure>
-  );
-
-  if (item.link) {
-    return (
-      <a
-        href={item.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-lg"
-        style={{ outlineColor: accent }}
-        aria-label={title}
-      >
-        {card}
-      </a>
-    );
-  }
-  return card;
 }
