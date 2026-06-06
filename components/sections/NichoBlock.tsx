@@ -122,7 +122,7 @@ export function NichoBlock({
             {nicho.code} — {String(NICHOS.length).padStart(2, "0")}
           </p>
           <h2
-            className="font-display uppercase text-[clamp(2.5rem,5.5vw,5rem)] leading-[0.95]"
+            className="font-display uppercase text-[clamp(2.5rem,5.5vw,5rem)] leading-[0.95] drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]"
             style={{ color: accent }}
           >
             {label}

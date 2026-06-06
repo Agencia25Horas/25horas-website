@@ -166,7 +166,7 @@ export function NichePackView({
                 </div>
               </RevealOnScroll>
               <RevealOnScroll delay={80}>
-                <h1 className="font-display uppercase text-canvas-white text-[clamp(2.5rem,7vw,6rem)] leading-[0.9]">
+                <h1 className="font-display uppercase text-canvas-white text-[clamp(2.5rem,7vw,6rem)] leading-[0.9] drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]">
                   {s(data.hero.titleL1)}
                   <br />
                   {s(data.hero.titleL2)}
