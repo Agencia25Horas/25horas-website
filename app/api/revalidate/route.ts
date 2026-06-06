@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
 export const runtime = "nodejs";
@@ -17,7 +17,7 @@ export const runtime = "nodejs";
  *   • Projection (p/ ter nicheSlug em packs/portfolioItem):
  *       {_type, slug, "nicheSlug": niche->slug}
  */
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { body, isValidSignature } = await parseBody<{
       _type: string;
