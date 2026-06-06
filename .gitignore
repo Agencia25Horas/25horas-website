@@ -40,3 +40,5 @@ public/media/*
 !public/media/logos/**
 !public/media/nichos
 !public/media/nichos/**
+!public/media/audio
+!public/media/audio/**

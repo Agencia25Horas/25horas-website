@@ -94,7 +94,7 @@ export function NichoBlock({
             strength={0.22}
             zoom={photoZoom ?? 1.16}
             overscan={photoOverscan ?? 16}
-            imgClassName={`${photoFit === "contain" ? "object-contain" : "object-cover"} ${photoPosition ?? "object-center"}`}
+            imgClassName={`${photoFit === "contain" ? "object-contain" : "object-cover"} ${photoPosition ?? "object-[center_30%] md:object-center"}`}
           />
           {/* scrim para o texto/heading se manterem legíveis sobre a foto */}
           <div className="absolute inset-0 bg-canvas-black/55" />
