@@ -44,7 +44,7 @@ export function ContactosView({
             strength={0.22}
             zoom={1.16}
             overscan={16}
-            imgClassName="object-cover object-center"
+            imgClassName="object-cover object-[center_35%]"
           />
           <div className="absolute inset-0 bg-canvas-black/60" />
           <div
