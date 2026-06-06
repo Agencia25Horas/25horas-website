@@ -117,7 +117,7 @@ export function NichePackView({
   nicho: Nicho;
   pack: NichePack;
 }) {
-  const { lang, t } = useLang();
+  const { lang, t, tNiche } = useLang();
   const accent = nicho.accentColor;
   const data = pack;
 
@@ -204,13 +204,6 @@ export function NichePackView({
                   >
                     <span className="w-4 h-4">{I.fb}</span>
                     Facebook
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] hover:opacity-70 transition-opacity"
-                  >
-                    <span className="w-4 h-4">{I.tk}</span>
-                    TikTok
                   </a>
                 </div>
               </RevealOnScroll>
@@ -367,6 +360,24 @@ export function NichePackView({
         </div>
       </section>
 
+      {/* Link discreto p/ a página de portfolio dedicada do nicho (#18 — re-link) */}
+      <div className="px-6 md:px-12 mt-2 mb-4 flex justify-center">
+        <Link
+          href={`/servicos/${nicho.slug}/portfolio`}
+          className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/60 hover:text-canvas-white transition-colors"
+        >
+          {t("common.verPortfolioCompleto")}{" "}
+          {tNiche(nicho.slug).label.toLowerCase()}
+          <span
+            aria-hidden
+            className="transition-transform group-hover:translate-x-1"
+            style={{ color: accent }}
+          >
+            →
+          </span>
+        </Link>
+      </div>
+
       {/* ═══════════ CONTACTOS ═══════════ */}
       <section className="px-6 md:px-12 py-10">
         <div className="max-w-[1320px] mx-auto flex flex-col md:flex-row md:items-center gap-6 md:gap-10 font-body text-[14px] text-canvas-white/75">
@@ -385,11 +396,11 @@ export function NichePackView({
               Avenida da Siderurgia Nacional Nº1, Sala 105, 2840-075 Aldeia de Paio Pires
             </span>
             <a
-              href="tel:+351928059855"
+              href="tel:+351912707015"
               className="inline-flex items-center gap-2 hover:text-canvas-white transition-colors"
             >
               <span className="w-4 h-4 text-canvas-white/55">{I.phone}</span>
-              +351 928 059 855
+              +351 912 707 015
             </a>
             <a
               href="mailto:agencia25horas@gmail.com"

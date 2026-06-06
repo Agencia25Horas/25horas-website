@@ -108,7 +108,7 @@ const LOCAL_BUSINESS_LD = {
   logo: `${SITE_URL}/media/logos/b25agency.png`,
   image: `${SITE_URL}/opengraph-image`,
   email: "agencia25horas@gmail.com",
-  telephone: "+351928059855",
+  telephone: "+351912707015",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Avenida da Siderurgia Nacional Nº1, Sala 105",
