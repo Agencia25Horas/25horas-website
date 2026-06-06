@@ -63,7 +63,7 @@ export function SiteFooter() {
           </li>
         </ul>
 
-        <p className="mt-4 font-body text-[12px] opacity-80">
+        <p className="mt-4 font-mono text-[11px] tracking-[0.08em] text-canvas-white/65">
           {t("footer.copyright")}
         </p>
       </div>

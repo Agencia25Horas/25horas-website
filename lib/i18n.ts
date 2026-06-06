@@ -22,7 +22,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "chrome.som": "SOM",
 
     // Footer
-    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
+    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • 517 769 034",
 
     // Common
     "common.verMais": "Ver mais →",
@@ -148,7 +148,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     "chrome.som": "SOUND",
 
-    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
+    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • 517 769 034",
 
     "common.verMais": "See more →",
     "common.verTudo": "See all →",
