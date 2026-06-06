@@ -4,6 +4,7 @@ import Image from "next/image";
 import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
+import { ParallaxText } from "@/components/effects/ParallaxText";
 import { NichoBlock } from "@/components/sections/NichoBlock";
 import { useLang } from "@/lib/language-context";
 import { LOGOS } from "@/lib/logos";
@@ -91,7 +92,10 @@ export function HomeView({
 
           {hasHeroText && (
             <RevealOnScroll delay={140}>
-              <div className="mt-2 md:mt-4 text-center max-w-3xl mx-auto">
+              <ParallaxText
+                strength={0.1}
+                className="mt-2 md:mt-4 text-center max-w-3xl mx-auto"
+              >
                 {heroL1 && (
                   <p className="font-display uppercase text-[clamp(1.25rem,2.4vw,1.875rem)] leading-tight text-canvas-white">
                     {heroL1}
@@ -107,7 +111,7 @@ export function HomeView({
                     {heroL3}
                   </p>
                 )}
-              </div>
+              </ParallaxText>
             </RevealOnScroll>
           )}
         </div>
