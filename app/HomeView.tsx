@@ -23,6 +23,28 @@ const STATIC_NICHE_PHOTOS: Record<string, string> = {
   educacao: "/media/nichos/testeop.png",
 };
 
+/** Afinações de enquadramento da foto depth por nicho (override dos defaults do
+ *  NichoBlock). Sem entrada = default object-[center_30%] md:object-center.
+ *  As object-[X%_30%] md:object-center deslocam o sujeito na horizontal SÓ em
+ *  mobile (no desktop volta a centrar). overscan menor = foto um pouco menor. */
+const NICHE_PHOTO_TUNING: Record<
+  string,
+  {
+    position?: string;
+    overscan?: number;
+    zoom?: number;
+    fit?: "cover" | "contain";
+  }
+> = {
+  saude: { position: "object-top", overscan: 0, zoom: 1 }, // FAMÍLIA — cabeças visíveis
+  educacao: { overscan: 6, zoom: 1.06 }, // zoom-out ligeiro
+  travel: { position: "object-[54%_30%] md:object-center", overscan: 8 }, // mobile: sujeito p/ esquerda + menor
+  "saude-bem-estar": {
+    position: "object-[47%_30%] md:object-center",
+    overscan: 8,
+  }, // mobile: sujeito p/ direita + menor
+};
+
 export function HomeView({
   siteContent,
   nichePhotos,
@@ -106,23 +128,10 @@ export function HomeView({
               photoSrc={
                 nichePhotos?.[nicho.slug] ?? STATIC_NICHE_PHOTOS[nicho.slug]
               }
-              photoPosition={
-                nicho.slug === "saude" ? "object-top" : undefined
-              }
-              photoOverscan={
-                nicho.slug === "saude"
-                  ? 0
-                  : nicho.slug === "educacao"
-                    ? 6
-                    : undefined
-              }
-              photoZoom={
-                nicho.slug === "saude"
-                  ? 1
-                  : nicho.slug === "educacao"
-                    ? 1.06
-                    : undefined
-              }
+              photoPosition={NICHE_PHOTO_TUNING[nicho.slug]?.position}
+              photoOverscan={NICHE_PHOTO_TUNING[nicho.slug]?.overscan}
+              photoZoom={NICHE_PHOTO_TUNING[nicho.slug]?.zoom}
+              photoFit={NICHE_PHOTO_TUNING[nicho.slug]?.fit}
             />
           );
         })}
