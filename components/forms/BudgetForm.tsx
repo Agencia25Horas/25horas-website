@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import { trackEvent } from "@/components/chrome/Analytics";
+import { NICHOS } from "@/lib/servicos";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -31,16 +32,10 @@ export function BudgetForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Deriva de NICHOS → auto-inclui todos os nichos (Educação, Saúde, etc.)
+  // sem ter de manter uma lista à parte.
   const projectTypes = useMemo(
-    () =>
-      [
-        "restaurantes",
-        "desporto",
-        "real-estate",
-        "travel",
-        "corporate",
-        "saude",
-      ].map((slug) => tNiche(slug).label),
+    () => NICHOS.map((n) => tNiche(n.slug).label),
     [tNiche],
   );
 
@@ -121,20 +116,21 @@ export function BudgetForm() {
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-grade">
           {t("orcamento.confirm.eyebrow")}
         </p>
-        <h2 className="mt-4 font-display uppercase text-[clamp(2rem,4vw,3rem)] leading-[1.05] text-canvas-white">
+        <h2 className="mt-4 font-display uppercase text-[clamp(2.5rem,5.5vw,4rem)] leading-[1.05] text-canvas-white">
           {t("orcamento.confirm.title")}
         </h2>
         <p className="mt-6 font-body text-[16px] leading-relaxed text-canvas-white/85">
           {t("orcamento.confirm.body")}
         </p>
-        <p className="mt-6 font-body text-[14px] leading-relaxed text-canvas-white/60">
+        <span className="block w-12 h-px bg-canvas-white/20 my-6" aria-hidden />
+        <p className="font-body text-[14px] leading-relaxed text-canvas-white/60">
           {t("orcamento.confirm.urgente")}
           <br />
           <a
-            href="mailto:atendimento@25horasagency.com"
+            href="mailto:agencia25horas@gmail.com"
             className="underline underline-offset-4 text-canvas-white hover:opacity-70"
           >
-            atendimento@25horasagency.com
+            agencia25horas@gmail.com
           </a>
           <br />
           <a
@@ -149,7 +145,21 @@ export function BudgetForm() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl pb-32 md:pb-0">
+      {/* Barra de progresso visual (4 segmentos) — mais clara que o texto */}
+      <div
+        className="mb-5 flex gap-1.5"
+        aria-label={`${t("orcamento.form.passo")} ${s.step} ${t("orcamento.form.de")} 4`}
+      >
+        {[1, 2, 3, 4].map((n) => (
+          <div
+            key={n}
+            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
+              n <= s.step ? "bg-canvas-white" : "bg-canvas-white/15"
+            }`}
+          />
+        ))}
+      </div>
       <div className="flex items-center justify-between mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/55">
         <span>{t("orcamento.form.title")}</span>
         <span>
@@ -192,7 +202,7 @@ export function BudgetForm() {
         </p>
       )}
 
-      <div className="mt-12 flex items-center justify-between">
+      <div className="mt-12 flex items-center justify-between fixed bottom-0 inset-x-0 p-4 bg-canvas-black/90 backdrop-blur-md border-t border-canvas-white/10 z-20 md:static md:mt-12 md:p-0 md:bg-transparent md:backdrop-blur-none md:border-t-0">
         <button
           onClick={back}
           disabled={s.step === 1 || submitting}
@@ -248,7 +258,7 @@ function ChipStep({
               key={opt}
               onClick={() => onChange(opt)}
               aria-pressed={active}
-              className={`px-5 py-4 border font-mono text-[11px] uppercase tracking-[0.15em] transition-colors ${
+              className={`px-6 py-5 border font-mono text-[12px] uppercase tracking-[0.15em] text-center min-h-[64px] flex items-center justify-center transition-colors ${
                 active
                   ? "border-canvas-white bg-canvas-white text-canvas-black"
                   : "border-canvas-white/30 text-canvas-white hover:border-canvas-white"
@@ -279,7 +289,7 @@ function ContactStep({
       <h2 className="font-display uppercase text-[clamp(1.75rem,3.5vw,2.75rem)] leading-[1.05] text-canvas-white mb-8">
         {t("orcamento.form.q4")}
       </h2>
-      <div className="space-y-5">
+      <div className="space-y-7">
         <Field
           label={t("orcamento.form.nome")}
           value={state.name}
@@ -385,7 +395,7 @@ function Field({
                 ? "name"
                 : "organization"
         }
-        className="w-full bg-transparent border-b border-canvas-white/25 focus:border-canvas-white aria-[invalid]:border-accent-grade outline-none font-body text-[clamp(1rem,1.5vw,1.25rem)] text-canvas-white py-2 transition-colors"
+        className="w-full bg-transparent border-b border-canvas-white/30 focus:border-canvas-white aria-[invalid]:border-accent-grade outline-none font-body text-[clamp(1rem,1.5vw,1.25rem)] text-canvas-white py-2 transition-colors"
       />
     </label>
   );

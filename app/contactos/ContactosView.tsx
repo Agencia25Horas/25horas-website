@@ -8,7 +8,8 @@ import { useLang } from "@/lib/language-context";
 import type { SanitySiteContent } from "@/lib/sanity/types";
 
 const FALLBACK = {
-  email: "atendimento@25horasagency.com",
+  // POR ENQUANTO: gmail do cliente (domínio 25horasagency.com ainda não live).
+  email: "agencia25horas@gmail.com",
   phone: "+351 912 707 015",
   address: "Lisboa, Portugal",
 };

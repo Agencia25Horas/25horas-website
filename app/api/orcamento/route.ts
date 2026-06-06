@@ -3,7 +3,9 @@ import { Resend } from "resend";
 
 export const runtime = "nodejs";
 
-const TO_EMAIL = "atendimento@25horasagency.com";
+// POR ENQUANTO: gmail do cliente (o domínio 25horasagency.com ainda não está
+// live). Trocar para atendimento@25horasagency.com quando o cliente pedir.
+const TO_EMAIL = "agencia25horas@gmail.com";
 const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL || "25 Horas <onboarding@resend.dev>";
 

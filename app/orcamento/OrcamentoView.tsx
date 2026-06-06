@@ -13,19 +13,19 @@ export function OrcamentoView() {
       <TomatinoHeader />
       <div className="h-[104px] md:h-[112px]" />
 
-      <section className="px-6 md:px-12 py-16 md:py-24" aria-label={t("orcamento.eyebrow")}>
+      <section className="px-6 md:px-12 pt-12 md:pt-16 pb-8 md:pb-10" aria-label={t("orcamento.eyebrow")}>
         <div className="max-w-[1100px] mx-auto">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-type-dim">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/55">
             {t("orcamento.eyebrow")}
           </p>
-          <h1 className="mt-4 font-display uppercase whitespace-pre-line text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-canvas-black max-w-3xl">
+          <h1 className="mt-4 font-display uppercase whitespace-pre-line text-[clamp(2rem,5vw,3.75rem)] leading-[0.95] text-canvas-white max-w-3xl">
             {t("orcamento.title")}
           </h1>
-          <p className="mt-6 font-body text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-type-neutral max-w-xl">
+          <p className="mt-6 font-body text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-canvas-white/75 max-w-xl">
             {t("orcamento.subtitle")}
           </p>
 
-          <div className="mt-14 md:mt-20">
+          <div className="mt-10 md:mt-14">
             <BudgetForm />
           </div>
         </div>
