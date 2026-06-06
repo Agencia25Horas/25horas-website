@@ -109,7 +109,7 @@ export function ContactosView({
               <ul className="mt-3 space-y-2 font-body text-[16px]">
                 <li>
                   <a
-                    href="https://instagram.com/25horas.agency"
+                    href="https://www.instagram.com/25horas.agency/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline underline-offset-4 text-canvas-white hover:opacity-60 transition-opacity"
