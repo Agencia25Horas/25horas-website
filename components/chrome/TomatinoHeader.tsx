@@ -74,13 +74,13 @@ export function TomatinoHeader() {
             aria-label="Principal"
           >
             {NAV.map((n) => (
-              <a
+              <Link
                 key={n.key}
                 href={n.href}
                 className="text-canvas-white hover:text-accent-grade transition-colors"
               >
                 {n.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -124,13 +124,13 @@ export function TomatinoHeader() {
           <ul className="flex flex-col py-2">
             {NAV.map((n) => (
               <li key={n.key}>
-                <a
+                <Link
                   href={n.href}
                   onClick={() => setOpen(false)}
                   className="block py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
                 >
                   {n.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
