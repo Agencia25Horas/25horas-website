@@ -4,6 +4,7 @@ import Link from "next/link";
 import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
+import { ParallaxImage } from "@/components/effects/ParallaxImage";
 import { useLang } from "@/lib/language-context";
 import type { SanitySiteContent } from "@/lib/sanity/types";
 
@@ -32,23 +33,47 @@ export function ContactosView({
       <TomatinoHeader />
       <div className="h-[104px] md:h-[112px]" />
 
-      <section className="px-6 md:px-12 py-16 md:py-24">
-        <div className="max-w-[1100px] mx-auto">
-          <RevealOnScroll>
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/55">
-              {t("contactos.eyebrow")}
-            </p>
-          </RevealOnScroll>
-          <RevealOnScroll delay={80}>
-            <h1 className="mt-4 font-display uppercase whitespace-pre-line text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-canvas-white">
-              {t("contactos.title")}
-            </h1>
-          </RevealOnScroll>
-          <RevealOnScroll delay={160}>
-            <p className="mt-6 font-body text-[clamp(1rem,1.4vw,1.2rem)] leading-relaxed text-canvas-white/80 max-w-2xl">
-              {t("contactos.subtitle")}
-            </p>
-          </RevealOnScroll>
+      <section className="relative w-full overflow-hidden min-h-[60svh] md:min-h-[72svh] flex items-center border-b border-canvas-white/10">
+        {/* Foto de fundo com DEPTH (parallax + zoom no scroll) — mesmo efeito
+            dos nichos da home. Scrim + fade em baixo para o texto ser legível. */}
+        <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+          <ParallaxImage
+            src="/media/nichos/vamosfalar.png"
+            alt=""
+            sizes="100vw"
+            strength={0.22}
+            zoom={1.16}
+            overscan={16}
+            imgClassName="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-canvas-black/60" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent 35%, rgba(10,10,10,0.55) 80%, var(--canvas-black) 100%)",
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 w-full px-6 md:px-12 py-16 md:py-20">
+          <div className="max-w-[1100px] mx-auto">
+            <RevealOnScroll>
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/60">
+                {t("contactos.eyebrow")}
+              </p>
+            </RevealOnScroll>
+            <RevealOnScroll delay={80}>
+              <h1 className="mt-4 font-display uppercase whitespace-pre-line text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-canvas-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]">
+                {t("contactos.title")}
+              </h1>
+            </RevealOnScroll>
+            <RevealOnScroll delay={160}>
+              <p className="mt-6 font-body text-[clamp(1rem,1.4vw,1.2rem)] leading-relaxed text-canvas-white/85 max-w-2xl">
+                {t("contactos.subtitle")}
+              </p>
+            </RevealOnScroll>
+          </div>
         </div>
       </section>
 
