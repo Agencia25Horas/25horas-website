@@ -150,6 +150,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(LOCAL_BUSINESS_LD) }}
         />
+        {/* Sem JS, os elementos com reveal-on-scroll ficariam a opacity:0.
+            Este fallback garante que o conteúdo aparece à mesma. */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important;}`}</style>
+        </noscript>
       </head>
       <body
         className="font-body bg-canvas-black text-canvas-white antialiased"

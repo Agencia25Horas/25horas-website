@@ -64,23 +64,23 @@ export function SiteFooter() {
             href="/politica-privacidade"
             className="hover:text-canvas-white transition-colors"
           >
-            Política de Privacidade
+            {t("footer.privacidade")}
           </Link>
-          <span aria-hidden className="text-canvas-white/30">·</span>
+          <span aria-hidden className="text-canvas-white/55">·</span>
           <Link
             href="/cookies"
             className="hover:text-canvas-white transition-colors"
           >
-            Cookies
+            {t("footer.cookies")}
           </Link>
-          <span aria-hidden className="text-canvas-white/30">·</span>
+          <span aria-hidden className="text-canvas-white/55">·</span>
           <a
             href="https://www.livroreclamacoes.pt/inicio"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-canvas-white transition-colors"
           >
-            Livro de Reclamações
+            {t("footer.livro")}
           </a>
         </nav>
 
