@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import Image, { type ImageProps } from "next/image";
-import { gsap, ScrollTrigger } from "@/lib/gsap-setup";
 
 type Props = Omit<ImageProps, "ref"> & {
   /** Parallax strength: 0 = no movement, 0.3 = subtle, 0.8 = strong. Default 0.3. */
@@ -40,32 +39,58 @@ export function ParallaxImage({
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const prefersReduced = window.matchMedia(
+    const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (prefersReduced) return;
+    const isMobile =
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.innerWidth <= 768;
+    // Mobile / reduced-motion → imagem ESTÁTICA (sem GSAP, sem repaints no
+    // scroll). O estado por defeito (sem transform) já é o visual final.
+    if (reduce || isMobile) return;
 
-    const trigger = el.parentElement || el;
+    let kill: (() => void) | null = null;
+    let cancelled = false;
 
-    const tween = gsap.fromTo(
-      el,
-      { yPercent: -strength * 50, scale: 1 },
-      {
-        yPercent: strength * 50,
-        scale: zoom,
-        ease: "none",
-        scrollTrigger: {
-          trigger,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.5,
+    // GSAP carregado on-demand (1.º scroll OU 1500ms) — fora do bundle inicial.
+    const setup = async () => {
+      if (cancelled || !wrapRef.current) return;
+      const { gsap } = await import("@/lib/gsap-setup");
+      if (cancelled || !wrapRef.current) return;
+      const node = wrapRef.current;
+      const tween = gsap.fromTo(
+        node,
+        { yPercent: -strength * 50, scale: 1 },
+        {
+          yPercent: strength * 50,
+          scale: zoom,
+          ease: "none",
+          scrollTrigger: {
+            trigger: node.parentElement || node,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.5,
+          },
         },
-      },
-    );
+      );
+      kill = () => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      };
+    };
+
+    const onFirstScroll = () => setup();
+    window.addEventListener("scroll", onFirstScroll, {
+      once: true,
+      passive: true,
+    });
+    const timer = window.setTimeout(setup, 1500);
 
     return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
+      cancelled = true;
+      window.removeEventListener("scroll", onFirstScroll);
+      window.clearTimeout(timer);
+      kill?.();
     };
   }, [strength, zoom]);
 

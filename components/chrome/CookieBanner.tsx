@@ -7,13 +7,15 @@ import { useLang } from "@/lib/language-context";
 const CONSENT_KEY = "cookie-consent-v1";
 
 export function CookieBanner() {
-  const [open, setOpen] = useState(false);
+  // SSR: visível por defeito → o banner pinta logo no FCP em vez de ficar
+  // refém da hidratação (que arrastava o LCP no mobile). Quem já decidiu é
+  // escondido ANTES do paint pelo script inline no <head> (classe cc-consented)
+  // e aqui desmontado de vez (sem flash).
+  const [open, setOpen] = useState(true);
   const { t } = useLang();
 
   useEffect(() => {
-    setOpen(
-      typeof window !== "undefined" && !localStorage.getItem(CONSENT_KEY),
-    );
+    if (localStorage.getItem(CONSENT_KEY)) setOpen(false);
   }, []);
 
   const decide = (value: "accepted" | "rejected") => {
@@ -30,7 +32,7 @@ export function CookieBanner() {
       role="region"
       aria-label={t("cookie.text")}
       data-no-clone
-      className="bg-accent-grade text-canvas-black text-[11px] md:text-[12px] py-2.5 px-4 md:px-8"
+      className="cookie-banner bg-accent-grade text-canvas-black text-[11px] md:text-[12px] py-2.5 px-4 md:px-8"
     >
       <div className="max-w-[1320px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="leading-snug">

@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
-import { ParallaxText } from "@/components/effects/ParallaxText";
+import { HeroReel } from "@/components/sections/HeroReel";
 import { NichoBlock } from "@/components/sections/NichoBlock";
 import { useLang } from "@/lib/language-context";
 import { LOGOS } from "@/lib/logos";
@@ -62,64 +60,17 @@ export function HomeView({
   const heroL1 = pick(siteContent?.homeHero_l1_pt, siteContent?.homeHero_l1_en);
   const heroL2 = pick(siteContent?.homeHero_l2_pt, siteContent?.homeHero_l2_en);
   const heroL3 = pick(siteContent?.homeHero_l3_pt, siteContent?.homeHero_l3_en);
-  const hasHeroText = Boolean(heroL1 || heroL2 || heroL3);
 
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">
       <TomatinoHeader />
-      <div className="h-[104px] md:h-[112px]" />
+      {/* H1 para SEO/leitores de ecrã — o herói é o reel de vídeo. */}
+      <h1 className="sr-only">
+        25 Horas Agency — cinema para marcas em Lisboa
+      </h1>
 
-      {/* ═══════════ 01 — HERO (logo + tagline opcional do Sanity) ═══════════ */}
-      <section
-        id="hero"
-        className="relative w-full overflow-hidden min-h-[640px] md:min-h-[760px] flex items-start justify-center bg-canvas-black"
-        aria-label="25 Horas Agency"
-      >
-        <div className="relative z-10 w-full flex flex-col items-center px-4 md:px-8 -mt-[60px]">
-          {/* H1 para SEO/leitores de ecrã — o herói é o logótipo (imagem). */}
-          <h1 className="sr-only">
-            25 Horas Agency — cinema para marcas em Lisboa
-          </h1>
-          <RevealOnScroll>
-            <div className="relative w-[min(85vw,900px)] aspect-[3/2]">
-              <Image
-                src="/media/logos/b25agency.png"
-                alt="25 Horas Agency"
-                fill
-                priority
-                sizes="(min-width: 768px) 900px, 85vw"
-                className="object-contain"
-                quality={82}
-              />
-            </div>
-          </RevealOnScroll>
-
-          {hasHeroText && (
-            <RevealOnScroll delay={140}>
-              <ParallaxText
-                strength={0.1}
-                className="mt-2 md:mt-4 text-center max-w-3xl mx-auto"
-              >
-                {heroL1 && (
-                  <p className="font-display uppercase text-[clamp(1.25rem,2.4vw,1.875rem)] leading-tight text-canvas-white">
-                    {heroL1}
-                  </p>
-                )}
-                {heroL2 && (
-                  <p className="font-display uppercase text-[clamp(1.25rem,2.4vw,1.875rem)] leading-tight text-canvas-white">
-                    {heroL2}
-                  </p>
-                )}
-                {heroL3 && (
-                  <p className="mt-1 font-display uppercase text-[clamp(1rem,2vw,1.5rem)] leading-tight text-canvas-white/65">
-                    {heroL3}
-                  </p>
-                )}
-              </ParallaxText>
-            </RevealOnScroll>
-          )}
-        </div>
-      </section>
+      {/* ═══════════ 01 — HERO REEL (vídeo por nicho + logo + som no hover) ═══════════ */}
+      <HeroReel heroLines={[heroL1, heroL2, heroL3].filter(Boolean)} />
 
       {/* ═══════════ 02-07 — SEIS NICHOS ═══════════ */}
       <div id="nichos">

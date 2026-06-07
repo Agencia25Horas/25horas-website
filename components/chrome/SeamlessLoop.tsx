@@ -85,6 +85,15 @@ export function SeamlessLoop() {
       .forEach((el) => {
         el.tabIndex = -1;
       });
+    // Vídeos no clone: são estáticos (sem React). Remover o src e desligar o
+    // preload para NÃO voltar a descarregar os vídeos do hero (só fica o poster).
+    clone.querySelectorAll("video").forEach((v) => {
+      const el = v as HTMLVideoElement;
+      el.removeAttribute("autoplay");
+      el.removeAttribute("src");
+      el.preload = "none";
+      el.muted = true;
+    });
     // Re-activar pointer events nas âncoras do clone para que cliques naveguem.
     // (#19) Para LINKS INTERNOS usamos router.push em vez do <a> nativo: a
     // navegação nativa do clone competia com o teleport de scroll → a 1ª

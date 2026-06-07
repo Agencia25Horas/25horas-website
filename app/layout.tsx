@@ -29,7 +29,9 @@ const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
-  display: "swap",
+  // utilitário (labels/eyebrows) — optional evita re-paint se a fonte chega
+  // tarde; o display/body ficam em swap (não queremos texto invisível).
+  display: "optional",
 });
 
 const SITE_URL = "https://25horasagency.com";
@@ -155,6 +157,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;}`}</style>
         </noscript>
+        {/* Esconde o cookie banner ANTES do paint para quem já decidiu (sem
+            flash). Para visitantes novos o banner fica visível e pinta no FCP. */}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('cookie-consent-v1'))document.documentElement.classList.add('cc-consented')}catch(e){}",
+          }}
+        />
+        <style
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: "html.cc-consented .cookie-banner{display:none!important}",
+          }}
+        />
       </head>
       <body
         className="font-body bg-canvas-black text-canvas-white antialiased"

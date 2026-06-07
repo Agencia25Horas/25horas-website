@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import { gsap } from "@/lib/gsap-setup";
 
 /**
  * Movimento de profundidade subtil para texto/elementos: translada lentamente
@@ -24,29 +23,54 @@ export function ParallaxText({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const prefersReduced = window.matchMedia(
+    const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (prefersReduced) return;
+    const isMobile =
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.innerWidth <= 768;
+    if (reduce || isMobile) return; // estático no mobile/reduced-motion
 
-    const tween = gsap.fromTo(
-      el,
-      { yPercent: -strength * 50 },
-      {
-        yPercent: strength * 50,
-        ease: "none",
-        scrollTrigger: {
-          trigger: el.parentElement || el,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.5,
+    let kill: (() => void) | null = null;
+    let cancelled = false;
+
+    const setup = async () => {
+      if (cancelled || !ref.current) return;
+      const { gsap } = await import("@/lib/gsap-setup");
+      if (cancelled || !ref.current) return;
+      const node = ref.current;
+      const tween = gsap.fromTo(
+        node,
+        { yPercent: -strength * 50 },
+        {
+          yPercent: strength * 50,
+          ease: "none",
+          scrollTrigger: {
+            trigger: node.parentElement || node,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.5,
+          },
         },
-      },
-    );
+      );
+      kill = () => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      };
+    };
+
+    const onFirstScroll = () => setup();
+    window.addEventListener("scroll", onFirstScroll, {
+      once: true,
+      passive: true,
+    });
+    const timer = window.setTimeout(setup, 1500);
 
     return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
+      cancelled = true;
+      window.removeEventListener("scroll", onFirstScroll);
+      window.clearTimeout(timer);
+      kill?.();
     };
   }, [strength]);
 

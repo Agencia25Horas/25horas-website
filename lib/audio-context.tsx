@@ -1,50 +1,139 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { disableAudio, enableAudio } from "./audio";
+import { useLang } from "./language-context";
 
 type AudioCtx = {
   on: boolean;
   blocked: boolean;
   toggle: () => Promise<void>;
+  /** Baixa (true) / repõe (false) o volume da faixa ATIVA — o vídeo do hero
+   *  usa isto para deixar a música de fundo, sem a cortar. */
+  duck: (active: boolean) => void;
 };
 
 const Ctx = createContext<AudioCtx | null>(null);
 
 const LS_KEY = "25h.audio";
-const TRACK_SRC = "/media/audio/vintecinco.mp3";
+// Duas faixas que tocam EM SINCRONIA: só se ouve a da língua ativa.
+const TRACKS = {
+  pt: "/media/audio/vintecinco.mp3",
+  en: "/media/audio/twentyfive.mp3",
+} as const;
 const TRACK_VOLUME = 0.5;
+const DUCK_VOLUME = 0.1; // ~20% — fica de fundo quando o vídeo tem som
 
 /**
- * Background track stays silent (no autoplay) until the user clicks SOM.
- * First click = play; subsequent clicks toggle play/pause. The first click
- * counts as the user gesture, so all browsers accept audio.play().
+ * Música de fundo bilingue. Ao clicar SOM, as DUAS faixas arrancam ao mesmo
+ * tempo, do início; só a da língua ativa é que tem volume (a outra toca muda,
+ * em sincronia). Mudar de língua troca qual se ouve — sem cortar.
+ *
+ * As faixas NÃO fazem loop e têm durações diferentes. Se mudares para uma
+ * língua cuja faixa já TERMINOU, ela recomeça do início.
  */
 export function AudioProvider({ children }: { children: React.ReactNode }) {
+  const { lang } = useLang();
   const [on, setOn] = useState(false);
   const [blocked, setBlocked] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ptRef = useRef<HTMLAudioElement | null>(null);
+  const enRef = useRef<HTMLAudioElement | null>(null);
+  const duckedRef = useRef(false);
+  const fadeRaf = useRef<number | null>(null);
+  const onRef = useRef(on);
+  onRef.current = on;
+  const langRef = useRef(lang);
+  langRef.current = lang;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const audio = new Audio(TRACK_SRC);
-    audio.loop = true;
-    audio.volume = TRACK_VOLUME;
-    audio.preload = "auto";
-    audioRef.current = audio;
+    const pt = new Audio(TRACKS.pt);
+    const en = new Audio(TRACKS.en);
+    pt.preload = "auto";
+    en.preload = "auto";
+    pt.volume = 0;
+    en.volume = 0;
+    ptRef.current = pt;
+    enRef.current = en;
     return () => {
-      audio.pause();
-      audio.src = "";
-      audioRef.current = null;
+      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
+      pt.pause();
+      en.pause();
+      pt.src = "";
+      en.src = "";
+      ptRef.current = null;
+      enRef.current = null;
     };
   }, []);
 
-  const toggle = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  const activeAudio = useCallback(
+    () => (langRef.current === "en" ? enRef.current : ptRef.current),
+    [],
+  );
+  const inactiveAudio = useCallback(
+    () => (langRef.current === "en" ? ptRef.current : enRef.current),
+    [],
+  );
+  const targetVolume = useCallback(
+    () => (duckedRef.current ? DUCK_VOLUME : TRACK_VOLUME),
+    [],
+  );
 
-    if (on) {
-      audio.pause();
+  const fadeVolumeTo = useCallback(
+    (el: HTMLAudioElement | null, target: number) => {
+      if (!el) return;
+      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
+      const start = el.volume;
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - t0) / 400);
+        el.volume = start + (target - start) * t;
+        if (t < 1) fadeRaf.current = requestAnimationFrame(tick);
+        else fadeRaf.current = null;
+      };
+      fadeRaf.current = requestAnimationFrame(tick);
+    },
+    [],
+  );
+
+  // ── troca de língua: muda qual a faixa audível ───────────────────
+  useEffect(() => {
+    if (!onRef.current) return; // só faz sentido com a música ligada
+    if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
+    const act = activeAudio();
+    const ina = inactiveAudio();
+    if (ina) ina.volume = 0; // a anterior fica muda (continua em sincronia)
+    if (act) {
+      // se a nova faixa já tinha acabado, recomeça do início
+      if (act.ended) act.currentTime = 0;
+      if (act.paused) act.play().catch(() => {});
+      act.volume = targetVolume();
+    }
+  }, [lang, activeAudio, inactiveAudio, targetVolume]);
+
+  const duck = useCallback(
+    (active: boolean) => {
+      duckedRef.current = active;
+      fadeVolumeTo(activeAudio(), active ? DUCK_VOLUME : TRACK_VOLUME);
+    },
+    [activeAudio, fadeVolumeTo],
+  );
+
+  const toggle = async () => {
+    const pt = ptRef.current;
+    const en = enRef.current;
+    if (!pt || !en) return;
+
+    if (onRef.current) {
+      pt.pause();
+      en.pause();
       disableAudio();
       setOn(false);
       setBlocked(false);
@@ -53,10 +142,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // Click is the user gesture — safe to start playback + resume the
-      // Web Audio context used by the SFX layer (shutter/clap/tick).
+      // Click = gesto do utilizador → áudio permitido em todos os browsers.
       await enableAudio();
-      await audio.play();
+      // ARRANCAM ao mesmo tempo, do início — é isto que garante a sincronia.
+      pt.currentTime = 0;
+      en.currentTime = 0;
+      const act = activeAudio();
+      const ina = inactiveAudio();
+      if (ina) ina.volume = 0;
+      if (act) act.volume = targetVolume();
+      await Promise.all([pt.play(), en.play()]);
       setOn(true);
       setBlocked(false);
       window.localStorage.setItem(LS_KEY, "on");
@@ -65,7 +160,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  return <Ctx.Provider value={{ on, blocked, toggle }}>{children}</Ctx.Provider>;
+  return (
+    <Ctx.Provider value={{ on, blocked, toggle, duck }}>
+      {children}
+    </Ctx.Provider>
+  );
 }
 
 export function useAudio() {

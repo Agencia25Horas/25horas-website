@@ -42,3 +42,7 @@ public/media/*
 !public/media/nichos/**
 !public/media/audio
 !public/media/audio/**
+
+# hero — vídeos-fonte pesados ficam locais; só os outputs (public/hero/) vão p/ git
+/items/
+/Items/
