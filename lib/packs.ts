@@ -98,8 +98,8 @@ const STUDIO_FEATURE: PackFeature = {
   icon: "studio",
   accent: true,
   title: {
-    pt: "Acesso ao estúdio 25Horas Agency",
-    en: "Access to 25Horas Agency studio",
+    pt: "Acesso ao estúdio 25 Horas Agency",
+    en: "Access to 25 Horas Agency studio",
   },
   desc: {
     pt: "Fotografia profissional, podcast, entrevistas, vídeos institucionais e branding.",
@@ -111,8 +111,8 @@ const NO_STUDIO_FEATURE: PackFeature = {
   icon: "block",
   title: { pt: "Não inclui acesso ao estúdio", en: "Studio access not included" },
   desc: {
-    pt: "Este pack não inclui acesso ao estúdio de fotografia/podcast da 25Horas Agency.",
-    en: "This pack does not include access to the 25Horas Agency photography/podcast studio.",
+    pt: "Este pack não inclui acesso ao estúdio de fotografia/podcast da 25 Horas Agency.",
+    en: "This pack does not include access to the 25 Horas Agency photography/podcast studio.",
   },
 };
 

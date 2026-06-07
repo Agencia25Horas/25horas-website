@@ -3,8 +3,10 @@ import { SobreView } from "./SobreView";
 import { fetchSiteContent } from "@/lib/sanity/fetch";
 
 export const metadata: Metadata = {
-  title: "Sobre — 25 Horas",
-  description: "25 Horas Agency. Cinema para marcas. Lisboa, Portugal.",
+  title: "Sobre",
+  description:
+    "Quem é a 25 Horas Agency — cinema para marcas em Lisboa. Vídeo, fotografia, design e gestão de redes sociais.",
+  alternates: { canonical: "/sobre" },
 };
 
 export default async function SobrePage() {

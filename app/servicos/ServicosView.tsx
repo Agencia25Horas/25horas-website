@@ -25,12 +25,12 @@ export function ServicosView() {
               </p>
             </RevealOnScroll>
             <RevealOnScroll delay={80}>
-              <h1 className="mt-4 font-display uppercase text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-canvas-black">
+              <h1 className="mt-4 font-display uppercase text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-canvas-white">
                 {t("servicos.title")}
               </h1>
             </RevealOnScroll>
             <RevealOnScroll delay={160}>
-              <p className="mt-6 font-body text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-type-neutral max-w-xl">
+              <p className="mt-6 font-body text-[clamp(1rem,1.4vw,1.125rem)] leading-relaxed text-canvas-white/75 max-w-xl">
                 {t("servicos.subtitle")}
               </p>
             </RevealOnScroll>
@@ -62,10 +62,10 @@ export function ServicosView() {
                   <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-type-dim">
                     {nicho.code} / {String(NICHOS.length).padStart(2, "0")}
                   </p>
-                  <h2 className="mt-2 font-display uppercase text-[clamp(1.5rem,2.5vw,2.25rem)] leading-[1] text-canvas-black">
+                  <h2 className="mt-2 font-display uppercase text-[clamp(1.5rem,2.5vw,2.25rem)] leading-[1] text-canvas-white">
                     {label}
                   </h2>
-                  <p className="mt-1 font-body text-[14px] leading-snug text-type-neutral">
+                  <p className="mt-1 font-body text-[14px] leading-snug text-canvas-white/65">
                     {tagline}
                   </p>
                 </div>

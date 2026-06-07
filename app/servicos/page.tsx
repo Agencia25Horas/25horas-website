@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { ServicosView } from "./ServicosView";
 
 export const metadata: Metadata = {
-  title: "Serviços — 25 Horas",
-  description: "Os 6 sectores em que trabalhamos.",
+  title: "Serviços",
+  description:
+    "Oito sectores, um vocabulário cinematográfico — vídeo, fotografia e gestão de redes sociais para a tua marca, em Lisboa.",
+  alternates: { canonical: "/servicos" },
 };
 
 export default function ServicosPage() {

@@ -11,18 +11,21 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "header.sobre": "Sobre",
     "header.portfolio": "Portefolio",
     "header.contactos": "Contactos",
-    "header.orcamento": "Pedido de Orçamento",
+    "header.orcamento": "Pedir orçamento",
 
     // Cookie banner
     "cookie.text":
-      "Apenas usamos cookies para ver as visitas ao nosso site. Não guardamos dados pessoais.",
+      "Usamos armazenamento essencial para o site funcionar e, com a tua autorização, estatísticas anónimas de visitas. Não vendemos dados.",
     "cookie.close": "Fechar",
+    "cookie.aceitar": "Aceitar",
+    "cookie.rejeitar": "Rejeitar não-essenciais",
+    "cookie.saberMais": "Saber mais",
 
     // Chrome
     "chrome.som": "SOM",
 
     // Footer
-    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • 517 769 034",
+    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
 
     // Common
     "common.verMais": "Ver mais →",
@@ -51,10 +54,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l3": "AS IMAGENS SÃO NOSSAS.",
 
     // /servicos (índice)
-    "servicos.eyebrow": "07 Nichos",
+    "servicos.eyebrow": "08 Nichos",
     "servicos.title": "Onde fazemos magia.",
     "servicos.subtitle":
-      "Seis sectores, um vocabulário cinematográfico. Carrega num para ver o que fazemos em cada.",
+      "Oito sectores, um vocabulário cinematográfico. Carrega num para ver o que fazemos em cada.",
 
     // /servicos/[nicho] (deep)
     "nichoPage.oQueFazemos": "O que fazemos",
@@ -74,7 +77,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.comoTrabalhamosTitle": "Do briefing\nao corte final.",
     "sobre.comoTrabalhamosBody":
       "Conhecemos o cliente, o produto, a equipa e o sítio antes de pegar na câmara. Cada projecto tem um realizador responsável. Direcção de fotografia, som, edição e colorização pensados em conjunto e sempre afinados.",
-    "sobre.sectoresEyebrow": "Os 6 sectores em que trabalhamos",
+    "sobre.sectoresEyebrow": "Os 8 sectores em que trabalhamos",
     "sobre.sectoresTitle": "As nossas sub-marcas.",
 
     // /contactos
@@ -97,7 +100,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "orcamento.title": "Quatro perguntas.\nResposta em 24h.",
     "orcamento.subtitle":
       "Diz-nos o nicho, o entregável e o prazo. Respondemos em PT ou EN no prazo de um dia útil.",
-    "orcamento.form.title": "Pedido de orçamento",
+    "orcamento.form.title": "Pedir orçamento",
     "orcamento.form.passo": "Passo",
     "orcamento.form.de": "de",
     "orcamento.form.q1": "Qual o nicho do teu projecto?",
@@ -140,15 +143,18 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "header.sobre": "About",
     "header.portfolio": "Portfolio",
     "header.contactos": "Contact",
-    "header.orcamento": "Get a Quote",
+    "header.orcamento": "Get a quote",
 
     "cookie.text":
-      "We only use cookies to count visits to our site. No personal data stored.",
+      "We use essential storage to run the site and, with your consent, anonymous visit analytics. We don't sell data.",
     "cookie.close": "Close",
+    "cookie.aceitar": "Accept",
+    "cookie.rejeitar": "Reject non-essential",
+    "cookie.saberMais": "Learn more",
 
     "chrome.som": "SOUND",
 
-    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • 517 769 034",
+    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
 
     "common.verMais": "See more →",
     "common.verTudo": "See all →",
@@ -173,10 +179,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l2": "BELONG TO THE BRANDS.",
     "home.hero.title.l3": "THE IMAGES ARE OURS.",
 
-    "servicos.eyebrow": "07 Sectors",
+    "servicos.eyebrow": "08 Sectors",
     "servicos.title": "Where we make magic.",
     "servicos.subtitle":
-      "Six sectors, one cinematic vocabulary. Click one to see what we do for each.",
+      "Eight sectors, one cinematic vocabulary. Click one to see what we do for each.",
 
     "nichoPage.oQueFazemos": "What we do",
     "nichoPage.para": "For",
@@ -194,7 +200,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.comoTrabalhamosTitle": "From briefing\nto final cut.",
     "sobre.comoTrabalhamosBody":
       "We get to know the client, product, team and location before we pick up the camera. Each project has a dedicated director. Cinematography, sound, edit and colour grading are all thought through together and always tuned in.",
-    "sobre.sectoresEyebrow": "The 6 sectors we work in",
+    "sobre.sectoresEyebrow": "The 8 sectors we work in",
     "sobre.sectoresTitle": "Our sub-brands.",
 
     "contactos.eyebrow": "Contact",
@@ -215,7 +221,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "orcamento.title": "Four questions.\nReply within 24h.",
     "orcamento.subtitle":
       "Tell us the sector, the deliverable and the timeline. We respond in PT or EN within one business day.",
-    "orcamento.form.title": "Quote request",
+    "orcamento.form.title": "Get a quote",
     "orcamento.form.passo": "Step",
     "orcamento.form.de": "of",
     "orcamento.form.q1": "What sector is your project in?",

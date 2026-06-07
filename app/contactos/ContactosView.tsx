@@ -5,6 +5,7 @@ import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
 import { ParallaxImage } from "@/components/effects/ParallaxImage";
+import { trackEvent } from "@/components/chrome/Analytics";
 import { useLang } from "@/lib/language-context";
 import type { SanitySiteContent } from "@/lib/sanity/types";
 
@@ -100,6 +101,7 @@ export function ContactosView({
               </p>
               <a
                 href={telHref(phone)}
+                onClick={() => trackEvent("phone_click", { local: "contactos" })}
                 className="mt-3 block font-display uppercase text-[clamp(1.25rem,2.2vw,1.875rem)] leading-tight text-canvas-white hover:opacity-60 transition-opacity"
               >
                 {phone}

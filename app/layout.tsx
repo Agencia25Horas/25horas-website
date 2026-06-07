@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Anton, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AudioProvider } from "@/lib/audio-context";
 import { LanguageProvider } from "@/lib/language-context";
 import { LenisProvider } from "@/lib/lenis-provider";
 import { Analytics } from "@/components/chrome/Analytics";
+import { GoogleTags } from "@/components/chrome/GoogleTags";
 import { StickyCTA } from "@/components/chrome/StickyCTA";
 import { SeamlessLoop } from "@/components/chrome/SeamlessLoop";
 
@@ -33,11 +34,18 @@ const fontMono = JetBrains_Mono({
 
 const SITE_URL = "https://25horasagency.com";
 
+// Tema escuro forçado — diz ao browser para usar controlos nativos (inputs,
+// autofill, scrollbars) em dark, evitando texto escuro-sobre-escuro.
+export const viewport: Viewport = {
+  themeColor: "#0A0A0A",
+  colorScheme: "dark",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: "25 Horas — Cinema para marcas",
-    template: "%s — 25 Horas",
+    template: "%s | 25 Horas Agency",
   },
   description:
     "Não fazemos vídeos. Fazemos filmes para marcas. 25 frames por segundo, 25 horas por dia. Lisboa, Portugal.",
@@ -109,6 +117,7 @@ const LOCAL_BUSINESS_LD = {
   image: `${SITE_URL}/opengraph-image`,
   email: "agencia25horas@gmail.com",
   telephone: "+351912707015",
+  vatID: "PT517769034",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Avenida da Siderurgia Nacional Nº1, Sala 105",
@@ -126,7 +135,7 @@ const LOCAL_BUSINESS_LD = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="pt"
+      lang="pt-PT"
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}
       suppressHydrationWarning
     >
@@ -159,6 +168,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </LanguageProvider>
         </LenisProvider>
         <Analytics />
+        <GoogleTags />
       </body>
     </html>
   );

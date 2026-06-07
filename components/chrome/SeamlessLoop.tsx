@@ -74,6 +74,17 @@ export function SeamlessLoop() {
     // Remover UI stateful que não deve aparecer no clone (CookieBanner,
     // toasts, etc). Marca-se com data-no-clone na componente original.
     clone.querySelectorAll("[data-no-clone]").forEach((el) => el.remove());
+    // Tirar TODOS os elementos focáveis (não-âncora) da ordem de Tab: um
+    // elemento aria-hidden não pode conter focáveis (WCAG 4.1.2 /
+    // axe "aria-hidden-focus"). Os <a> tratam-se a seguir (mantêm-se
+    // clicáveis mas com tabIndex=-1).
+    clone
+      .querySelectorAll<HTMLElement>(
+        "button, input, select, textarea, iframe, [tabindex], [contenteditable]",
+      )
+      .forEach((el) => {
+        el.tabIndex = -1;
+      });
     // Re-activar pointer events nas âncoras do clone para que cliques naveguem.
     // (#19) Para LINKS INTERNOS usamos router.push em vez do <a> nativo: a
     // navegação nativa do clone competia com o teleport de scroll → a 1ª

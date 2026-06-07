@@ -19,7 +19,9 @@ export async function generateMetadata({
   const n = findNicho(nicho);
   if (!n) return { title: "Serviços — 25 Horas" };
 
-  const title = `${n.label} — 25 Horas Agency`;
+  // Título "nu" (o template do layout junta "| 25 Horas Agency"); OG usa o nome completo.
+  const title = n.label;
+  const ogTitle = `${n.label} — 25 Horas Agency`;
   const description = `${n.tagline} Vídeo, fotografia e gestão de redes para ${n.label.toLowerCase()} em Portugal.`;
 
   return {
@@ -36,7 +38,7 @@ export async function generateMetadata({
     ],
     alternates: { canonical: `/servicos/${n.slug}` },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       url: `/servicos/${n.slug}`,
       type: "website",
@@ -45,7 +47,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
     },
   };

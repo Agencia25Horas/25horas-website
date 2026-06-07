@@ -9,11 +9,12 @@
 
 import type { NichePack } from "@/lib/packs";
 import { getNichePack as staticGetNichePack } from "@/lib/packs";
-import type { NichoSlug } from "@/lib/servicos";
+import { NICHOS, type NichoSlug } from "@/lib/servicos";
 import { sanityClient, sanityEnabled, urlForImage } from "./client";
 import {
   ALL_NICHES_QUERY,
   NICHE_BY_SLUG_QUERY,
+  NICHE_SITEMAP_QUERY,
   PORTFOLIO_ALL_QUERY,
   PORTFOLIO_BY_NICHE_QUERY,
   SITE_CONTENT_QUERY,
@@ -101,6 +102,34 @@ export async function fetchNichePhotos(): Promise<Record<string, string>> {
   } catch (err) {
     console.warn("[sanity] fetchNichePhotos falhou", err);
     return {};
+  }
+}
+
+/**
+ * Slugs + _updatedAt dos nichos, para o sitemap. Usa o Sanity (para o
+ * lastModified refletir edições reais no Studio) e cai para a lista estática
+ * de NICHOS se o CMS estiver desligado / falhar / vier vazio.
+ */
+export async function fetchNicheSitemap(): Promise<
+  { slug: string; updatedAt?: string }[]
+> {
+  const fallback = NICHOS.map((n) => ({ slug: n.slug as string }));
+  if (!sanityEnabled || !sanityClient) return fallback;
+  try {
+    const rows = await sanityClient.fetch<
+      { slug: string; _updatedAt: string }[] | null
+    >(
+      NICHE_SITEMAP_QUERY,
+      {},
+      { next: { revalidate: 3600, tags: ["niche:sitemap"] } },
+    );
+    if (!rows || rows.length === 0) return fallback;
+    return rows
+      .filter((r) => r.slug)
+      .map((r) => ({ slug: r.slug, updatedAt: r._updatedAt }));
+  } catch (err) {
+    console.warn("[sanity] fetchNicheSitemap falhou — fallback static", err);
+    return fallback;
   }
 }
 

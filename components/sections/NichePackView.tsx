@@ -9,6 +9,7 @@ import { useLang } from "@/lib/language-context";
 import type { Nicho } from "@/lib/servicos";
 import type { NichePack, PackIcon } from "@/lib/packs";
 import { whatsappLink } from "@/lib/whatsapp";
+import { trackEvent } from "@/components/chrome/Analytics";
 
 /* ─── ÍCONES SVG INLINE ────────────────────────────────────────────────── */
 
@@ -343,6 +344,7 @@ export function NichePackView({
               href={whatsappLink(s(data.whatsappText))}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("whatsapp_click", { nicho: nicho.slug })}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-canvas-black font-mono text-[14px] uppercase tracking-[0.15em] hover:opacity-85 transition-opacity"
               style={{ backgroundColor: accent }}
             >
@@ -397,6 +399,7 @@ export function NichePackView({
             </span>
             <a
               href="tel:+351912707015"
+              onClick={() => trackEvent("phone_click", { nicho: nicho.slug })}
               className="inline-flex items-center gap-2 hover:text-canvas-white transition-colors"
             >
               <span className="w-4 h-4 text-canvas-white/55">{I.phone}</span>

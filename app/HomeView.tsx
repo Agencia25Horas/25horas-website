@@ -76,6 +76,10 @@ export function HomeView({
         aria-label="25 Horas Agency"
       >
         <div className="relative z-10 w-full flex flex-col items-center px-4 md:px-8 -mt-[60px]">
+          {/* H1 para SEO/leitores de ecrã — o herói é o logótipo (imagem). */}
+          <h1 className="sr-only">
+            25 Horas Agency — cinema para marcas em Lisboa
+          </h1>
           <RevealOnScroll>
             <div className="relative w-[min(85vw,900px)] aspect-[3/2]">
               <Image
@@ -85,7 +89,7 @@ export function HomeView({
                 priority
                 sizes="(min-width: 768px) 900px, 85vw"
                 className="object-contain"
-                quality={95}
+                quality={82}
               />
             </div>
           </RevealOnScroll>

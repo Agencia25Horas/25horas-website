@@ -17,10 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { nicho } = await params;
   const n = findNicho(nicho);
-  if (!n) return { title: "Portfolio — 25 Horas" };
+  if (!n) return { title: "Portfólio" };
   return {
-    title: `Portfolio · ${n.label} — 25 Horas`,
-    description: `Trabalhos no nicho ${n.label}.`,
+    title: `Portfólio · ${n.label}`,
+    description: `Trabalhos de ${n.label.toLowerCase()} da 25 Horas Agency — vídeo, fotografia e design.`,
+    alternates: { canonical: `/servicos/${n.slug}/portfolio` },
   };
 }
 

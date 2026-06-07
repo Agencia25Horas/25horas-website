@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import { trackEvent } from "@/components/chrome/Analytics";
 import { NICHOS } from "@/lib/servicos";
@@ -31,6 +31,8 @@ export function BudgetForm() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Timestamp do mount — anti-spam (submissões instantâneas = bot).
+  const mountedAt = useRef(Date.now());
 
   // Deriva de NICHOS → auto-inclui todos os nichos (Educação, Saúde, etc.)
   // sem ter de manter uma lista à parte.
@@ -73,6 +75,7 @@ export function BudgetForm() {
           phone: s.phone,
           company: s.company,
           website: s.website,
+          _t: mountedAt.current,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {
@@ -84,13 +87,15 @@ export function BudgetForm() {
           data.error ??
             "Não conseguimos enviar agora. Tenta de novo ou usa o email directo.",
         );
-        trackEvent("Quote failed", {
+        trackEvent("form_error", {
           reason: data.error ?? `http_${res.status}`,
         });
         return;
       }
-      trackEvent("Quote submitted", {
-        niche: s.projectType ?? "",
+      // O form de orçamento não escolhe "pack" (isso é nas páginas de nicho);
+      // enviamos o nicho + entregável + prazo.
+      trackEvent("form_submit", {
+        nicho: s.projectType ?? "",
         deliverable: s.deliverable ?? "",
         timeline: s.timeline ?? "",
       });
@@ -135,6 +140,7 @@ export function BudgetForm() {
           <br />
           <a
             href="tel:+351912707015"
+            onClick={() => trackEvent("phone_click", { local: "orcamento" })}
             className="underline underline-offset-4 text-canvas-white hover:opacity-70"
           >
             +351 912 707 015
@@ -149,6 +155,10 @@ export function BudgetForm() {
       {/* Barra de progresso visual (4 segmentos) — mais clara que o texto */}
       <div
         className="mb-5 flex gap-1.5"
+        role="progressbar"
+        aria-valuenow={s.step}
+        aria-valuemin={1}
+        aria-valuemax={4}
         aria-label={`${t("orcamento.form.passo")} ${s.step} ${t("orcamento.form.de")} 4`}
       >
         {[1, 2, 3, 4].map((n) => (

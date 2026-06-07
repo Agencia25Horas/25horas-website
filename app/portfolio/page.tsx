@@ -3,8 +3,10 @@ import { PortfolioView } from "./PortfolioView";
 import { fetchAllPortfolio } from "@/lib/sanity/fetch";
 
 export const metadata: Metadata = {
-  title: "Portefolio — 25 Horas",
-  description: "Trabalhos por nicho — vídeo, fotografia e design.",
+  title: "Portfólio",
+  description:
+    "Trabalhos da 25 Horas Agency por nicho — vídeo, fotografia e design para marcas.",
+  alternates: { canonical: "/portfolio" },
 };
 
 export default async function PortfolioPage() {

@@ -146,7 +146,7 @@ export const NICHOS: Nicho[] = [
   {
     code: "03",
     slug: "real-estate",
-    label: "REAL STATE",
+    label: "REAL ESTATE",
     emoji: "🏠",
     tagline: "Espaços que se vendem em sessenta segundos.",
     image: "/media/nichos/real-estate.jpg",

@@ -42,6 +42,12 @@ export const ALL_NICHES_QUERY = groq`*[_type == "niche"] | order(order asc) {
 /** Slugs apenas — para generateStaticParams. */
 export const ALL_NICHE_SLUGS_QUERY = groq`*[_type == "niche"].slug`;
 
+/** Slugs + data de última modificação — para o sitemap (lastModified). */
+export const NICHE_SITEMAP_QUERY = groq`*[_type == "niche" && defined(slug)] | order(slug asc){
+  "slug": slug,
+  _updatedAt
+}`;
+
 /** Portfolio items por nicho — capa, título, link e nicheSlug resolvidos. */
 export const PORTFOLIO_BY_NICHE_QUERY = groq`*[_type == "portfolioItem" && niche->slug == $slug] | order(order asc, _createdAt desc) {
   _id,
