@@ -107,7 +107,10 @@ export function SeamlessLoop() {
     // ── Teleporte helper ────────────────────────────────────────
     const teleport = (y: number) => {
       if (lenis) {
-        lenis.scrollTo(y, { immediate: true, force: true, lock: true });
+        // Sem `lock` → o momentum do smooth-scroll continua a partir da nova
+        // posição em vez de parar no wrap (menos "break"). `immediate` mantém
+        // o salto instantâneo e invisível (o clone é igual ao original).
+        lenis.scrollTo(y, { immediate: true, force: true });
       } else {
         window.scrollTo({ top: y, behavior: "auto" });
       }
