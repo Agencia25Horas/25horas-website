@@ -34,14 +34,15 @@ export const portfolioItem = defineType({
       title: "Imagem de capa",
       type: "image",
       options: { hotspot: true },
-      validation: (Rule) => Rule.required(),
+      description:
+        "Opcional p/ YouTube/Vimeo (a capa vem automática da thumbnail do vídeo). Para Instagram ou foto, faz upload aqui.",
     }),
     defineField({
       name: "link",
-      title: "Link (Instagram / YouTube / TikTok)",
+      title: "Link (YouTube / Vimeo / Instagram)",
       type: "url",
       description:
-        "Opcional. Se preenchido, clicar na capa abre este link num separador novo.",
+        "Opcional. YouTube/Vimeo → player dentro do site + capa automática. Instagram → cartão do post dentro do site. Outro link → abre em nova tab.",
     }),
     defineField({
       name: "order",
