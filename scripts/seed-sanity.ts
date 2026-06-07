@@ -130,8 +130,8 @@ async function seedSiteContent() {
       "We don't make videos. We make films for brands. 25 frames per second, 25 hours a day.",
     // Contactos
     contact_email: "agencia25horas@gmail.com",
-    contact_phone: "+351 928 059 855",
-    contact_whatsapp: "351963869519",
+    contact_phone: "+351 912 707 015",
+    contact_whatsapp: "351912707015",
     contact_address:
       "Avenida da Siderurgia Nacional Nº1, Sala 105, 2840-075 Aldeia de Paio Pires",
   });

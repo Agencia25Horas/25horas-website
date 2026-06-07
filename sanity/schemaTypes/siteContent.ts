@@ -126,7 +126,7 @@ export const siteContent = defineType({
     }),
     defineField({
       name: "contact_whatsapp",
-      title: "WhatsApp (sem prefixo +, ex 351963869519)",
+      title: "WhatsApp (sem prefixo +, ex 351912707015)",
       type: "string",
       group: "contactos",
     }),
