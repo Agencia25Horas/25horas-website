@@ -5,7 +5,6 @@ import { ParallaxImage } from "@/components/effects/ParallaxImage";
 import { useLang } from "@/lib/language-context";
 import type { LogoEntry } from "@/lib/logos";
 import type { Nicho } from "@/lib/servicos";
-import { NICHOS } from "@/lib/servicos";
 
 /** Menu compacto de categorias oferecidas neste nicho. */
 function CategoryMenu({
@@ -115,12 +114,6 @@ export function NichoBlock({
             textOnLeft ? "md:order-1" : "md:order-2"
           }`}
         >
-          <p
-            className="font-mono text-[11px] uppercase tracking-[0.2em]"
-            style={{ color: accent }}
-          >
-            {nicho.code} — {String(NICHOS.length).padStart(2, "0")}
-          </p>
           <h2
             className="font-display uppercase text-[clamp(2.5rem,5.5vw,5rem)] leading-[0.95] drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]"
             style={{ color: accent }}

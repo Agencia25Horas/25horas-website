@@ -32,12 +32,17 @@ const TRACK_VOLUME = 0.5;
 const DUCK_VOLUME = 0.1; // ~20% — fica de fundo quando o vídeo tem som
 
 /**
- * Música de fundo bilingue. Ao clicar SOM, as DUAS faixas arrancam ao mesmo
- * tempo, do início; só a da língua ativa é que tem volume (a outra toca muda,
- * em sincronia). Mudar de língua troca qual se ouve — sem cortar.
+ * Música de fundo bilingue + LOOP sincronizado.
  *
- * As faixas NÃO fazem loop e têm durações diferentes. Se mudares para uma
- * língua cuja faixa já TERMINOU, ela recomeça do início.
+ * As duas faixas (25pt + 25en) arrancam ao mesmo tempo, do início; só a da
+ * língua ativa tem som (a outra toca muda, em sincronia, via `muted` —
+ * iOS-safe). Mudar de língua troca qual se ouve, sem cortar.
+ *
+ * As faixas têm durações diferentes (a PT é um pouco mais longa). Para nunca
+ * haver silêncio e poder mudar de língua a qualquer momento:
+ *   • o LOOP é comandado pela faixa ATIVA — quando ela acaba, AS DUAS
+ *     recomeçam juntas do início (a mais curta, que acabou antes, espera);
+ *   • mudar para uma língua cuja faixa já tinha acabado → recomeça AS DUAS.
  */
 export function AudioProvider({ children }: { children: React.ReactNode }) {
   const { lang } = useLang();
@@ -52,32 +57,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const langRef = useRef(lang);
   langRef.current = lang;
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const pt = new Audio(TRACKS.pt);
-    const en = new Audio(TRACKS.en);
-    pt.preload = "auto";
-    en.preload = "auto";
-    // `muted` (não `volume`) é o que silencia de forma fiável — no iOS o
-    // volume é read-only/ignorado, por isso só com muted é que a faixa
-    // inativa fica mesmo calada.
-    pt.volume = 0;
-    en.volume = 0;
-    pt.muted = true;
-    en.muted = true;
-    ptRef.current = pt;
-    enRef.current = en;
-    return () => {
-      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-      pt.pause();
-      en.pause();
-      pt.src = "";
-      en.src = "";
-      ptRef.current = null;
-      enRef.current = null;
-    };
-  }, []);
-
   const activeAudio = useCallback(
     () => (langRef.current === "en" ? enRef.current : ptRef.current),
     [],
@@ -90,6 +69,69 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     () => (duckedRef.current ? DUCK_VOLUME : TRACK_VOLUME),
     [],
   );
+
+  // Só a faixa da língua ativa se ouve (muted, não volume → fiável no iOS).
+  const applyMutes = useCallback(() => {
+    const a = activeAudio();
+    const i = inactiveAudio();
+    if (i) {
+      i.muted = true;
+      i.volume = 0;
+    }
+    if (a) {
+      a.muted = false;
+      a.volume = targetVolume();
+    }
+  }, [activeAudio, inactiveAudio, targetVolume]);
+
+  // Recomeça AS DUAS faixas do início (mantém sincronia) e toca.
+  const restartBoth = useCallback(() => {
+    const pt = ptRef.current;
+    const en = enRef.current;
+    if (!pt || !en) return;
+    pt.currentTime = 0;
+    en.currentTime = 0;
+    applyMutes();
+    pt.play().catch(() => {});
+    en.play().catch(() => {});
+  }, [applyMutes]);
+  const restartBothRef = useRef(restartBoth);
+  restartBothRef.current = restartBoth;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const pt = new Audio(TRACKS.pt);
+    const en = new Audio(TRACKS.en);
+    pt.preload = "auto";
+    en.preload = "auto";
+    pt.volume = 0;
+    en.volume = 0;
+    pt.muted = true;
+    en.muted = true;
+    ptRef.current = pt;
+    enRef.current = en;
+    // LOOP sincronizado: quando a faixa ATIVA acaba, recomeçam AS DUAS. A
+    // inativa (mais curta) que acabe antes fica à espera. NÃO usamos o atributo
+    // `loop` — cada uma a fazer loop sozinha desincronizava-as.
+    const onEnded = (e: Event) => {
+      if (!onRef.current) return;
+      const active = langRef.current === "en" ? enRef.current : ptRef.current;
+      if (e.target === active) restartBothRef.current();
+    };
+    pt.addEventListener("ended", onEnded);
+    en.addEventListener("ended", onEnded);
+    return () => {
+      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
+      pt.removeEventListener("ended", onEnded);
+      en.removeEventListener("ended", onEnded);
+      pt.pause();
+      en.pause();
+      pt.src = "";
+      en.src = "";
+      ptRef.current = null;
+      enRef.current = null;
+    };
+  }, []);
 
   const fadeVolumeTo = useCallback(
     (el: HTMLAudioElement | null, target: number) => {
@@ -108,24 +150,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  // ── troca de língua: muda qual a faixa audível ───────────────────
+  // ── troca de língua ──────────────────────────────────────────────
   useEffect(() => {
-    if (!onRef.current) return; // só faz sentido com a música ligada
+    if (!onRef.current) return;
     if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-    const act = activeAudio();
-    const ina = inactiveAudio();
-    if (ina) {
-      ina.muted = true; // a anterior fica muda (continua em sincronia)
-      ina.volume = 0;
+    const a = activeAudio();
+    // se a nova faixa já tinha ACABADO → recomeça AS DUAS (loop sincronizado).
+    if (a && a.ended) {
+      restartBoth();
+      return;
     }
-    if (act) {
-      // se a nova faixa já tinha acabado, recomeça do início
-      if (act.ended) act.currentTime = 0;
-      if (act.paused) act.play().catch(() => {});
-      act.muted = false;
-      act.volume = targetVolume();
-    }
-  }, [lang, activeAudio, inactiveAudio, targetVolume]);
+    // senão, está a tocar em sincronia → só troca qual se ouve.
+    applyMutes();
+    if (a && a.paused) a.play().catch(() => {});
+  }, [lang, activeAudio, applyMutes, restartBoth]);
 
   const duck = useCallback(
     (active: boolean) => {
@@ -153,20 +191,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     try {
       // Click = gesto do utilizador → áudio permitido em todos os browsers.
       await enableAudio();
-      // ARRANCAM ao mesmo tempo, do início — é isto que garante a sincronia.
-      pt.currentTime = 0;
-      en.currentTime = 0;
-      const act = activeAudio();
-      const ina = inactiveAudio();
-      if (ina) {
-        ina.muted = true;
-        ina.volume = 0;
-      }
-      if (act) {
-        act.muted = false;
-        act.volume = targetVolume();
-      }
-      await Promise.all([pt.play(), en.play()]);
+      onRef.current = true; // para o onEnded (loop) já funcionar
+      restartBoth(); // arrancam ao mesmo tempo, do início
       setOn(true);
       setBlocked(false);
       window.localStorage.setItem(LS_KEY, "on");

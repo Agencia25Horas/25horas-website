@@ -59,9 +59,6 @@ export function ServicosView() {
                   />
                 </div>
                 <div className="mt-4">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-type-dim">
-                    {nicho.code} / {String(NICHOS.length).padStart(2, "0")}
-                  </p>
                   <h2 className="mt-2 font-display uppercase text-[clamp(1.5rem,2.5vw,2.25rem)] leading-[1] text-canvas-white">
                     {label}
                   </h2>

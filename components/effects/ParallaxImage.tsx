@@ -42,12 +42,10 @@ export function ParallaxImage({
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const isMobile =
-      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
-      window.innerWidth <= 768;
-    // Mobile / reduced-motion → imagem ESTÁTICA (sem GSAP, sem repaints no
-    // scroll). O estado por defeito (sem transform) já é o visual final.
-    if (reduce || isMobile) return;
+    // Estático só em reduced-motion. O GSAP continua a carregar on-demand
+    // (1.º scroll/1500ms) — não pesa no arranque, e o depth funciona também
+    // em mobile.
+    if (reduce) return;
 
     let kill: (() => void) | null = null;
     let cancelled = false;

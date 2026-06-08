@@ -26,10 +26,7 @@ export function ParallaxText({
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const isMobile =
-      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
-      window.innerWidth <= 768;
-    if (reduce || isMobile) return; // estático no mobile/reduced-motion
+    if (reduce) return; // estático só em reduced-motion (mobile tem depth)
 
     let kill: (() => void) | null = null;
     let cancelled = false;
