@@ -46,29 +46,51 @@ export function SobreView({
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">
       <TomatinoHeader />
-      <div className="h-[104px] md:h-[112px]" />
 
-      <section className="px-6 md:px-12 py-20 md:py-28">
-        <div className="max-w-[1100px] mx-auto">
-          <RevealOnScroll>
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/55">
-              {t("sobre.eyebrow")}
-            </p>
-          </RevealOnScroll>
-          <RevealOnScroll delay={80}>
-            <h1 className="mt-4 font-display uppercase text-[clamp(3rem,8vw,7rem)] leading-[0.95] text-canvas-white">
-              {title}
-            </h1>
-          </RevealOnScroll>
-          <RevealOnScroll delay={160}>
-            <p className="mt-10 font-body text-[clamp(1.15rem,1.6vw,1.4rem)] leading-relaxed text-canvas-white/85 max-w-3xl">
-              {subtitle}
-            </p>
-          </RevealOnScroll>
+      {/* Hero full-bleed: a foto estende-se por trás do header (sem barra preta).
+          O pt-[104px] empurra só o CONTEÚDO para baixo do header fixo. */}
+      <section className="relative w-full overflow-hidden h-[54svh] md:h-[60svh] flex items-center border-b border-canvas-white/10 pt-[104px] md:pt-[112px]">
+        {/* Foto de fundo ESTÁTICA (sem parallax/zoom — altura fixa = "barreira"
+            igual em todas as páginas; a imagem nunca ultrapassa a section). */}
+        <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+          <Image
+            src="/media/nichos/aboutus.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-canvas-black/60" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent 35%, rgba(10,10,10,0.55) 80%, var(--canvas-black) 100%)",
+            }}
+          />
+        </div>
+        <div className="relative z-10 w-full px-6 md:px-12 py-16 md:py-20">
+          <div className="max-w-[1100px] mx-auto">
+            <RevealOnScroll>
+              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/60">
+                {t("sobre.eyebrow")}
+              </p>
+            </RevealOnScroll>
+            <RevealOnScroll delay={80}>
+              <h1 className="mt-4 font-display uppercase text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-canvas-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]">
+                {title}
+              </h1>
+            </RevealOnScroll>
+            <RevealOnScroll delay={160}>
+              <p className="mt-6 font-body text-[clamp(1.15rem,1.6vw,1.4rem)] leading-relaxed text-canvas-white/85 max-w-3xl">
+                {subtitle}
+              </p>
+            </RevealOnScroll>
+          </div>
         </div>
       </section>
 
-      <section className="px-6 md:px-12 pb-20 md:pb-28">
+      <section className="px-6 md:px-12 pt-12 md:pt-20 pb-20 md:pb-28">
         <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
           <RevealOnScroll>
             <div>

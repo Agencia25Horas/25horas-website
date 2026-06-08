@@ -111,7 +111,11 @@ export function BudgetForm() {
     if (s.step === 1) return !!s.projectType;
     if (s.step === 2) return !!s.deliverable;
     if (s.step === 3) return !!s.timeline;
-    if (s.step === 4) return s.name.length > 1 && /.+@.+\..+/.test(s.email);
+    if (s.step === 4)
+      return (
+        s.name.length > 1 &&
+        (/.+@.+\..+/.test(s.email) || s.phone.replace(/\D/g, "").length >= 6)
+      );
     return false;
   })();
 
@@ -290,7 +294,7 @@ function ContactStep({
   state: State;
   setState: React.Dispatch<React.SetStateAction<State>>;
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const upd = <K extends keyof State>(k: K, v: State[K]) =>
     setState((p) => ({ ...p, [k]: v }));
 
@@ -306,17 +310,24 @@ function ContactStep({
           onChange={(v) => upd("name", v)}
           type="text"
         />
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-canvas-white/45 !mt-2">
+          {lang === "en"
+            ? "Email or phone — at least one"
+            : "Email ou telefone — pelo menos um"}
+        </p>
         <Field
           label={t("orcamento.form.email")}
           value={state.email}
           onChange={(v) => upd("email", v)}
           type="email"
+          optional
         />
         <Field
           label={t("orcamento.form.telefone")}
           value={state.phone}
           onChange={(v) => upd("phone", v)}
           type="tel"
+          optional
         />
         <Field
           label={t("orcamento.form.empresa")}
@@ -369,7 +380,6 @@ function Field({
   const { t } = useLang();
   const required = !optional;
   const invalid =
-    required &&
     value.length > 0 &&
     type === "email" &&
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);

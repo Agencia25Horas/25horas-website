@@ -71,7 +71,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.eyebrow": "25 Horas Agency",
     "sobre.title": "Cinema para marcas.",
     "sobre.subtitle":
-      "Não fazemos vídeos. Fazemos filmes para marcas. 25 frames por segundo, 25 horas por dia.",
+      "Não fazemos vídeos. Fazemos filmes para marcas. 25 horas por dia.",
     "sobre.quemSomos": "Quem somos",
     "sobre.quemSomosTitle": "Equipa pequena.\nAutoria clara.",
     "sobre.quemSomosBody":
@@ -134,7 +134,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "portfolio.eyebrow": "Portefolio",
     "portfolio.title": "Trabalhos por nicho.",
     "portfolio.subtitle":
-      "Selecção de filmes, campanhas e fotografia. Cada nicho tem a sua secção — para ver tudo de um, abre a página dedicada.",
+      "Selecção de filmes, campanhas e fotografia. Cada nicho tem a sua secção.",
     "portfolio.emConstrucao": "Em construção",
     "portfolio.brevemente": "Brevemente, os trabalhos de",
     "portfolio.preparar":
@@ -197,7 +197,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.eyebrow": "25 Horas Agency",
     "sobre.title": "Cinema for brands.",
     "sobre.subtitle":
-      "We don't make videos. We make films for brands. 25 frames per second, 25 hours a day.",
+      "We don't make videos. We make films for brands. 25 hours a day.",
     "sobre.quemSomos": "Who we are",
     "sobre.quemSomosTitle": "Small team.\nClear authorship.",
     "sobre.quemSomosBody":
@@ -257,7 +257,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "portfolio.eyebrow": "Portfolio",
     "portfolio.title": "Work by sector.",
     "portfolio.subtitle":
-      "A selection of films, campaigns and photography. Each sector has its section — to see everything from one, open the dedicated page.",
+      "A selection of films, campaigns and photography. Each sector has its section.",
     "portfolio.emConstrucao": "Under construction",
     "portfolio.brevemente": "Coming soon, work for",
     "portfolio.preparar":

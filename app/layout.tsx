@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     template: "%s | 25 Horas Agency",
   },
   description:
-    "Não fazemos vídeos. Fazemos filmes para marcas. 25 frames por segundo, 25 horas por dia. Lisboa, Portugal.",
+    "Não fazemos vídeos. Fazemos filmes para marcas. 25 horas por dia. Lisboa, Portugal.",
   applicationName: "25 Horas Agency",
   keywords: [
     "agência audiovisual",

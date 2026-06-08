@@ -51,6 +51,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const ptRef = useRef<HTMLAudioElement | null>(null);
   const enRef = useRef<HTMLAudioElement | null>(null);
   const duckedRef = useRef(false);
+  // Garante que a faixa INATIVA só é "rebobinada" uma vez por ciclo da ATIVA.
+  const inactiveResetDoneRef = useRef(false);
   const fadeRaf = useRef<number | null>(null);
   const onRef = useRef(on);
   onRef.current = on;
@@ -94,6 +96,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     applyMutes();
     pt.play().catch(() => {});
     en.play().catch(() => {});
+    inactiveResetDoneRef.current = false; // novo ciclo → re-arma o reset da inativa
   }, [applyMutes]);
   const restartBothRef = useRef(restartBoth);
   restartBothRef.current = restartBoth;
@@ -118,12 +121,37 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       const active = langRef.current === "en" ? enRef.current : ptRef.current;
       if (e.target === active) restartBothRef.current();
     };
+    // Rebobina a faixa INATIVA pelo menos 4s ANTES de a ATIVA acabar. Ex.: com
+    // a 25en.mp3 a tocar, a 25pt.mp3 volta ao início >=4s antes do fim da EN —
+    // assim nunca fica presa no fim/silenciada e mudar de língua é sempre suave,
+    // seja qual for a duração de cada faixa.
+    const onTimeUpdate = (e: Event) => {
+      if (!onRef.current) return;
+      const en2 = enRef.current;
+      const pt2 = ptRef.current;
+      const active = langRef.current === "en" ? en2 : pt2;
+      const inactive = langRef.current === "en" ? pt2 : en2;
+      if (e.target !== active || !active || !inactive) return;
+      const d = active.duration;
+      if (!Number.isFinite(d) || d <= 0) return;
+      if (active.currentTime >= d - 4 && !inactiveResetDoneRef.current) {
+        inactiveResetDoneRef.current = true;
+        inactive.currentTime = 0;
+        inactive.muted = true;
+        inactive.volume = 0;
+        inactive.play().catch(() => {});
+      }
+    };
     pt.addEventListener("ended", onEnded);
     en.addEventListener("ended", onEnded);
+    pt.addEventListener("timeupdate", onTimeUpdate);
+    en.addEventListener("timeupdate", onTimeUpdate);
     return () => {
       if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
       pt.removeEventListener("ended", onEnded);
       en.removeEventListener("ended", onEnded);
+      pt.removeEventListener("timeupdate", onTimeUpdate);
+      en.removeEventListener("timeupdate", onTimeUpdate);
       pt.pause();
       en.pause();
       pt.src = "";
@@ -154,6 +182,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!onRef.current) return;
     if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
+    inactiveResetDoneRef.current = false; // a ativa/inativa trocaram → re-arma
     const a = activeAudio();
     // se a nova faixa já tinha ACABADO → recomeça AS DUAS (loop sincronizado).
     if (a && a.ended) {

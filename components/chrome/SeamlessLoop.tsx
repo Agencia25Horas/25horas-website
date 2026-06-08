@@ -94,6 +94,18 @@ export function SeamlessLoop() {
       el.preload = "none";
       el.muted = true;
     });
+    // O hero clonado tem os vídeos neutralizados (sem re-download), por isso o
+    // hover nele não fazia nada. Re-activamos pointer-events SÓ nesta secção e
+    // ligamos o mouseenter/leave à API global → o hero REAL ganha áudio (fade),
+    // cor e ducking. Optional chaining: se o hero real estiver desmontado, no-op.
+    const heroClone = clone.querySelector<HTMLElement>("[data-hero-reel]");
+    const onHeroEnter = () => window.__heroHover?.(true);
+    const onHeroLeave = () => window.__heroHover?.(false);
+    if (heroClone) {
+      heroClone.style.pointerEvents = "auto";
+      heroClone.addEventListener("mouseenter", onHeroEnter);
+      heroClone.addEventListener("mouseleave", onHeroLeave);
+    }
     // Re-activar pointer events nas âncoras do clone para que cliques naveguem.
     // (#19) Para LINKS INTERNOS usamos router.push em vez do <a> nativo: a
     // navegação nativa do clone competia com o teleport de scroll → a 1ª
@@ -183,6 +195,10 @@ export function SeamlessLoop() {
       window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("keydown", onKey, { capture: true });
       window.removeEventListener("load", measure);
+      if (heroClone) {
+        heroClone.removeEventListener("mouseenter", onHeroEnter);
+        heroClone.removeEventListener("mouseleave", onHeroLeave);
+      }
       ro.disconnect();
       clone.remove();
       cloneRef.current = null;

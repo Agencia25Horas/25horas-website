@@ -5,10 +5,22 @@ import Image from "next/image";
 import { useLang } from "@/lib/language-context";
 import { useAudio } from "@/lib/audio-context";
 
-const VIDEOS = [
+declare global {
+  interface Window {
+    /** Accionado pelo clone do SeamlessLoop p/ replicar o hover no hero real. */
+    __heroHover?: (active: boolean) => void;
+  }
+}
+
+const VIDEOS: { src: string; poster: string; objectPosition?: string }[] = [
   { src: "/hero/1realestate.mp4", poster: "/hero/1realestate.jpg" },
   { src: "/hero/1restaurante.mp4", poster: "/hero/1restaurante.jpg" },
-  { src: "/hero/1desporto.mp4", poster: "/hero/1desporto.jpg" },
+  // desporto: baixar ~20px para não cortar a cabeça ao miúdo
+  {
+    src: "/hero/1desporto.mp4",
+    poster: "/hero/1desporto.jpg",
+    objectPosition: "center calc(50% - 20px)",
+  },
   { src: "/hero/1educ.mp4", poster: "/hero/1educ.jpg" },
 ];
 const N = VIDEOS.length;
@@ -28,19 +40,6 @@ const SpeakerOff = () => (
     <path d="M3 9v6h4l5 5V4L7 9H3zm18.3-.7-1.4-1.4L17 9.8 14.2 7l-1.4 1.4L15.6 11l-2.8 2.8 1.4 1.4L17 12.4l2.8 2.8 1.4-1.4L18.4 11l2.9-2.7z" />
   </svg>
 );
-const ChevronLeft = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M15 19l-7-7 7-7" />
-  </svg>
-);
-const ChevronRight = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M9 5l7 7-7 7" />
-  </svg>
-);
-const arrowCls =
-  "absolute z-20 top-[44svh] -translate-y-1/2 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors";
-
 export function HeroReel({
   logoSrc = "/media/logos/b25agency.webp",
   heroLines = [],
@@ -70,7 +69,6 @@ export function HeroReel({
   const [hasHover, setHasHover] = useState(false);
   const [fallback, setFallback] = useState(false);
   const [fbIdx, setFbIdx] = useState(0);
-  const [videoReady, setVideoReady] = useState(false);
 
   // espelhos para os handlers (evita closures obsoletos)
   const mutedRef = useRef(muted);
@@ -82,7 +80,6 @@ export function HeroReel({
   const hasHoverRef = useRef(hasHover);
   hasHoverRef.current = hasHover;
   const transitioning = useRef(false);
-  const fadeRaf = useRef<number | null>(null);
   const fadeTimer = useRef<number | null>(null);
   const slotsRef = useRef(slots);
   slotsRef.current = slots;
@@ -95,27 +92,23 @@ export function HeroReel({
   const fadeAudio = useCallback(
     (el: HTMLVideoElement | null, target: number, duration: number) => {
       if (!el) return;
-      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
+      // setInterval (não rAF) → o fade corre de forma fiável e suave em todo o
+      // lado (o rAF pode ser estrangulado e parecer instantâneo).
+      if (fadeTimer.current) clearInterval(fadeTimer.current);
       const start = el.volume;
       const t0 = performance.now();
       if (target > 0) el.muted = false;
-      const tick = (now: number) => {
-        const t = Math.min(1, (now - t0) / duration);
-        el.volume = start + (target - start) * t;
-        if (t < 1) fadeRaf.current = requestAnimationFrame(tick);
-        else {
-          fadeRaf.current = null;
-          if (target === 0) el.muted = true;
+      const step = () => {
+        const t = Math.min(1, (performance.now() - t0) / duration);
+        el.volume = Math.max(0, Math.min(1, start + (target - start) * t));
+        if (t >= 1) {
+          if (fadeTimer.current) clearInterval(fadeTimer.current);
+          fadeTimer.current = null;
+          if (target === 0) el.muted = true; // só silencia DEPOIS do fade-out
         }
       };
-      fadeRaf.current = requestAnimationFrame(tick);
-      // GARANTIA do estado final mesmo que o rAF seja throttled (tab em
-      // background, etc.) — sem isto o som podia continuar após o hover-out.
-      fadeTimer.current = window.setTimeout(() => {
-        el.volume = target;
-        el.muted = target === 0;
-      }, duration + 60);
+      step(); // primeiro passo imediato
+      fadeTimer.current = window.setInterval(step, 25); // ~40 fps
     },
     [],
   );
@@ -174,8 +167,7 @@ export function HeroReel({
       fv.play().catch(() => {});
     }
     return () => {
-      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-      if (fadeTimer.current) clearTimeout(fadeTimer.current);
+      if (fadeTimer.current) clearInterval(fadeTimer.current);
     };
   }, [refOf]);
 
@@ -264,10 +256,6 @@ export function HeroReel({
     () => crossfadeTo((currentIdx() + 1) % N),
     [crossfadeTo, currentIdx],
   );
-  const goPrev = useCallback(
-    () => crossfadeTo((currentIdx() - 1 + N) % N),
-    [crossfadeTo, currentIdx],
-  );
 
   const onTimeUpdate = useCallback(
     (e: React.SyntheticEvent<HTMLVideoElement>) => {
@@ -305,6 +293,17 @@ export function HeroReel({
     applyAudio(); // rato saiu → mute
   }, [applyAudio]);
 
+  // ── API global: o CLONE do SeamlessLoop (scroll infinito) chama isto p/
+  // accionar o MESMO hover no hero REAL — áudio + cor + ducking — mesmo que o
+  // hero real esteja fora do viewport (no topo). O onEnter/onLeave já guardam
+  // o estado 'muted' e o hasHover, por isso o botão de som continua a mandar. ──
+  useEffect(() => {
+    window.__heroHover = (active: boolean) => (active ? onEnter() : onLeave());
+    return () => {
+      delete window.__heroHover;
+    };
+  }, [onEnter, onLeave]);
+
   // ── botão de som: liga/desliga (em desktop o hover é que toca) ──
   const toggleMute = useCallback(() => {
     setMuted((m) => {
@@ -316,8 +315,9 @@ export function HeroReel({
   }, [applyAudio]);
 
   const videoStyle = (slot: 0 | 1): React.CSSProperties => ({
-    opacity: front === slot && videoReady ? 1 : 0,
+    opacity: front === slot ? 1 : 0,
     filter: colorOn ? "grayscale(0)" : "grayscale(1)",
+    objectPosition: VIDEOS[slotsRef.current[slot]]?.objectPosition ?? "center",
     transitionProperty: "opacity, filter",
     transitionDuration: `${XFADE_MS}ms, ${FADE_MS}ms`,
     transitionTimingFunction: "ease",
@@ -326,6 +326,7 @@ export function HeroReel({
   return (
     <section
       aria-label="25 Horas Agency"
+      data-hero-reel="true"
       className="relative w-full h-[110svh] md:h-[115svh] min-h-[640px] overflow-hidden bg-canvas-black"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
@@ -358,10 +359,10 @@ export function HeroReel({
             ref={v0}
             src={VIDEOS[slots[0]].src}
             poster={VIDEOS[slots[0]].poster}
+            autoPlay
             muted
             playsInline
             preload="metadata"
-            onCanPlay={() => setVideoReady(true)}
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
             className="absolute inset-0 w-full h-full object-cover"
@@ -371,10 +372,10 @@ export function HeroReel({
             ref={v1}
             src={VIDEOS[slots[1]].src}
             poster={VIDEOS[slots[1]].poster}
+            autoPlay
             muted
             playsInline
             preload="metadata"
-            onCanPlay={() => setVideoReady(true)}
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
             className="absolute inset-0 w-full h-full object-cover"
@@ -442,28 +443,6 @@ export function HeroReel({
           </div>
         )}
       </div>
-
-      {/* ── Setas anterior/seguinte (z-20) — escondidas no fallback ── */}
-      {!fallback && (
-        <>
-          <button
-            type="button"
-            onClick={goPrev}
-            aria-label={en ? "Previous video" : "Vídeo anterior"}
-            className={`${arrowCls} left-4 md:left-8`}
-          >
-            <ChevronLeft />
-          </button>
-          <button
-            type="button"
-            onClick={advance}
-            aria-label={en ? "Next video" : "Vídeo seguinte"}
-            className={`${arrowCls} right-4 md:right-8`}
-          >
-            <ChevronRight />
-          </button>
-        </>
-      )}
 
       {/* ── Botão de som (z-20) — escondido no fallback ── */}
       {!fallback && (

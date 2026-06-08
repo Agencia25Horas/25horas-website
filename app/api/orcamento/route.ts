@@ -151,7 +151,14 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (email.length > 254 || !EMAIL_RE.test(email)) {
+  // Email OU telefone — pelo menos um (não são os dois obrigatórios).
+  if (!email && !phone) {
+    return NextResponse.json(
+      { ok: false, error: "Indica um email ou um telefone." },
+      { status: 400 },
+    );
+  }
+  if (email && (email.length > 254 || !EMAIL_RE.test(email))) {
     return NextResponse.json(
       { ok: false, error: "Email inválido" },
       { status: 400 },
@@ -184,7 +191,7 @@ export async function POST(req: Request) {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: TO_EMAIL,
-      replyTo: email,
+      replyTo: email || undefined,
       subject: cleanHeader(
         `Pedido de orçamento — ${body.projectType} · ${body.deliverable}`,
       ),

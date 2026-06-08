@@ -3,16 +3,18 @@
 import { useEffect, useState } from "react";
 
 /**
- * Counter sempre fixo em "25:00:SS" — segundos correm de 00→59 e voltam a 00.
- * Reflecte o conceito da marca: são sempre 25 horas.
+ * Counter sempre fixo em "25:00:SS" — os segundos correm 00→59 e voltam a 00,
+ * SEM parar nem reiniciar ao mudar de página: usa o relógio real, por isso é
+ * contínuo entre navegações. Reflecte o conceito da marca: são sempre 25 horas.
  */
 export function Timecode() {
+  // Começa em 0 no SSR (sem mismatch de hidratação); o valor real entra no mount.
   const [s, setS] = useState(0);
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      setS((prev) => (prev + 1) % 60);
-    }, 1000);
+    const tick = () => setS(new Date().getSeconds());
+    tick();
+    const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, []);
 

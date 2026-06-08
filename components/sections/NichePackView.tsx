@@ -128,10 +128,10 @@ export function NichePackView({
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">
       <TomatinoHeader />
-      <div className="h-[104px] md:h-[112px]" />
 
-      {/* ═══════════ HERO ═══════════ */}
-      <section className="relative w-full overflow-hidden min-h-[80svh] flex items-center">
+      {/* ═══════════ HERO ═══════════ — full-bleed: foto por trás do header,
+          pt-[104px] empurra só o conteúdo (sem barra preta header→foto). */}
+      <section className="relative w-full overflow-hidden min-h-[80svh] flex items-center pt-[104px] md:pt-[112px]">
         <Image
           src={nicho.image}
           alt={`Produção audiovisual para ${nicho.label.toLowerCase()} — 25 Horas Agency`}

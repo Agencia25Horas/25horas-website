@@ -77,7 +77,7 @@ export default async function OG() {
               color: "rgba(255,255,255,0.7)",
             }}
           >
-            25 frames por segundo. 25 horas por dia. Lisboa, Portugal.
+            25 horas por dia. Lisboa, Portugal.
           </div>
         </div>
 
