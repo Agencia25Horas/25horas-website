@@ -25,8 +25,8 @@ const Ctx = createContext<AudioCtx | null>(null);
 const LS_KEY = "25h.audio";
 // Duas faixas que tocam EM SINCRONIA: só se ouve a da língua ativa.
 const TRACKS = {
-  pt: "/media/audio/vintecinco.mp3",
-  en: "/media/audio/twentyfive.mp3",
+  pt: "/media/audio/25pt.mp3",
+  en: "/media/audio/25en.mp3",
 } as const;
 const TRACK_VOLUME = 0.5;
 const DUCK_VOLUME = 0.1; // ~20% — fica de fundo quando o vídeo tem som
