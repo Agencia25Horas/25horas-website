@@ -58,8 +58,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const en = new Audio(TRACKS.en);
     pt.preload = "auto";
     en.preload = "auto";
+    // `muted` (não `volume`) é o que silencia de forma fiável — no iOS o
+    // volume é read-only/ignorado, por isso só com muted é que a faixa
+    // inativa fica mesmo calada.
     pt.volume = 0;
     en.volume = 0;
+    pt.muted = true;
+    en.muted = true;
     ptRef.current = pt;
     enRef.current = en;
     return () => {
@@ -109,11 +114,15 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
     const act = activeAudio();
     const ina = inactiveAudio();
-    if (ina) ina.volume = 0; // a anterior fica muda (continua em sincronia)
+    if (ina) {
+      ina.muted = true; // a anterior fica muda (continua em sincronia)
+      ina.volume = 0;
+    }
     if (act) {
       // se a nova faixa já tinha acabado, recomeça do início
       if (act.ended) act.currentTime = 0;
       if (act.paused) act.play().catch(() => {});
+      act.muted = false;
       act.volume = targetVolume();
     }
   }, [lang, activeAudio, inactiveAudio, targetVolume]);
@@ -149,8 +158,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       en.currentTime = 0;
       const act = activeAudio();
       const ina = inactiveAudio();
-      if (ina) ina.volume = 0;
-      if (act) act.volume = targetVolume();
+      if (ina) {
+        ina.muted = true;
+        ina.volume = 0;
+      }
+      if (act) {
+        act.muted = false;
+        act.volume = targetVolume();
+      }
       await Promise.all([pt.play(), en.play()]);
       setOn(true);
       setBlocked(false);

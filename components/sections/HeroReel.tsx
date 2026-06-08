@@ -87,8 +87,9 @@ export function HeroReel({
   const slotsRef = useRef(slots);
   slotsRef.current = slots;
 
-  // Cor segue SÓ o hover — passar o rato dá vida ao vídeo, mesmo em mute.
-  const colorOn = hovering;
+  // Desktop: cor segue o hover (b&w por defeito, cor ao passar o rato — mesmo
+  // em mute). Mobile (sem hover): SEMPRE com cor, nunca fica cinzento.
+  const colorOn = !hasHover || hovering;
 
   // ── fade de áudio (helper) ──────────────────────────────────────
   const fadeAudio = useCallback(
