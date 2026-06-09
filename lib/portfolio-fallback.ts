@@ -11,20 +11,47 @@
 
 import type { SanityPortfolioItem } from "./sanity/types";
 
+// Fotos de restaurantes (vertical = story 9:16, horizontal = 16:9)
+const VERTICAL_PHOTOS = new Set(["01", "06", "08", "013", "014", "015", "017", "018", "022"]);
+
+function restPhoto(num: string, order: number): SanityPortfolioItem {
+  return {
+    _id: `fb-rest-photo-${num}`,
+    nicheSlug: "restaurantes",
+    imageUrl: `/portfolio/restaurantes/${num}.jpeg`,
+    mediaType: "foto",
+    orientation: VERTICAL_PHOTOS.has(num) ? "vertical" : "horizontal",
+    featured: true,
+    order,
+  };
+}
+
+const REST_PHOTO_NUMS = [
+  "01","02","03","04","05","06","07","08","09",
+  "010","011","012","013","014","015","016","017","018","019","020","021","022","023",
+];
+
+export const PORTFOLIO_PHOTOS_FALLBACK: Record<string, SanityPortfolioItem[]> = {
+  restaurantes: REST_PHOTO_NUMS.map((n, i) => restPhoto(n, i)),
+};
+
 export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
   restaurantes: [
     {
       _id: "fb-restaurantes-1",
       nicheSlug: "restaurantes",
       link: "https://www.youtube.com/shorts/o4kIVyRa4Fg",
+      mediaType: "video",
+      orientation: "vertical",
       featured: true,
       order: 0,
     },
     {
       _id: "fb-restaurantes-2",
       nicheSlug: "restaurantes",
-      // vídeo normal (horizontal) — só o ID é usado; a playlist (&list=) é ignorada
       link: "https://www.youtube.com/watch?v=84iBKOrEAfY",
+      mediaType: "video",
+      orientation: "vertical",
       featured: true,
       order: 1,
     },
@@ -34,8 +61,28 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
       _id: "fb-corporate-1",
       nicheSlug: "corporate",
       link: "https://www.youtube.com/shorts/FHkPl6cFOtU",
+      mediaType: "video",
+      orientation: "vertical",
       featured: true,
       order: 0,
+    },
+    {
+      _id: "fb-corporate-2",
+      nicheSlug: "corporate",
+      link: "https://www.youtube.com/watch?v=A1SW8wCwC3Q",
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: 1,
+    },
+    {
+      _id: "fb-corporate-3",
+      nicheSlug: "corporate",
+      link: "https://www.youtube.com/shorts/6PV0FM2TRX0",
+      mediaType: "video",
+      orientation: "vertical",
+      featured: true,
+      order: 2,
     },
   ],
 };

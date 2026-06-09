@@ -50,6 +50,34 @@ export const portfolioItem = defineType({
         "Opcional. YouTube/Vimeo → player dentro do site + capa automática. Instagram → cartão do post dentro do site. Outro link → abre em nova tab.",
     }),
     defineField({
+      name: "mediaType",
+      title: "Tipo de conteúdo",
+      type: "string",
+      options: {
+        list: [
+          { title: "Vídeo", value: "video" },
+          { title: "Fotografia", value: "foto" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "video",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "orientation",
+      title: "Orientação do card",
+      type: "string",
+      options: {
+        list: [
+          { title: "Vertical (4:5 — Shorts / Instagram)", value: "vertical" },
+          { title: "Horizontal (16:9 — YouTube)", value: "horizontal" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "vertical",
+      description: "Define a forma do card no portfólio.",
+    }),
+    defineField({
       name: "order",
       title: "Ordem",
       type: "number",

@@ -55,6 +55,8 @@ export const PORTFOLIO_BY_NICHE_QUERY = groq`*[_type == "portfolioItem" && niche
   "nicheSlug": niche->slug,
   "imageUrl": coverImage.asset->url,
   link,
+  mediaType,
+  orientation,
   order,
   featured
 }`;
@@ -66,6 +68,8 @@ export const PORTFOLIO_ALL_QUERY = groq`*[_type == "portfolioItem"] | order(orde
   "nicheSlug": niche->slug,
   "imageUrl": coverImage.asset->url,
   link,
+  mediaType,
+  orientation,
   order,
   featured
 }`;

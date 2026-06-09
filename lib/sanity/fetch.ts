@@ -9,7 +9,7 @@
 
 import type { NichePack } from "@/lib/packs";
 import { getNichePack as staticGetNichePack } from "@/lib/packs";
-import { PORTFOLIO_FALLBACK } from "@/lib/portfolio-fallback";
+import { PORTFOLIO_FALLBACK, PORTFOLIO_PHOTOS_FALLBACK } from "@/lib/portfolio-fallback";
 import { NICHOS, type NichoSlug } from "@/lib/servicos";
 import { sanityClient, sanityEnabled, urlForImage } from "./client";
 import {
@@ -142,7 +142,7 @@ export async function fetchNicheSitemap(): Promise<
 export async function fetchAllPortfolio(): Promise<
   Record<string, SanityPortfolioItem[]>
 > {
-  if (!sanityEnabled || !sanityClient) return {};
+  if (!sanityEnabled || !sanityClient) return withPortfolioFallback({});
   try {
     const items = await sanityClient.fetch<SanityPortfolioItem[] | null>(
       PORTFOLIO_ALL_QUERY,
@@ -169,4 +169,13 @@ function withPortfolioFallback(
     if (!grouped[slug] || grouped[slug].length === 0) grouped[slug] = items;
   }
   return grouped;
+}
+
+/** Todos os portfolio items do tipo FOTO, agrupados por nicheSlug. */
+export async function fetchAllPortfolioFotos(): Promise<
+  Record<string, SanityPortfolioItem[]>
+> {
+  // Por agora usa sempre o fallback estático. Quando o Sanity tiver fotos
+  // com mediaType="foto", esta função pode ser expandida para as buscar.
+  return { ...PORTFOLIO_PHOTOS_FALLBACK };
 }

@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CookieBanner } from "./CookieBanner";
 import { Timecode } from "./Timecode";
 import { AudioToggle } from "./AudioToggle";
 import { LangToggle } from "./LangToggle";
 import { useLang } from "@/lib/language-context";
+import { StableLabel } from "./StableLabel";
 
 /**
  * Header preto fixo:
@@ -20,13 +21,23 @@ import { useLang } from "@/lib/language-context";
  */
 export function TomatinoHeader() {
   const [open, setOpen] = useState(false);
-  const { t } = useLang();
+  const [portfolioDropdown, setPortfolioDropdown] = useState(false);
+  const dropdownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { lang, t } = useLang();
+
+  const openDropdown = () => {
+    if (dropdownTimer.current) clearTimeout(dropdownTimer.current);
+    setPortfolioDropdown(true);
+  };
+  const closeDropdown = () => {
+    dropdownTimer.current = setTimeout(() => setPortfolioDropdown(false), 120);
+  };
 
   const NAV = [
-    { key: "sobre", label: t("header.sobre"), href: "/sobre" },
-    { key: "portfolio", label: t("header.portfolio"), href: "/portfolio" },
-    { key: "contactos", label: t("header.contactos"), href: "/contactos" },
-    { key: "orcamento", label: t("header.orcamento"), href: "/orcamento" },
+    { key: "sobre",     pt: "Sobre",           en: "About",       es: "Nosotros",          href: "/sobre" },
+    { key: "portfolio", pt: "Portefolio",       en: "Portfolio",   es: "Portafolio",        href: "/portfolio" },
+    { key: "contactos", pt: "Contactos",        en: "Contact",     es: "Contacto",          href: "/contactos" },
+    { key: "orcamento", pt: "Pedir orçamento",  en: "Get a quote", es: "Pedir presupuesto", href: "/orcamento" },
   ];
 
   return (
@@ -73,15 +84,57 @@ export function TomatinoHeader() {
             className="hidden lg:flex items-center gap-7 text-[12px] uppercase tracking-wider font-body font-semibold"
             aria-label="Principal"
           >
-            {NAV.map((n) => (
-              <Link
-                key={n.key}
-                href={n.href}
-                className="text-canvas-white hover:text-accent-grade transition-colors"
-              >
-                {n.label}
-              </Link>
-            ))}
+            {NAV.map((n) =>
+              n.key === "portfolio" ? (
+                <div
+                  key={n.key}
+                  className="relative"
+                  onMouseEnter={openDropdown}
+                  onMouseLeave={closeDropdown}
+                >
+                  <Link
+                    href={n.href}
+                    className="text-canvas-white hover:text-accent-grade transition-colors"
+                  >
+                    <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
+                  </Link>
+
+                  {portfolioDropdown && (
+                    <div
+                      onMouseEnter={openDropdown}
+                      onMouseLeave={closeDropdown}
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50 min-w-[160px] rounded-lg border border-canvas-white/15 bg-black/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden"
+                    >
+                      <Link
+                        href="/portfolio/videos"
+                        onClick={() => setPortfolioDropdown(false)}
+                        className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
+                      >
+                        <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><polygon points="2,1 9,5 2,9"/></svg>
+                        {t("nav.videos")}
+                      </Link>
+                      <div className="h-px bg-canvas-white/10 mx-3" />
+                      <Link
+                        href="/portfolio/fotografias"
+                        onClick={() => setPortfolioDropdown(false)}
+                        className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
+                      >
+                        <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><rect x="1" y="1" width="8" height="8" rx="1"/></svg>
+                        {t("nav.fotografias")}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={n.key}
+                  href={n.href}
+                  className="text-canvas-white hover:text-accent-grade transition-colors"
+                >
+                  <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
+                </Link>
+              )
+            )}
           </nav>
 
           {/* SOM no extremo direito de tudo */}
@@ -122,17 +175,38 @@ export function TomatinoHeader() {
           aria-label="Principal — mobile"
         >
           <ul className="flex flex-col py-2">
-            {NAV.map((n) => (
-              <li key={n.key}>
-                <Link
-                  href={n.href}
-                  onClick={() => setOpen(false)}
-                  className="block py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
-                >
-                  {n.label}
-                </Link>
-              </li>
-            ))}
+            {NAV.map((n) =>
+              n.key === "portfolio" ? (
+                <li key={n.key}>
+                  <Link
+                    href="/portfolio/videos"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
+                  >
+                    <span className="text-[10px] text-canvas-white/50">▶</span>
+                    {t("nav.videos")}
+                  </Link>
+                  <Link
+                    href="/portfolio/fotografias"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
+                  >
+                    <span className="text-[10px] text-canvas-white/50">◼</span>
+                    {t("nav.fotografias")}
+                  </Link>
+                </li>
+              ) : (
+                <li key={n.key}>
+                  <Link
+                    href={n.href}
+                    onClick={() => setOpen(false)}
+                    className="block py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
+                  >
+                    <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
+                  </Link>
+                </li>
+              )
+            )}
           </ul>
           <div className="flex items-center justify-between px-6 py-4 border-t border-canvas-white/10">
             <LangToggle />

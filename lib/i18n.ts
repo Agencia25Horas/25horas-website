@@ -155,6 +155,17 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "portfolio.brevemente": "Brevemente, os trabalhos de",
     "portfolio.preparar":
       "Estamos a preparar a galeria. Volta em breve ou contacta-nos para ver casos relevantes para o teu projecto.",
+
+    // /portfolio/videos + /portfolio/fotografias
+    "nav.videos": "VÍDEOS",
+    "nav.fotografias": "FOTOGRAFIAS",
+    "portfolio.videos.eyebrow": "Portefolio · Vídeo",
+    "portfolio.videos.title": "Os nossos\nvídeos.",
+    "portfolio.videos.subtitle": "Filmes e campanhas por nicho.",
+    "portfolio.fotografias.eyebrow": "Portefolio · Fotografia",
+    "portfolio.fotografias.title": "A nossa\nfotografia.",
+    "portfolio.fotografias.subtitle": "Fotografia de marca por nicho.",
+    "portfolio.fotografias.vazio": "Em breve — estamos a preparar a galeria de fotografia.",
   },
 
   en: {
@@ -293,6 +304,16 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "portfolio.brevemente": "Coming soon, work for",
     "portfolio.preparar":
       "We're putting the gallery together. Come back soon or contact us to see relevant cases for your project.",
+
+    "nav.videos": "VIDEOS",
+    "nav.fotografias": "PHOTOS",
+    "portfolio.videos.eyebrow": "Portfolio · Video",
+    "portfolio.videos.title": "Our\nvideos.",
+    "portfolio.videos.subtitle": "Films and campaigns by sector.",
+    "portfolio.fotografias.eyebrow": "Portfolio · Photography",
+    "portfolio.fotografias.title": "Our\nphotography.",
+    "portfolio.fotografias.subtitle": "Brand photography by sector.",
+    "portfolio.fotografias.vazio": "Coming soon — we're preparing the photography gallery.",
   },
 
   es: {
@@ -443,6 +464,16 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "portfolio.brevemente": "Próximamente, los trabajos de",
     "portfolio.preparar":
       "Estamos preparando la galería. Vuelve pronto o contáctanos para ver casos relevantes para tu proyecto.",
+
+    "nav.videos": "VÍDEOS",
+    "nav.fotografias": "FOTOGRAFÍAS",
+    "portfolio.videos.eyebrow": "Portafolio · Vídeo",
+    "portfolio.videos.title": "Nuestros\nvídeos.",
+    "portfolio.videos.subtitle": "Películas y campañas por sector.",
+    "portfolio.fotografias.eyebrow": "Portafolio · Fotografía",
+    "portfolio.fotografias.title": "Nuestra\nfotografía.",
+    "portfolio.fotografias.subtitle": "Fotografía de marca por sector.",
+    "portfolio.fotografias.vazio": "Próximamente — estamos preparando la galería de fotografía.",
   },
 };
 

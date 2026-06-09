@@ -2,6 +2,7 @@
 
 import { useAudio } from "@/lib/audio-context";
 import { useLang } from "@/lib/language-context";
+import { StableLabel } from "./StableLabel";
 
 /**
  * Botão "SOM" — toggle de vintecinco.mp3.
@@ -9,7 +10,7 @@ import { useLang } from "@/lib/language-context";
  */
 export function AudioToggle() {
   const { on, toggle } = useAudio();
-  const { t } = useLang();
+  const { lang, t } = useLang();
 
   return (
     <button
@@ -24,7 +25,7 @@ export function AudioToggle() {
         }`}
         aria-hidden
       />
-      {t("chrome.som")}
+      <StableLabel pt="SOM" en="SOUND" es="SONIDO" lang={lang} />
     </button>
   );
 }

@@ -3,7 +3,10 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
+import { useAudio } from "@/lib/audio-context";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
+
+const MUTE_EVENT = "portfolio:audio-activate";
 
 /**
  * Card de portfolio adaptável a vários tipos de média (campo `link` no Sanity):
@@ -38,10 +41,22 @@ function parseMedia(link?: string): Media {
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 
-export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
+export function PortfolioCard({
+  item,
+  gridMode = false,
+  onFocus,
+}: {
+  item: SanityPortfolioItem;
+  gridMode?: boolean;
+  /** Chamado ao clicar — permite ao carousel centrar este slide. */
+  onFocus?: () => void;
+}) {
   const { lang, t } = useLang();
+  const { duck } = useAudio();
   const [open, setOpen] = useState(false);
-  const [hovering, setHovering] = useState(false);
+  const [audioOn, setAudioOn] = useState(false);
+  const audioOnRef = useRef(audioOn);
+  audioOnRef.current = audioOn;
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const title =
@@ -88,44 +103,111 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
     }
   }, [open, media]);
 
-  // ── YouTube / Shorts INLINE: toca em loop a P&B; hover dá cor + som (e, via
-  //    stopOnMouseEnter do carrossel, pausa o scroll) — igual ao hero. ──
+  // ── YouTube / Shorts INLINE: toca em loop silencioso; clique activa/desactiva som. ──
   const ytPost = (func: string) =>
     iframeRef.current?.contentWindow?.postMessage(
       JSON.stringify({ event: "command", func, args: [] }),
       "*",
     );
-  const onVideoEnter = () => {
-    setHovering(true);
-    ytPost("unMute");
+
+  // Quando outro card activa som → mutar este
+  useEffect(() => {
+    if (media?.kind !== "youtube") return;
+    const handler = (e: Event) => {
+      const { id } = (e as CustomEvent<{ id: string }>).detail;
+      if (id !== item._id && audioOnRef.current) {
+        setAudioOn(false);
+        ytPost("mute");
+      }
+    };
+    window.addEventListener(MUTE_EVENT, handler);
+    return () => window.removeEventListener(MUTE_EVENT, handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item._id, media?.kind]);
+
+  // Duck da música de fundo enquanto este card tem som activo
+  useEffect(() => {
+    duck(audioOn);
+    return () => { if (audioOn) duck(false); };
+  }, [audioOn, duck]);
+
+  const onCardClick = () => {
+    onFocus?.();
+    const next = !audioOn;
+    setAudioOn(next);
+    ytPost(next ? "unMute" : "mute");
     ytPost("playVideo");
-  };
-  const onVideoLeave = () => {
-    setHovering(false);
-    ytPost("mute");
+    if (next) {
+      window.dispatchEvent(
+        new CustomEvent(MUTE_EVENT, { detail: { id: item._id } }),
+      );
+    }
   };
 
+  // Orientação: usa o campo explícito do item; fallback: shorts=vertical, resto=horizontal
+  const ytShort = media?.kind === "youtube" && media.short;
+  const isHorizontal =
+    item.orientation === "horizontal" ||
+    (item.orientation == null && !ytShort);
+
   if (media?.kind === "youtube") {
+    const iframeSrc = `https://www.youtube.com/embed/${media.id}?autoplay=1&mute=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`;
+
+    if (gridMode) {
+      // Altura fixa em todos os breakpoints; largura deriva do aspect ratio.
+      // Sem w-full — deixa o carrossel determinar o espaço por slide.
+      const wrapperClass = isHorizontal
+        ? "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-video"
+        : "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-[9/16]";
+
+      return (
+        <div
+          onClick={onCardClick}
+          className={`group relative ${wrapperClass} overflow-hidden rounded-xl bg-canvas-black cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_0_2px_rgba(255,255,255,0.15),0_16px_48px_rgba(0,0,0,0.6)]`}
+        >
+          <iframe
+            ref={iframeRef}
+            src={iframeSrc}
+            title={title || t("cat.video")}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            className="absolute inset-0 w-full h-full pointer-events-none transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          />
+          {/* Overlay escuro que some no hover — vídeo ganha brilho */}
+          <div className="pointer-events-none absolute inset-0 bg-canvas-black/20 group-hover:bg-canvas-black/0 transition-colors duration-300" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-canvas-black/85 via-canvas-black/25 to-transparent">
+            {title && (
+              <p className="font-display uppercase text-canvas-white text-[clamp(0.95rem,1.4vw,1.15rem)] leading-tight">
+                {title}
+              </p>
+            )}
+          </div>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/60 backdrop-blur-sm text-[11px] transition-colors duration-200"
+            style={{ color: audioOn ? "var(--signal-live)" : "rgba(255,255,255,0.6)" }}
+          >
+            {audioOn ? "◼" : "▶"}
+          </span>
+        </div>
+      );
+    }
+
     return (
-      <a
-        href={`https://www.youtube.com/watch?v=${media.id}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        onMouseEnter={onVideoEnter}
-        onMouseLeave={onVideoLeave}
-        aria-label={`${t("common.verVideo")}: ${title || t("common.trabalho")}`}
-        className="group relative block aspect-[4/5] overflow-hidden rounded-lg bg-canvas-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-canvas-white"
+      <div
+        onClick={onCardClick}
+        className="group relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-black cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_0_2px_rgba(255,255,255,0.2),0_20px_60px_rgba(0,0,0,0.7)]"
       >
         <iframe
           ref={iframeRef}
-          src={`https://www.youtube.com/embed/${media.id}?autoplay=1&mute=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
+          src={iframeSrc}
           title={title || t("cat.video")}
           allow="autoplay; encrypted-media; picture-in-picture"
-          className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-[filter] duration-500 ${
-            media.short ? "w-full aspect-[9/16]" : "h-full aspect-video"
+          className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 ease-out group-hover:scale-[1.04] ${
+            isHorizontal ? "h-full aspect-video" : "w-full aspect-[9/16]"
           }`}
-          style={{ filter: hovering ? "grayscale(0)" : "grayscale(1)" }}
         />
+        {/* Overlay escuro que some no hover — vídeo ganha brilho */}
+        <div className="pointer-events-none absolute inset-0 bg-canvas-black/25 group-hover:bg-canvas-black/0 transition-colors duration-300" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-canvas-black/85 via-canvas-black/25 to-transparent">
           {title && (
             <p className="font-display uppercase text-canvas-white text-[clamp(0.95rem,1.4vw,1.15rem)] leading-tight">
@@ -133,7 +215,14 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
             </p>
           )}
         </div>
-      </a>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/60 backdrop-blur-sm text-[11px] transition-colors duration-200"
+          style={{ color: audioOn ? "var(--signal-live)" : "rgba(255,255,255,0.6)" }}
+        >
+          {audioOn ? "◼" : "▶"}
+        </span>
+      </div>
     );
   }
 
