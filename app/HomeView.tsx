@@ -52,14 +52,36 @@ export function HomeView({
   /** Mapa slug → URL da foto do nicho (Sanity). Editável pelo cliente no Studio. */
   nichePhotos?: Record<string, string>;
 }) {
-  const { lang } = useLang();
+  const { lang, t } = useLang();
 
-  const pick = (pt: string | undefined, en: string | undefined) =>
-    (lang === "pt" ? pt : en) ?? "";
+  // O Sanity é um override por-língua. Se faltar a língua atual (ex.: ES ainda
+  // não preenchido no CMS) cai para a tradução ESTÁTICA do i18n — nunca para
+  // outra língua (era isso que mostrava inglês no modo espanhol).
+  const pick = (
+    pt: string | undefined,
+    en: string | undefined,
+    es: string | undefined,
+    key: string,
+  ) => (lang === "es" ? es : lang === "en" ? en : pt) || t(key);
 
-  const heroL1 = pick(siteContent?.homeHero_l1_pt, siteContent?.homeHero_l1_en);
-  const heroL2 = pick(siteContent?.homeHero_l2_pt, siteContent?.homeHero_l2_en);
-  const heroL3 = pick(siteContent?.homeHero_l3_pt, siteContent?.homeHero_l3_en);
+  const heroL1 = pick(
+    siteContent?.homeHero_l1_pt,
+    siteContent?.homeHero_l1_en,
+    siteContent?.homeHero_l1_es,
+    "home.hero.title.l1",
+  );
+  const heroL2 = pick(
+    siteContent?.homeHero_l2_pt,
+    siteContent?.homeHero_l2_en,
+    siteContent?.homeHero_l2_es,
+    "home.hero.title.l2",
+  );
+  const heroL3 = pick(
+    siteContent?.homeHero_l3_pt,
+    siteContent?.homeHero_l3_en,
+    siteContent?.homeHero_l3_es,
+    "home.hero.title.l3",
+  );
 
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">

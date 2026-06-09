@@ -19,27 +19,32 @@ export function SobreView({
   const pick = (
     pt: string | undefined,
     en: string | undefined,
+    es: string | undefined,
     fallback: string,
-  ) => ((lang === "pt" ? pt : en) || fallback);
+  ) => (lang === "es" ? es : lang === "en" ? en : pt) || fallback;
 
   const title = pick(
     siteContent?.sobre_title_pt,
     siteContent?.sobre_title_en,
+    siteContent?.sobre_title_es,
     t("sobre.title"),
   );
   const subtitle = pick(
     siteContent?.sobre_subtitle_pt,
     siteContent?.sobre_subtitle_en,
+    siteContent?.sobre_subtitle_es,
     t("sobre.subtitle"),
   );
   const quemSomosBody = pick(
     siteContent?.sobre_quemSomosBody_pt,
     siteContent?.sobre_quemSomosBody_en,
+    siteContent?.sobre_quemSomosBody_es,
     t("sobre.quemSomosBody"),
   );
   const comoTrabalhamosBody = pick(
     siteContent?.sobre_comoTrabalhamosBody_pt,
     siteContent?.sobre_comoTrabalhamosBody_en,
+    siteContent?.sobre_comoTrabalhamosBody_es,
     t("sobre.comoTrabalhamosBody"),
   );
 

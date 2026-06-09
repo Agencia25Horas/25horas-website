@@ -41,7 +41,7 @@ export function TomatinoHeader() {
         <div className="flex items-center gap-4 md:gap-6 min-w-0">
           <Link
             href="/"
-            aria-label="25 Horas — Início"
+            aria-label={t("chrome.inicio")}
             onClick={() => setOpen(false)}
             className="inline-flex items-center -ml-1 md:-ml-2 shrink-0"
           >
@@ -92,7 +92,7 @@ export function TomatinoHeader() {
 
           <button
             className="lg:hidden flex flex-col gap-1.5 p-2 -mr-2"
-            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-label={open ? t("chrome.fecharMenu") : t("chrome.abrirMenu")}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >

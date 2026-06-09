@@ -97,10 +97,31 @@ export function SeamlessLoop() {
     // O hero clonado tem os vídeos neutralizados (sem re-download), por isso o
     // hover nele não fazia nada. Re-activamos pointer-events SÓ nesta secção e
     // ligamos o mouseenter/leave à API global → o hero REAL ganha áudio (fade),
-    // cor e ducking. Optional chaining: se o hero real estiver desmontado, no-op.
+    // cor e muta a música de fundo. Optional chaining: hero desmontado → no-op.
     const heroClone = clone.querySelector<HTMLElement>("[data-hero-reel]");
-    const onHeroEnter = () => window.__heroHover?.(true);
-    const onHeroLeave = () => window.__heroHover?.(false);
+    // O clone é um snapshot do DOM: pode ter sido tirado quando o vídeo real
+    // ainda estava a cores (antes de o hover-gating resolver) → ficava a cores
+    // no fundo da página. Forçamos o estado de REPOUSO — desktop (hover) = P&B,
+    // mobile (sem hover) = cor — e fazemos o toggle de cor no hover do clone,
+    // espelhando o hero real (que ganha áudio + cor via __heroHover).
+    const hoverCapable = window.matchMedia("(hover: hover)").matches;
+    const restFilter = hoverCapable ? "grayscale(1)" : "grayscale(0)";
+    const heroCloneVideos = heroClone
+      ? Array.from(heroClone.querySelectorAll("video"))
+      : [];
+    const setCloneFilter = (f: string) =>
+      heroCloneVideos.forEach((v) => {
+        (v as HTMLVideoElement).style.filter = f;
+      });
+    setCloneFilter(restFilter);
+    const onHeroEnter = () => {
+      setCloneFilter("grayscale(0)");
+      window.__heroHover?.(true);
+    };
+    const onHeroLeave = () => {
+      setCloneFilter(restFilter);
+      window.__heroHover?.(false);
+    };
     if (heroClone) {
       heroClone.style.pointerEvents = "auto";
       heroClone.addEventListener("mouseenter", onHeroEnter);

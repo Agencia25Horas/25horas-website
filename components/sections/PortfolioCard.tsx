@@ -39,11 +39,17 @@ function parseMedia(link?: string): Media {
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 
 export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
-  const { lang } = useLang();
+  const { lang, t } = useLang();
   const [open, setOpen] = useState(false);
 
   const title =
-    (lang === "pt" ? item.title_pt : item.title_en) || item.title_pt || "";
+    (lang === "es"
+      ? item.title_es ?? item.title_en
+      : lang === "en"
+        ? item.title_en
+        : item.title_pt) ||
+    item.title_pt ||
+    "";
   const media = parseMedia(item.link);
 
   // Capa: a manual (coverImage) tem prioridade; senão auto da thumbnail do YT.
@@ -85,7 +91,7 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
       {cover ? (
         <Image
           src={cover}
-          alt={title || "Portfolio"}
+          alt={title || t("common.trabalho")}
           fill
           sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
@@ -122,7 +128,7 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
         href={media.url}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`${title || "Trabalho"} — abrir`}
+        aria-label={`${title || t("common.trabalho")} — ${t("common.abrir")}`}
         className="block rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-canvas-white"
       >
         {cardInner}
@@ -141,10 +147,10 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
         onClick={() => setOpen(true)}
         aria-label={
           isVideo
-            ? `Ver vídeo: ${title || "trabalho"}`
+            ? `${t("common.verVideo")}: ${title || t("common.trabalho")}`
             : media?.kind === "instagram"
-              ? `Ver no Instagram: ${title || "trabalho"}`
-              : `Ver ${title || "trabalho"} em tamanho grande`
+              ? `${t("common.verInstagram")}: ${title || t("common.trabalho")}`
+              : title || t("common.trabalho")
         }
         className="block w-full text-left rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-canvas-white"
       >
@@ -155,13 +161,13 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={title || "Trabalho"}
+          aria-label={title || t("common.trabalho")}
           onClick={() => setOpen(false)}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-canvas-black/95 backdrop-blur-sm"
         >
           <button
             type="button"
-            aria-label="Fechar"
+            aria-label={t("cookie.close")}
             onClick={(e) => {
               e.stopPropagation();
               setOpen(false);
@@ -180,7 +186,7 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={`https://www.youtube-nocookie.com/embed/${media.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-                  title={title || "Vídeo"}
+                  title={title || t("cat.video")}
                   allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                   allowFullScreen
                 />
@@ -192,7 +198,7 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={`https://player.vimeo.com/video/${media.id}?autoplay=1&dnt=1`}
-                  title={title || "Vídeo"}
+                  title={title || t("cat.video")}
                   allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen
                 />
@@ -214,7 +220,7 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
               <div className="relative w-full aspect-[4/5] max-h-[85vh]">
                 <Image
                   src={cover}
-                  alt={title || "Trabalho"}
+                  alt={title || t("common.trabalho")}
                   fill
                   sizes="90vw"
                   className="object-contain"

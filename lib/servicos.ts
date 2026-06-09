@@ -198,7 +198,12 @@ export const NICHOS: Nicho[] = [
       "Experiência",
       "Lifestyle",
     ],
-    // NO design — Travel não oferece design como serviço.
+    design: [
+      "Branding",
+      "Flyers",
+      "Stories",
+      "Posts",
+    ],
   },
   {
     code: "05",
@@ -224,7 +229,12 @@ export const NICHOS: Nicho[] = [
       "Office lifestyle",
       "Eventos",
     ],
-    // NO design — Corporate não oferece design como serviço.
+    design: [
+      "Apresentações",
+      "Branding",
+      "Motion graphics",
+      "Campanhas",
+    ],
   },
   {
     code: "06",
@@ -253,7 +263,12 @@ export const NICHOS: Nicho[] = [
       "Lifestyle",
       "Casais",
     ],
-    // NO design — Família não oferece design como serviço.
+    design: [
+      "Convites",
+      "Álbuns",
+      "Stories",
+      "Posts",
+    ],
   },
   {
     code: "07",
@@ -283,7 +298,12 @@ export const NICHOS: Nicho[] = [
       "Branding",
       "Retratos profissionais",
     ],
-    // NO design — Saúde e Bem Estar não oferece design como serviço.
+    design: [
+      "Branding clínico",
+      "Stories",
+      "Posts",
+      "Flyers",
+    ],
   },
   {
     code: "08",

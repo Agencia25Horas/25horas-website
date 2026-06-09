@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     description:
       "Não fazemos vídeos. Fazemos filmes para marcas. Lisboa, Portugal.",
     locale: "pt_PT",
-    alternateLocale: ["en_US"],
+    alternateLocale: ["en_US", "es_ES"],
   },
   twitter: {
     card: "summary_large_image",

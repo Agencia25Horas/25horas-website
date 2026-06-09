@@ -31,6 +31,12 @@ export const siteContent = defineType({
       group: "home",
     }),
     defineField({
+      name: "homeHero_l1_es",
+      title: "Hero L1 (ES)",
+      type: "string",
+      group: "home",
+    }),
+    defineField({
       name: "homeHero_l2_pt",
       title: "Hero L2 (PT)",
       type: "string",
@@ -43,6 +49,12 @@ export const siteContent = defineType({
       group: "home",
     }),
     defineField({
+      name: "homeHero_l2_es",
+      title: "Hero L2 (ES)",
+      type: "string",
+      group: "home",
+    }),
+    defineField({
       name: "homeHero_l3_pt",
       title: "Hero L3 (PT)",
       type: "string",
@@ -51,6 +63,12 @@ export const siteContent = defineType({
     defineField({
       name: "homeHero_l3_en",
       title: "Hero L3 (EN)",
+      type: "string",
+      group: "home",
+    }),
+    defineField({
+      name: "homeHero_l3_es",
+      title: "Hero L3 (ES)",
       type: "string",
       group: "home",
     }),
@@ -69,6 +87,12 @@ export const siteContent = defineType({
       group: "sobre",
     }),
     defineField({
+      name: "sobre_title_es",
+      title: "Sobre — Title (ES)",
+      type: "string",
+      group: "sobre",
+    }),
+    defineField({
       name: "sobre_subtitle_pt",
       title: "Sobre — Subtitle (PT)",
       type: "text",
@@ -78,6 +102,13 @@ export const siteContent = defineType({
     defineField({
       name: "sobre_subtitle_en",
       title: "Sobre — Subtitle (EN)",
+      type: "text",
+      rows: 2,
+      group: "sobre",
+    }),
+    defineField({
+      name: "sobre_subtitle_es",
+      title: "Sobre — Subtitle (ES)",
       type: "text",
       rows: 2,
       group: "sobre",
@@ -97,6 +128,13 @@ export const siteContent = defineType({
       group: "sobre",
     }),
     defineField({
+      name: "sobre_quemSomosBody_es",
+      title: "Quem somos — body (ES)",
+      type: "text",
+      rows: 4,
+      group: "sobre",
+    }),
+    defineField({
       name: "sobre_comoTrabalhamosBody_pt",
       title: "Como trabalhamos — body (PT)",
       type: "text",
@@ -106,6 +144,13 @@ export const siteContent = defineType({
     defineField({
       name: "sobre_comoTrabalhamosBody_en",
       title: "Como trabalhamos — body (EN)",
+      type: "text",
+      rows: 4,
+      group: "sobre",
+    }),
+    defineField({
+      name: "sobre_comoTrabalhamosBody_es",
+      title: "Como trabalhamos — body (ES)",
       type: "text",
       rows: 4,
       group: "sobre",

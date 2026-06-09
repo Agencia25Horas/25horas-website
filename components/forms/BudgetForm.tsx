@@ -83,10 +83,7 @@ export function BudgetForm() {
         error?: string;
       };
       if (!res.ok || !data.ok) {
-        setError(
-          data.error ??
-            "Não conseguimos enviar agora. Tenta de novo ou usa o email directo.",
-        );
+        setError(data.error ?? t("orcamento.form.erroEnvio"));
         trackEvent("form_error", {
           reason: data.error ?? `http_${res.status}`,
         });
@@ -101,7 +98,7 @@ export function BudgetForm() {
       });
       set((p) => ({ ...p, step: 5 }));
     } catch {
-      setError("Falha de rede. Verifica a ligação ou usa o email directo.");
+      setError(t("orcamento.form.erroRede"));
     } finally {
       setSubmitting(false);
     }
@@ -311,9 +308,11 @@ function ContactStep({
           type="text"
         />
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-canvas-white/45 !mt-2">
-          {lang === "en"
-            ? "Email or phone — at least one"
-            : "Email ou telefone — pelo menos um"}
+          {lang === "es"
+            ? "Email o teléfono — al menos uno"
+            : lang === "en"
+              ? "Email or phone — at least one"
+              : "Email ou telefone — pelo menos um"}
         </p>
         <Field
           label={t("orcamento.form.email")}

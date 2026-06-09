@@ -28,8 +28,10 @@ import type {
 
 /** Devolve o NichePack para um slug, do Sanity ou fallback estático. */
 export async function fetchNichePack(slug: NichoSlug): Promise<NichePack> {
+  // Estático = default JÁ TRADUZIDO (PT/EN/ES); Sanity faz override por-língua.
+  const fallback = staticGetNichePack(slug);
   if (!sanityEnabled || !sanityClient) {
-    return staticGetNichePack(slug);
+    return fallback;
   }
   try {
     const data = await sanityClient.fetch<SanityNiche | null>(
@@ -37,11 +39,11 @@ export async function fetchNichePack(slug: NichoSlug): Promise<NichePack> {
       { slug },
       { next: { revalidate: 60, tags: [`niche:${slug}`] } },
     );
-    if (!data) return staticGetNichePack(slug);
-    return adaptSanityNiche(data);
+    if (!data) return fallback;
+    return adaptSanityNiche(data, fallback);
   } catch (err) {
     console.warn(`[sanity] fetchNichePack(${slug}) falhou — fallback static`, err);
-    return staticGetNichePack(slug);
+    return fallback;
   }
 }
 

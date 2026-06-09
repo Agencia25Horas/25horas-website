@@ -3,7 +3,7 @@
  * específico de nicho (label, tagline) e items de serviço.
  */
 
-export type Lang = "pt" | "en";
+export type Lang = "pt" | "en" | "es";
 
 export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
   pt: {
@@ -23,6 +23,22 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     // Chrome
     "chrome.som": "SOM",
+    "chrome.abrirMenu": "Abrir menu",
+    "chrome.fecharMenu": "Fechar menu",
+    "chrome.inicio": "25 Horas — Início",
+
+    // A11y / carrossel / erros (adicionado na revisão ES)
+    "common.prev": "Anterior",
+    "common.next": "Seguinte",
+    "common.deslizar": "← deslizar →",
+    "common.trabalho": "Trabalho",
+    "common.abrir": "abrir",
+    "common.verVideo": "Ver vídeo",
+    "common.verInstagram": "Ver no Instagram",
+    "orcamento.form.erroEnvio":
+      "Não conseguimos enviar agora. Tenta de novo ou usa o email directo.",
+    "orcamento.form.erroRede":
+      "Falha de rede. Verifica a ligação ou usa o email directo.",
 
     // Footer
     "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
@@ -156,6 +172,21 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "cookie.saberMais": "Learn more",
 
     "chrome.som": "SOUND",
+    "chrome.abrirMenu": "Open menu",
+    "chrome.fecharMenu": "Close menu",
+    "chrome.inicio": "25 Horas — Home",
+
+    "common.prev": "Previous",
+    "common.next": "Next",
+    "common.deslizar": "← swipe →",
+    "common.trabalho": "Work",
+    "common.abrir": "open",
+    "common.verVideo": "Watch video",
+    "common.verInstagram": "View on Instagram",
+    "orcamento.form.erroEnvio":
+      "We couldn't send right now. Try again or use the direct email.",
+    "orcamento.form.erroRede":
+      "Network error. Check your connection or use the direct email.",
 
     "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
     "footer.privacidade": "Privacy Policy",
@@ -263,6 +294,156 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "portfolio.preparar":
       "We're putting the gallery together. Come back soon or contact us to see relevant cases for your project.",
   },
+
+  es: {
+    // Header
+    "header.sobre": "Nosotros",
+    "header.portfolio": "Portafolio",
+    "header.contactos": "Contacto",
+    "header.orcamento": "Pedir presupuesto",
+
+    // Cookie banner
+    "cookie.text":
+      "Usamos almacenamiento esencial para que el sitio funcione y, con tu permiso, estadísticas anónimas de visitas. No vendemos datos.",
+    "cookie.close": "Cerrar",
+    "cookie.aceitar": "Aceptar",
+    "cookie.rejeitar": "Rechazar no esenciales",
+    "cookie.saberMais": "Saber más",
+
+    // Chrome
+    "chrome.som": "SONIDO",
+    "chrome.abrirMenu": "Abrir menú",
+    "chrome.fecharMenu": "Cerrar menú",
+    "chrome.inicio": "25 Horas — Inicio",
+
+    "common.prev": "Anterior",
+    "common.next": "Siguiente",
+    "common.deslizar": "← desliza →",
+    "common.trabalho": "Trabajo",
+    "common.abrir": "abrir",
+    "common.verVideo": "Ver vídeo",
+    "common.verInstagram": "Ver en Instagram",
+    "orcamento.form.erroEnvio":
+      "No hemos podido enviar ahora. Inténtalo de nuevo o usa el email directo.",
+    "orcamento.form.erroRede":
+      "Error de red. Comprueba la conexión o usa el email directo.",
+
+    // Footer
+    "footer.copyright": "Copyright © 2026 • 25 Horas Agency • NIF 517 769 034",
+    "footer.privacidade": "Política de Privacidad",
+    "footer.cookies": "Cookies",
+    "footer.livro": "Libro de Reclamaciones",
+
+    // Common
+    "common.verMais": "Ver más →",
+    "common.verTudo": "Ver todo →",
+    "common.verPortfolio": "Ver portafolio →",
+    "common.pedirOrcamento": "Pedir presupuesto →",
+    "common.emBreve": "Próximamente",
+    "common.proximoPasso": "Siguiente paso",
+    "common.anterior": "← Anterior",
+    "common.seguinte": "Siguiente →",
+    "common.todosNichos": "← Todos los sectores",
+    "common.verPortfolioCompleto": "Ver portafolio completo de",
+    "common.voltar": "← Volver",
+    "common.continuar": "Continuar →",
+    "common.enviarPedido": "Enviar solicitud →",
+
+    // Categories
+    "cat.video": "Vídeo",
+    "cat.fotografia": "Fotografía",
+    "cat.design": "Diseño",
+    "cat.gestao": "Gestión de Redes Sociales",
+
+    // Home — hero
+    "home.hero.title.l1": "LAS HISTORIAS",
+    "home.hero.title.l2": "SON DE LAS MARCAS.",
+    "home.hero.title.l3": "LAS IMÁGENES SON NUESTRAS.",
+
+    // /servicos (índice)
+    "servicos.eyebrow": "08 Sectores",
+    "servicos.title": "Donde hacemos magia.",
+    "servicos.subtitle":
+      "Ocho sectores, un mismo vocabulario cinematográfico. Pulsa en uno para ver lo que hacemos en cada caso.",
+
+    // /servicos/[nicho] (deep)
+    "nichoPage.oQueFazemos": "Qué hacemos",
+    "nichoPage.para": "Para",
+    "nichoPage.alinharCalendario": "Vamos a alinear calendario y presupuesto.",
+
+    // /sobre
+    "sobre.eyebrow": "25 Horas Agency",
+    "sobre.title": "Cine para marcas.",
+    "sobre.subtitle":
+      "No hacemos vídeos. Hacemos películas para marcas. 25 horas al día.",
+    "sobre.quemSomos": "Quiénes somos",
+    "sobre.quemSomosTitle": "Equipo pequeño.\nAutoría clara.",
+    "sobre.quemSomosBody":
+      "Trabajamos desde el briefing hasta el montaje final. Vídeo, fotografía, diseño y gestión de redes — en registro cinematográfico. Lisboa, para marcas portuguesas que necesitan ser vistas en cualquier canal, a cualquier escala.",
+    "sobre.comoTrabalhamos": "Cómo trabajamos",
+    "sobre.comoTrabalhamosTitle": "Del briefing\nal montaje final.",
+    "sobre.comoTrabalhamosBody":
+      "Conocemos al cliente, el producto, el equipo y el lugar antes de coger la cámara. Cada proyecto tiene un director responsable. Dirección de fotografía, sonido, edición y etalonaje pensados en conjunto y siempre afinados.",
+    "sobre.sectoresEyebrow": "Los 8 sectores en los que trabajamos",
+    "sobre.sectoresTitle": "Nuestras submarcas.",
+
+    // /contactos
+    "contactos.eyebrow": "Contacto",
+    "contactos.title": "Vamos a\nhablar.",
+    "contactos.subtitle":
+      "Di hola. Para presupuestos, usa el formulario — respondemos en 24 h en español, portugués o inglés.",
+    "contactos.emailLabel": "Email",
+    "contactos.telefoneLabel": "Teléfono",
+    "contactos.telefoneNota": "Llamada a la red móvil nacional.",
+    "contactos.localizacaoLabel": "Ubicación",
+    "contactos.localizacaoValue": "Lisboa,\nPortugal",
+    "contactos.redesLabel": "Redes",
+    "contactos.projectoEmMente": "¿Tienes un proyecto en mente?",
+    "contactos.faz": "Pide tu presupuesto.",
+    "contactos.quatroPerguntas": "Cuatro preguntas, respuesta en 24 h.",
+
+    // /orcamento
+    "orcamento.eyebrow": "Pedir presupuesto",
+    "orcamento.title": "Cuatro preguntas.\nRespuesta en 24h.",
+    "orcamento.subtitle":
+      "Dinos el sector, el entregable y el plazo. Respondemos en español, portugués o inglés en un día laborable.",
+    "orcamento.form.title": "Pedir presupuesto",
+    "orcamento.form.passo": "Paso",
+    "orcamento.form.de": "de",
+    "orcamento.form.q1": "¿En qué sector está tu proyecto?",
+    "orcamento.form.q2": "¿Qué tipo de entregable?",
+    "orcamento.form.q3": "¿En qué plazo?",
+    "orcamento.form.q4": "¿Cómo te contactamos?",
+    "orcamento.form.nome": "Nombre",
+    "orcamento.form.email": "Email",
+    "orcamento.form.telefone": "Teléfono",
+    "orcamento.form.empresa": "Empresa",
+    "orcamento.form.opcional": "opcional",
+    "orcamento.confirm.eyebrow": "Solicitud enviada",
+    "orcamento.confirm.title": "Gracias.",
+    "orcamento.confirm.body":
+      "Revisaremos tu solicitud y responderemos en 24 h, en español, portugués o inglés.",
+    "orcamento.confirm.urgente": "Si es urgente:",
+    "orcamento.form.deliverable.video": "VÍDEO INSTITUCIONAL",
+    "orcamento.form.deliverable.reels": "REELS / TIKTOK",
+    "orcamento.form.deliverable.foto": "FOTOGRAFÍA",
+    "orcamento.form.deliverable.design": "DISEÑO GRÁFICO",
+    "orcamento.form.deliverable.redes": "GESTIÓN DE REDES",
+    "orcamento.form.deliverable.outro": "OTRO",
+    "orcamento.form.timeline.short": "< 1 mes",
+    "orcamento.form.timeline.mid": "1 — 3 meses",
+    "orcamento.form.timeline.long": "> 3 meses",
+
+    // /portfolio (índice)
+    "portfolio.eyebrow": "Portafolio",
+    "portfolio.title": "Trabajos por sector.",
+    "portfolio.subtitle":
+      "Una selección de películas, campañas y fotografía. Cada sector tiene su sección.",
+    "portfolio.emConstrucao": "En construcción",
+    "portfolio.brevemente": "Próximamente, los trabajos de",
+    "portfolio.preparar":
+      "Estamos preparando la galería. Vuelve pronto o contáctanos para ver casos relevantes para tu proyecto.",
+  },
 };
 
 /** Labels + taglines de cada nicho (chave = slug em PT). */
@@ -336,6 +517,41 @@ export const NICHE_CONTENT: Record<
     educacao: {
       label: "EDUCATION",
       tagline: "Schools, educators and knowledge — in cinema form.",
+    },
+  },
+  es: {
+    restaurantes: {
+      label: "RESTAURANTES",
+      tagline: "Platos, ambiente y equipo — en forma de cine.",
+    },
+    desporto: {
+      label: "DEPORTE",
+      tagline: "Highlights, hype videos y fotografía de partido.",
+    },
+    "real-estate": {
+      label: "REAL ESTATE",
+      tagline: "Tours inmobiliarios, drone cinematográfico, walkthroughs.",
+    },
+    travel: {
+      label: "TRAVEL",
+      tagline: "Hoteles, destinos y lifestyle en bucle cinematográfico.",
+    },
+    corporate: {
+      label: "CORPORATE",
+      tagline: "Institucional, podcast, eventos y reclutamiento.",
+    },
+    saude: {
+      label: "FAMILIA",
+      tagline: "Padres, hijos y momentos — en forma de cine.",
+    },
+    "saude-bem-estar": {
+      label: "SALUD",
+      tagline:
+        "Clínicas, profesionales y procedimientos — en tono de confianza.",
+    },
+    educacao: {
+      label: "EDUCACIÓN",
+      tagline: "Escuelas, formadores y conocimiento — en forma de cine.",
     },
   },
 };
@@ -449,4 +665,136 @@ export const SERVICE_ITEMS_EN: Record<string, string> = {
   "Social campaigns": "Social campaigns",
   "TikTok sports": "TikTok sports",
   "Vertical reels": "Vertical reels",
+  // Design — Família / Corporate / Saúde
+  "Apresentações": "Presentations",
+  "Convites": "Invitations",
+  "Álbuns": "Albums",
+};
+
+/** Service items translation map — PT key → ES value (es-ES, informal). */
+export const SERVICE_ITEMS_ES: Record<string, string> = {
+  // Restaurantes
+  "Reels gastronómicos": "Reels gastronómicos",
+  "Highlights restaurante": "Highlights de restaurante",
+  "Vídeos pratos premium": "Vídeos de platos premium",
+  "Behind the scenes": "Behind the scenes",
+  "Chef videos": "Vídeos de chef",
+  "Eventos": "Eventos",
+  "TikTok vertical": "TikTok vertical",
+  "Drone cinematic": "Drone cinematográfico",
+  "UGC style content": "Contenido estilo UGC",
+  "Gastronómica": "Gastronómica",
+  "Cocktails": "Cócteles",
+  "Ambiente": "Ambiente",
+  "Staff": "Personal",
+  "Branding": "Branding",
+  "Menu": "Menú",
+  "Lifestyle": "Lifestyle",
+  "Menus": "Menús",
+  "Stories": "Stories",
+  "Campanhas": "Campañas",
+  "Promoções": "Promociones",
+  "Visual": "Identidad visual",
+  // Desporto
+  "Jogos completos": "Partidos completos",
+  "Entrevistas": "Entrevistas",
+  "Hype videos": "Hype videos",
+  "Bastidores": "Detrás de cámaras",
+  "Drone": "Drone",
+  "Atletas": "Atletas",
+  "Equipa": "Equipo",
+  "Treino": "Entrenamiento",
+  "Media day": "Media day",
+  "Matchday": "Matchday",
+  "Resultados": "Resultados",
+  "Escalações": "Alineaciones",
+  // Real Estate
+  "Tours imobiliários": "Tours inmobiliarios",
+  "Walkthrough": "Walkthrough",
+  "Reels": "Reels",
+  "Showcase": "Showcase",
+  "Interior": "Interior",
+  "Exterior": "Exterior",
+  "Arquitetura": "Arquitectura",
+  "Flyers": "Flyers",
+  "Cards": "Cards",
+  // Travel
+  "Cinematic": "Cinematográfico",
+  "Hotel reels": "Reels de hotel",
+  "Destination": "Destino",
+  "Hotel": "Hotel",
+  "Paisagem": "Paisaje",
+  "Experiência": "Experiencia",
+  // Corporate
+  "Institucional": "Institucional",
+  "Podcast": "Podcast",
+  "Recrutamento": "Reclutamiento",
+  "Portraits": "Retratos",
+  "Office": "Oficina",
+  // Família
+  "Família": "Familia",
+  "Reels familiares": "Reels familiares",
+  "Eventos familiares": "Eventos familiares",
+  "Memórias": "Recuerdos",
+  "Crianças": "Niños",
+  "Casais": "Parejas",
+  "Retratos": "Retratos",
+  // Saúde e Bem Estar
+  "Procedimentos": "Procedimientos",
+  "Reels informativos": "Reels informativos",
+  "Branding clínico": "Branding clínico",
+  "Testemunhos": "Testimonios",
+  "Equipa clínica": "Equipo clínico",
+  "Espaço": "Espacio",
+  "Retratos profissionais": "Retratos profesionales",
+  // Gestão de Redes
+  "Planeamento mensal": "Planificación mensual",
+  "Copywriting": "Copywriting",
+  "Agendamento": "Programación",
+  "Instagram": "Instagram",
+  "Facebook": "Facebook",
+  "TikTok": "TikTok",
+  "15 posts": "15 posts",
+  "60 stories": "60 stories",
+  // Extras / auditoria
+  "Atleta": "Atleta",
+  "Branding clinic": "Branding de clínica",
+  "Branding visual": "Branding visual",
+  "Campanhas jogadores": "Campañas de jugadores",
+  "Cinematic travel": "Travel cinematográfico",
+  "Corporate portraits": "Retratos corporativos",
+  "Destination promo": "Promo de destino",
+  "Drone estádio": "Drone de estadio",
+  "Fotografia gastronómica": "Fotografía gastronómica",
+  "Highlights": "Highlights",
+  "Jogo": "Partido",
+  "Lifestyle clínico": "Lifestyle clínico",
+  "Lifestyle travel": "Lifestyle travel",
+  "Luxury walkthrough": "Walkthrough de lujo",
+  "Motion graphics": "Motion graphics",
+  "Office lifestyle": "Lifestyle de oficina",
+  "Posts": "Posts",
+  "Property cards": "Cards de propiedades",
+  "Property showcase": "Showcase de propiedades",
+  "Retratos de família": "Retratos de familia",
+  "Social campaigns": "Campañas sociales",
+  "TikTok sports": "TikTok deportivo",
+  "Vertical reels": "Reels verticales",
+  // Educação
+  "Vídeos institucionais": "Vídeos institucionales",
+  "Cursos online": "Cursos online",
+  "Depoimentos de alunos": "Testimonios de alumnos",
+  "Aulas em destaque": "Clases destacadas",
+  "Eventos académicos": "Eventos académicos",
+  "Reels educativos": "Reels educativos",
+  "Campus": "Campus",
+  "Formadores": "Formadores",
+  "Alunos": "Alumnos",
+  "Lifestyle académico": "Lifestyle académico",
+  "Materiais de curso": "Materiales de curso",
+  "Campanhas de inscrição": "Campañas de inscripción",
+  // Design — Família / Corporate / Saúde
+  "Apresentações": "Presentaciones",
+  "Convites": "Invitaciones",
+  "Álbuns": "Álbumes",
 };

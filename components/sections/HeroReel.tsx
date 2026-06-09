@@ -130,7 +130,36 @@ export function HeroReel({
     fadeAudio(fv, target, FADE_MS);
   }, [refOf, fadeAudio]);
 
-  // ── ducking: quando o vídeo tem som, baixa a música de fundo do site ──
+  // ── arranque robusto do vídeo da frente ─────────────────────────
+  // O autoplay (muted) às vezes não dispara no 1.º paint e o vídeo só começa
+  // depois de mudar de tab e voltar. Causas: o React NÃO emite o atributo
+  // `muted` no SSR (autoplay SEM `muted` é bloqueado) e/ou o readyState ainda é
+  // 0 quando o play() corre. Garantimos o play em 3 momentos — mount, quando há
+  // dados (onCanPlay) e ao voltar à tab (visibilitychange). Só age se estiver
+  // `paused`, por isso nunca interrompe o áudio do hover.
+  const kickFront = useCallback(() => {
+    const fv = refOf(frontRef.current);
+    if (!fv || !fv.paused) return;
+    fv.play().catch(() => {});
+  }, [refOf]);
+
+  const onCanPlay = useCallback(
+    (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      const v = e.currentTarget;
+      if (v === refOf(frontRef.current) && v.paused) v.play().catch(() => {});
+    },
+    [refOf],
+  );
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") kickFront();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [kickFront]);
+
+  // ── mute da música de fundo: quando o vídeo do hero tem som, MUTA o site ──
   const videoAudible = !muted && (hasHover ? hovering : true);
   useEffect(() => {
     duck(videoAudible);
@@ -164,12 +193,15 @@ export function HeroReel({
     const fv = refOf(0);
     if (fv) {
       fv.muted = true;
-      fv.play().catch(() => {});
+      // reflecte o atributo `muted` no DOM (o React não o emite no SSR) → ajuda
+      // o autoplay a ser permitido logo no 1.º paint, antes de qualquer retry.
+      fv.defaultMuted = true;
     }
+    kickFront();
     return () => {
       if (fadeTimer.current) clearInterval(fadeTimer.current);
     };
-  }, [refOf]);
+  }, [refOf, kickFront]);
 
   // ciclo de posters no modo fallback
   useEffect(() => {
@@ -365,6 +397,7 @@ export function HeroReel({
             preload="metadata"
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
+            onCanPlay={onCanPlay}
             className="absolute inset-0 w-full h-full object-cover"
             style={videoStyle(0)}
           />
@@ -378,6 +411,7 @@ export function HeroReel({
             preload="metadata"
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
+            onCanPlay={onCanPlay}
             className="absolute inset-0 w-full h-full object-cover"
             style={videoStyle(1)}
           />
@@ -451,12 +485,16 @@ export function HeroReel({
           onClick={toggleMute}
           aria-label={
             muted
-              ? en
-                ? "Turn sound on"
-                : "Ligar som"
-              : en
-                ? "Turn sound off"
-                : "Desligar som"
+              ? lang === "es"
+                ? "Activar sonido"
+                : en
+                  ? "Turn sound on"
+                  : "Ligar som"
+              : lang === "es"
+                ? "Silenciar"
+                : en
+                  ? "Turn sound off"
+                  : "Desligar som"
           }
           className="absolute z-20 bottom-[16svh] right-6 md:bottom-[19svh] md:right-12 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
         >

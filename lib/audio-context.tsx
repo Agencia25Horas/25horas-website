@@ -9,207 +9,100 @@ import {
   useState,
 } from "react";
 import { disableAudio, enableAudio } from "./audio";
-import { useLang } from "./language-context";
 
 type AudioCtx = {
   on: boolean;
   blocked: boolean;
   toggle: () => Promise<void>;
-  /** Baixa (true) / repõe (false) o volume da faixa ATIVA — o vídeo do hero
-   *  usa isto para deixar a música de fundo, sem a cortar. */
+  /** Muta (true) / repõe (false) a música de fundo. O vídeo do hero usa isto
+   *  para silenciar TOTALMENTE o site enquanto tem som (mute, não ducking). */
   duck: (active: boolean) => void;
 };
 
 const Ctx = createContext<AudioCtx | null>(null);
 
 const LS_KEY = "25h.audio";
-// Duas faixas que tocam EM SINCRONIA: só se ouve a da língua ativa.
-const TRACKS = {
-  pt: "/media/audio/25pt.mp3",
-  en: "/media/audio/25en.mp3",
-} as const;
+// Faixa de fundo ÚNICA: toca a mesma versão (PT) em qualquer língua do site.
+// A antiga versão EN (25en.mp3) deixou de ser usada — música é só ambiente.
+const TRACK = "/media/audio/25pt.mp3";
 const TRACK_VOLUME = 0.5;
-const DUCK_VOLUME = 0.1; // ~20% — fica de fundo quando o vídeo tem som
 
 /**
- * Música de fundo bilingue + LOOP sincronizado.
+ * Música de fundo — faixa única em loop nativo.
  *
- * As duas faixas (25pt + 25en) arrancam ao mesmo tempo, do início; só a da
- * língua ativa tem som (a outra toca muda, em sincronia, via `muted` —
- * iOS-safe). Mudar de língua troca qual se ouve, sem cortar.
- *
- * As faixas têm durações diferentes (a PT é um pouco mais longa). Para nunca
- * haver silêncio e poder mudar de língua a qualquer momento:
- *   • o LOOP é comandado pela faixa ATIVA — quando ela acaba, AS DUAS
- *     recomeçam juntas do início (a mais curta, que acabou antes, espera);
- *   • mudar para uma língua cuja faixa já tinha acabado → recomeça AS DUAS.
+ * Antes existiam duas faixas (PT/EN) sincronizadas e a língua trocava qual se
+ * ouvia. Por decisão de produto passou a tocar SEMPRE a mesma faixa (PT),
+ * independentemente da língua — por isso esta camada deixou de depender de
+ * `lang` e o loop é simplesmente o `loop` nativo do <audio>.
  */
 export function AudioProvider({ children }: { children: React.ReactNode }) {
-  const { lang } = useLang();
   const [on, setOn] = useState(false);
   const [blocked, setBlocked] = useState(false);
-  const ptRef = useRef<HTMLAudioElement | null>(null);
-  const enRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Hover do hero pede mute total da música; guardamos para reaplicar mesmo que
+  // o som seja ligado já durante um hover.
   const duckedRef = useRef(false);
-  // Garante que a faixa INATIVA só é "rebobinada" uma vez por ciclo da ATIVA.
-  const inactiveResetDoneRef = useRef(false);
   const fadeRaf = useRef<number | null>(null);
   const onRef = useRef(on);
   onRef.current = on;
-  const langRef = useRef(lang);
-  langRef.current = lang;
 
-  const activeAudio = useCallback(
-    () => (langRef.current === "en" ? enRef.current : ptRef.current),
-    [],
-  );
-  const inactiveAudio = useCallback(
-    () => (langRef.current === "en" ? ptRef.current : enRef.current),
-    [],
-  );
-  const targetVolume = useCallback(
-    () => (duckedRef.current ? DUCK_VOLUME : TRACK_VOLUME),
-    [],
-  );
-
-  // Só a faixa da língua ativa se ouve (muted, não volume → fiável no iOS).
-  const applyMutes = useCallback(() => {
-    const a = activeAudio();
-    const i = inactiveAudio();
-    if (i) {
-      i.muted = true;
-      i.volume = 0;
-    }
-    if (a) {
-      a.muted = false;
-      a.volume = targetVolume();
-    }
-  }, [activeAudio, inactiveAudio, targetVolume]);
-
-  // Recomeça AS DUAS faixas do início (mantém sincronia) e toca.
-  const restartBoth = useCallback(() => {
-    const pt = ptRef.current;
-    const en = enRef.current;
-    if (!pt || !en) return;
-    pt.currentTime = 0;
-    en.currentTime = 0;
-    applyMutes();
-    pt.play().catch(() => {});
-    en.play().catch(() => {});
-    inactiveResetDoneRef.current = false; // novo ciclo → re-arma o reset da inativa
-  }, [applyMutes]);
-  const restartBothRef = useRef(restartBoth);
-  restartBothRef.current = restartBoth;
-
+  // ── cria o elemento de áudio (uma vez) ──────────────────────────
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const pt = new Audio(TRACKS.pt);
-    const en = new Audio(TRACKS.en);
-    pt.preload = "auto";
-    en.preload = "auto";
-    pt.volume = 0;
-    en.volume = 0;
-    pt.muted = true;
-    en.muted = true;
-    ptRef.current = pt;
-    enRef.current = en;
-    // LOOP sincronizado: quando a faixa ATIVA acaba, recomeçam AS DUAS. A
-    // inativa (mais curta) que acabe antes fica à espera. NÃO usamos o atributo
-    // `loop` — cada uma a fazer loop sozinha desincronizava-as.
-    const onEnded = (e: Event) => {
-      if (!onRef.current) return;
-      const active = langRef.current === "en" ? enRef.current : ptRef.current;
-      if (e.target === active) restartBothRef.current();
-    };
-    // Rebobina a faixa INATIVA pelo menos 4s ANTES de a ATIVA acabar. Ex.: com
-    // a 25en.mp3 a tocar, a 25pt.mp3 volta ao início >=4s antes do fim da EN —
-    // assim nunca fica presa no fim/silenciada e mudar de língua é sempre suave,
-    // seja qual for a duração de cada faixa.
-    const onTimeUpdate = (e: Event) => {
-      if (!onRef.current) return;
-      const en2 = enRef.current;
-      const pt2 = ptRef.current;
-      const active = langRef.current === "en" ? en2 : pt2;
-      const inactive = langRef.current === "en" ? pt2 : en2;
-      if (e.target !== active || !active || !inactive) return;
-      const d = active.duration;
-      if (!Number.isFinite(d) || d <= 0) return;
-      if (active.currentTime >= d - 4 && !inactiveResetDoneRef.current) {
-        inactiveResetDoneRef.current = true;
-        inactive.currentTime = 0;
-        inactive.muted = true;
-        inactive.volume = 0;
-        inactive.play().catch(() => {});
-      }
-    };
-    pt.addEventListener("ended", onEnded);
-    en.addEventListener("ended", onEnded);
-    pt.addEventListener("timeupdate", onTimeUpdate);
-    en.addEventListener("timeupdate", onTimeUpdate);
+    const a = new Audio(TRACK);
+    a.preload = "auto";
+    a.loop = true; // loop nativo — faixa única, sem sincronização
+    a.volume = TRACK_VOLUME;
+    audioRef.current = a;
     return () => {
       if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-      pt.removeEventListener("ended", onEnded);
-      en.removeEventListener("ended", onEnded);
-      pt.removeEventListener("timeupdate", onTimeUpdate);
-      en.removeEventListener("timeupdate", onTimeUpdate);
-      pt.pause();
-      en.pause();
-      pt.src = "";
-      en.src = "";
-      ptRef.current = null;
-      enRef.current = null;
+      a.pause();
+      a.src = "";
+      audioRef.current = null;
     };
   }, []);
 
-  const fadeVolumeTo = useCallback(
-    (el: HTMLAudioElement | null, target: number) => {
-      if (!el) return;
-      if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-      const start = el.volume;
-      const t0 = performance.now();
-      const tick = (now: number) => {
-        const t = Math.min(1, (now - t0) / 400);
-        el.volume = start + (target - start) * t;
-        if (t < 1) fadeRaf.current = requestAnimationFrame(tick);
-        else fadeRaf.current = null;
-      };
-      fadeRaf.current = requestAnimationFrame(tick);
-    },
-    [],
-  );
-
-  // ── troca de língua ──────────────────────────────────────────────
-  useEffect(() => {
-    if (!onRef.current) return;
+  // Fade de volume (suave no desktop; no iOS o volume é ignorado mas o
+  // `muted`/play continua a comandar).
+  const fadeVolumeTo = useCallback((target: number) => {
+    const el = audioRef.current;
+    if (!el) return;
     if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
-    inactiveResetDoneRef.current = false; // a ativa/inativa trocaram → re-arma
-    const a = activeAudio();
-    // se a nova faixa já tinha ACABADO → recomeça AS DUAS (loop sincronizado).
-    if (a && a.ended) {
-      restartBoth();
-      return;
-    }
-    // senão, está a tocar em sincronia → só troca qual se ouve.
-    applyMutes();
-    if (a && a.paused) a.play().catch(() => {});
-  }, [lang, activeAudio, applyMutes, restartBoth]);
+    const start = el.volume;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - t0) / 400);
+      el.volume = start + (target - start) * t;
+      if (t < 1) fadeRaf.current = requestAnimationFrame(tick);
+      else fadeRaf.current = null;
+    };
+    fadeRaf.current = requestAnimationFrame(tick);
+  }, []);
 
+  // ── mute total quando o vídeo do hero tem som (não ducking) ─────
+  // `muted` é o único caminho fiável no iOS (lá o `volume` é ignorado).
   const duck = useCallback(
     (active: boolean) => {
       duckedRef.current = active;
-      fadeVolumeTo(activeAudio(), active ? DUCK_VOLUME : TRACK_VOLUME);
+      const el = audioRef.current;
+      if (!el) return;
+      if (active) {
+        el.muted = true; // silêncio total enquanto o hero toca
+      } else {
+        el.muted = false;
+        el.volume = 0;
+        fadeVolumeTo(TRACK_VOLUME); // repõe com fade suave
+      }
     },
-    [activeAudio, fadeVolumeTo],
+    [fadeVolumeTo],
   );
 
   const toggle = async () => {
-    const pt = ptRef.current;
-    const en = enRef.current;
-    if (!pt || !en) return;
+    const el = audioRef.current;
+    if (!el) return;
 
     if (onRef.current) {
-      pt.pause();
-      en.pause();
+      el.pause();
       disableAudio();
       setOn(false);
       setBlocked(false);
@@ -220,8 +113,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     try {
       // Click = gesto do utilizador → áudio permitido em todos os browsers.
       await enableAudio();
-      onRef.current = true; // para o onEnded (loop) já funcionar
-      restartBoth(); // arrancam ao mesmo tempo, do início
+      el.currentTime = 0;
+      el.muted = duckedRef.current; // respeita um hover em curso
+      el.volume = TRACK_VOLUME;
+      await el.play();
       setOn(true);
       setBlocked(false);
       window.localStorage.setItem(LS_KEY, "on");

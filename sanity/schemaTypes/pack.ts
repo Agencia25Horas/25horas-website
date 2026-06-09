@@ -50,6 +50,11 @@ export const pack = defineType({
       type: "string",
     }),
     defineField({
+      name: "subtitle_es",
+      title: "Subtitle (ES)",
+      type: "string",
+    }),
+    defineField({
       name: "features",
       title: "Features",
       type: "array",
@@ -93,6 +98,11 @@ export const pack = defineType({
               type: "string",
             }),
             defineField({
+              name: "title_es",
+              title: "Title (ES)",
+              type: "string",
+            }),
+            defineField({
               name: "desc_pt",
               title: "Description (PT)",
               type: "text",
@@ -101,6 +111,12 @@ export const pack = defineType({
             defineField({
               name: "desc_en",
               title: "Description (EN)",
+              type: "text",
+              rows: 2,
+            }),
+            defineField({
+              name: "desc_es",
+              title: "Description (ES)",
               type: "text",
               rows: 2,
             }),

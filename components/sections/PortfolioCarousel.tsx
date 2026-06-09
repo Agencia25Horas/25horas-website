@@ -5,6 +5,7 @@ import AutoScroll from "embla-carousel-auto-scroll";
 import { useCallback, useEffect, useState } from "react";
 import { PortfolioCard } from "@/components/sections/PortfolioCard";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
+import { useLang } from "@/lib/language-context";
 
 const SLIDE_CLASS =
   "flex-[0_0_calc(100%-1rem)] md:flex-[0_0_calc(33.333%-1rem)] min-w-0";
@@ -29,6 +30,7 @@ export function PortfolioCarousel({
   /** Texto dos placeholders (traduzido pelo chamador). */
   emptyLabel?: string;
 }) {
+  const { t } = useLang();
   const hasItems = items != null && items.length > 0;
   const count = hasItems ? items.length : placeholderCount;
 
@@ -103,7 +105,7 @@ export function PortfolioCarousel({
       {/* Setas — só em desktop (mobile usa swipe) */}
       <button
         type="button"
-        aria-label="Anterior"
+        aria-label={t("common.prev")}
         onClick={prev}
         className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
       >
@@ -111,7 +113,7 @@ export function PortfolioCarousel({
       </button>
       <button
         type="button"
-        aria-label="Seguinte"
+        aria-label={t("common.next")}
         onClick={next}
         className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
       >
@@ -120,7 +122,7 @@ export function PortfolioCarousel({
 
       {/* Hint de swipe — só em mobile */}
       <p className="md:hidden mt-4 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-canvas-white/50">
-        ← deslizar →
+        {t("common.deslizar")}
       </p>
     </div>
   );

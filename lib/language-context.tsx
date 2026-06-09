@@ -11,6 +11,7 @@ import {
 import {
   NICHE_CONTENT,
   SERVICE_ITEMS_EN,
+  SERVICE_ITEMS_ES,
   TRANSLATIONS,
   type Lang,
 } from "./i18n";
@@ -33,7 +34,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(LS_KEY) as Lang | null;
-    if (stored === "pt" || stored === "en") setLangState(stored);
+    if (stored === "pt" || stored === "en" || stored === "es")
+      setLangState(stored);
   }, []);
 
   // Sincroniza <html lang> com a língua actual.
@@ -60,7 +62,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       tNiche: (slug) =>
         NICHE_CONTENT[lang][slug] ??
         NICHE_CONTENT.pt[slug] ?? { label: slug, tagline: "" },
-      tItem: (pt) => (lang === "en" ? SERVICE_ITEMS_EN[pt] ?? pt : pt),
+      tItem: (pt) =>
+        lang === "en"
+          ? SERVICE_ITEMS_EN[pt] ?? pt
+          : lang === "es"
+            ? SERVICE_ITEMS_ES[pt] ?? pt
+            : pt,
     }),
     [lang],
   );

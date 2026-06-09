@@ -53,6 +53,12 @@ export const niche = defineType({
       group: "identity",
     }),
     defineField({
+      name: "label_es",
+      title: "Label (ES)",
+      type: "string",
+      group: "identity",
+    }),
+    defineField({
       name: "tagline_pt",
       title: "Tagline (PT)",
       description: "Aparece nos cards da home",
@@ -63,6 +69,13 @@ export const niche = defineType({
     defineField({
       name: "tagline_en",
       title: "Tagline (EN)",
+      type: "text",
+      rows: 2,
+      group: "identity",
+    }),
+    defineField({
+      name: "tagline_es",
+      title: "Tagline (ES)",
       type: "text",
       rows: 2,
       group: "identity",
@@ -110,6 +123,13 @@ export const niche = defineType({
       group: "packPage",
     }),
     defineField({
+      name: "objective_es",
+      title: "Objective (ES)",
+      type: "text",
+      rows: 2,
+      group: "packPage",
+    }),
+    defineField({
       name: "taglineL1_pt",
       title: "Tagline L1 (PT)",
       type: "string",
@@ -119,6 +139,12 @@ export const niche = defineType({
     defineField({
       name: "taglineL1_en",
       title: "Tagline L1 (EN)",
+      type: "string",
+      group: "packPage",
+    }),
+    defineField({
+      name: "taglineL1_es",
+      title: "Tagline L1 (ES)",
       type: "string",
       group: "packPage",
     }),
@@ -136,6 +162,12 @@ export const niche = defineType({
       group: "packPage",
     }),
     defineField({
+      name: "taglineL2_es",
+      title: "Tagline L2 (ES)",
+      type: "string",
+      group: "packPage",
+    }),
+    defineField({
       name: "whatsappText_pt",
       title: "WhatsApp pre-fill (PT)",
       type: "text",
@@ -146,6 +178,13 @@ export const niche = defineType({
     defineField({
       name: "whatsappText_en",
       title: "WhatsApp pre-fill (EN)",
+      type: "text",
+      rows: 2,
+      group: "packPage",
+    }),
+    defineField({
+      name: "whatsappText_es",
+      title: "WhatsApp pre-fill (ES)",
       type: "text",
       rows: 2,
       group: "packPage",

@@ -122,8 +122,9 @@ export function NichePackView({
   const accent = nicho.accentColor;
   const data = pack;
 
-  // Bilingual string picker — keeps the JSX uncluttered.
-  const s = (b: { pt: string; en: string }) => b[lang];
+  // Trilingual string picker — keeps the JSX uncluttered. ES cai para PT
+  // quando ainda não há tradução (es é opcional no tipo Bi).
+  const s = (b: { pt: string; en: string; es?: string }) => b[lang] ?? b.pt;
 
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">
@@ -439,7 +440,7 @@ function PackCard({
 }: {
   pack: import("@/lib/packs").Pack;
   accent: string;
-  s: (b: { pt: string; en: string }) => string;
+  s: (b: { pt: string; en: string; es?: string }) => string;
 }) {
   const border = pack.highlighted ? accent : "rgba(255,255,255,0.12)";
   return (

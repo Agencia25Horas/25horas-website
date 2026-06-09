@@ -23,6 +23,11 @@ export const portfolioItem = defineType({
       type: "string",
     }),
     defineField({
+      name: "title_es",
+      title: "Título (ES)",
+      type: "string",
+    }),
+    defineField({
       name: "niche",
       title: "Nicho",
       type: "reference",

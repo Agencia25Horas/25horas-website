@@ -7,11 +7,15 @@ import { useLang } from "@/lib/language-context";
 
 export function NotFoundView() {
   const { lang } = useLang();
-  const en = lang === "en";
+  const tr = (pt: string, en: string, es: string) =>
+    lang === "es" ? es : lang === "en" ? en : pt;
   const ctas = [
-    { href: "/", label: en ? "Home" : "Início" },
-    { href: "/servicos", label: en ? "Services" : "Serviços" },
-    { href: "/orcamento", label: en ? "Get a quote" : "Pedir orçamento" },
+    { href: "/", label: tr("Início", "Home", "Inicio") },
+    { href: "/servicos", label: tr("Serviços", "Services", "Servicios") },
+    {
+      href: "/orcamento",
+      label: tr("Pedir orçamento", "Get a quote", "Pedir presupuesto"),
+    },
   ];
 
   return (
@@ -25,7 +29,7 @@ export function NotFoundView() {
       <section className="flex-1 flex items-center px-6 md:px-12 py-20">
         <div className="max-w-[760px] mx-auto w-full text-center">
           <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent-grade">
-            {en ? "Error 404" : "Erro 404"}
+            {tr("Erro 404", "Error 404", "Error 404")}
           </p>
           <p
             className="mt-6 font-display uppercase leading-[0.8] text-accent-grade text-[clamp(5rem,22vw,15rem)] drop-shadow-[0_4px_24px_rgba(232,93,58,0.25)]"
@@ -34,12 +38,14 @@ export function NotFoundView() {
             404
           </p>
           <h1 className="mt-2 font-display uppercase text-[clamp(1.75rem,5vw,3.5rem)] leading-[0.95] text-canvas-white">
-            {en ? "Page not found" : "Página não encontrada"}
+            {tr("Página não encontrada", "Page not found", "Página no encontrada")}
           </h1>
           <p className="mt-6 font-body text-[clamp(1rem,1.5vw,1.25rem)] leading-relaxed text-canvas-white/70 max-w-md mx-auto">
-            {en
-              ? "The link you followed may be broken, or the page has moved. No stress — pick where to go next:"
-              : "O link que seguiste pode estar partido ou a página foi movida. Sem stress — escolhe por onde seguir:"}
+            {tr(
+              "O link que seguiste pode estar partido ou a página foi movida. Sem stress — escolhe por onde seguir:",
+              "The link you followed may be broken, or the page has moved. No stress — pick where to go next:",
+              "El enlace que seguiste puede estar roto o la página se ha movido. Sin estrés — elige por dónde seguir:",
+            )}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
