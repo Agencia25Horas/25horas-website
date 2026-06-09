@@ -9,6 +9,7 @@
 
 import type { NichePack } from "@/lib/packs";
 import { getNichePack as staticGetNichePack } from "@/lib/packs";
+import { PORTFOLIO_FALLBACK } from "@/lib/portfolio-fallback";
 import { NICHOS, type NichoSlug } from "@/lib/servicos";
 import { sanityClient, sanityEnabled, urlForImage } from "./client";
 import {
@@ -51,17 +52,19 @@ export async function fetchNichePack(slug: NichoSlug): Promise<NichePack> {
 export async function fetchPortfolioByNiche(
   slug: NichoSlug,
 ): Promise<SanityPortfolioItem[]> {
-  if (!sanityEnabled || !sanityClient) return [];
+  const fb = PORTFOLIO_FALLBACK[slug] ?? [];
+  if (!sanityEnabled || !sanityClient) return fb;
   try {
     const data = await sanityClient.fetch<SanityPortfolioItem[] | null>(
       PORTFOLIO_BY_NICHE_QUERY,
       { slug },
       { next: { revalidate: 60, tags: [`portfolio:${slug}`] } },
     );
-    return data ?? [];
+    // Sanity manda; só cai para o fallback estático se não houver itens.
+    return data && data.length > 0 ? data : fb;
   } catch (err) {
     console.warn(`[sanity] fetchPortfolioByNiche(${slug}) falhou`, err);
-    return [];
+    return fb;
   }
 }
 
@@ -151,9 +154,19 @@ export async function fetchAllPortfolio(): Promise<
       const slug = it.nicheSlug ?? "_unknown";
       (grouped[slug] ??= []).push(it);
     }
-    return grouped;
+    return withPortfolioFallback(grouped);
   } catch (err) {
     console.warn("[sanity] fetchAllPortfolio falhou", err);
-    return {};
+    return withPortfolioFallback({});
   }
+}
+
+/** Preenche com o fallback estático os nichos que não trazem itens do Sanity. */
+function withPortfolioFallback(
+  grouped: Record<string, SanityPortfolioItem[]>,
+): Record<string, SanityPortfolioItem[]> {
+  for (const [slug, items] of Object.entries(PORTFOLIO_FALLBACK)) {
+    if (!grouped[slug] || grouped[slug].length === 0) grouped[slug] = items;
+  }
+  return grouped;
 }

@@ -288,6 +288,10 @@ export function HeroReel({
     () => crossfadeTo((currentIdx() + 1) % N),
     [crossfadeTo, currentIdx],
   );
+  const retreat = useCallback(
+    () => crossfadeTo((currentIdx() - 1 + N) % N),
+    [crossfadeTo, currentIdx],
+  );
 
   const onTimeUpdate = useCallback(
     (e: React.SyntheticEvent<HTMLVideoElement>) => {
@@ -477,6 +481,40 @@ export function HeroReel({
           </div>
         )}
       </div>
+
+      {/* ── Setas prev/next (z-20) — saltar vídeos do hero ── */}
+      {!fallback && (
+        <>
+          <button
+            type="button"
+            onClick={retreat}
+            aria-label={
+              lang === "es"
+                ? "Vídeo anterior"
+                : en
+                  ? "Previous video"
+                  : "Vídeo anterior"
+            }
+            className="absolute z-20 left-3 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white text-2xl leading-none hover:bg-canvas-black/70 transition-colors"
+          >
+            <span className="-mt-0.5">‹</span>
+          </button>
+          <button
+            type="button"
+            onClick={advance}
+            aria-label={
+              lang === "es"
+                ? "Vídeo siguiente"
+                : en
+                  ? "Next video"
+                  : "Próximo vídeo"
+            }
+            className="absolute z-20 right-3 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white text-2xl leading-none hover:bg-canvas-black/70 transition-colors"
+          >
+            <span className="-mt-0.5">›</span>
+          </button>
+        </>
+      )}
 
       {/* ── Botão de som (z-20) — escondido no fallback ── */}
       {!fallback && (

@@ -48,7 +48,8 @@ export function PortfolioCarousel({
         speed: 1,
         startDelay: 0,
         stopOnInteraction: false,
-        stopOnMouseEnter: false,
+        // Hover no carrossel pára o scroll (para se poder ver/ouvir o vídeo).
+        stopOnMouseEnter: true,
       }),
     ],
   );

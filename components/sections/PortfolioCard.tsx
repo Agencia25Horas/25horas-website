@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
 
@@ -17,7 +17,7 @@ import type { SanityPortfolioItem } from "@/lib/sanity/types";
  */
 
 type Media =
-  | { kind: "youtube"; id: string }
+  | { kind: "youtube"; id: string; short: boolean }
   | { kind: "vimeo"; id: string }
   | { kind: "instagram"; url: string }
   | { kind: "external"; url: string }
@@ -28,7 +28,7 @@ function parseMedia(link?: string): Media {
   const yt = link.match(
     /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/,
   );
-  if (yt) return { kind: "youtube", id: yt[1] };
+  if (yt) return { kind: "youtube", id: yt[1], short: /\/shorts\//.test(link) };
   const vimeo = link.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   if (vimeo) return { kind: "vimeo", id: vimeo[1] };
   if (/instagram\.com\/(?:p|reel|reels|tv)\//.test(link))
@@ -41,6 +41,8 @@ const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`
 export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
   const { lang, t } = useLang();
   const [open, setOpen] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const title =
     (lang === "es"
@@ -85,6 +87,55 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
       document.body.appendChild(s);
     }
   }, [open, media]);
+
+  // ── YouTube / Shorts INLINE: toca em loop a P&B; hover dá cor + som (e, via
+  //    stopOnMouseEnter do carrossel, pausa o scroll) — igual ao hero. ──
+  const ytPost = (func: string) =>
+    iframeRef.current?.contentWindow?.postMessage(
+      JSON.stringify({ event: "command", func, args: [] }),
+      "*",
+    );
+  const onVideoEnter = () => {
+    setHovering(true);
+    ytPost("unMute");
+    ytPost("playVideo");
+  };
+  const onVideoLeave = () => {
+    setHovering(false);
+    ytPost("mute");
+  };
+
+  if (media?.kind === "youtube") {
+    return (
+      <a
+        href={`https://www.youtube.com/watch?v=${media.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        onMouseEnter={onVideoEnter}
+        onMouseLeave={onVideoLeave}
+        aria-label={`${t("common.verVideo")}: ${title || t("common.trabalho")}`}
+        className="group relative block aspect-[4/5] overflow-hidden rounded-lg bg-canvas-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-canvas-white"
+      >
+        <iframe
+          ref={iframeRef}
+          src={`https://www.youtube.com/embed/${media.id}?autoplay=1&mute=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
+          title={title || t("cat.video")}
+          allow="autoplay; encrypted-media; picture-in-picture"
+          className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-[filter] duration-500 ${
+            media.short ? "w-full aspect-[9/16]" : "h-full aspect-video"
+          }`}
+          style={{ filter: hovering ? "grayscale(0)" : "grayscale(1)" }}
+        />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-canvas-black/85 via-canvas-black/25 to-transparent">
+          {title && (
+            <p className="font-display uppercase text-canvas-white text-[clamp(0.95rem,1.4vw,1.15rem)] leading-tight">
+              {title}
+            </p>
+          )}
+        </div>
+      </a>
+    );
+  }
 
   const cardInner = (
     <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-white/5 group">
@@ -181,18 +232,6 @@ export function PortfolioCard({ item }: { item: SanityPortfolioItem }) {
             className="relative w-full max-w-[1100px]"
             onClick={(e) => e.stopPropagation()}
           >
-            {media?.kind === "youtube" && (
-              <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
-                <iframe
-                  className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube-nocookie.com/embed/${media.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-                  title={title || t("cat.video")}
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                />
-              </div>
-            )}
-
             {media?.kind === "vimeo" && (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
                 <iframe
