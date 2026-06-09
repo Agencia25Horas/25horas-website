@@ -140,13 +140,19 @@ export function HeroReel({
   const kickFront = useCallback(() => {
     const fv = refOf(frontRef.current);
     if (!fv || !fv.paused) return;
-    fv.play().catch(() => {});
+    fv.muted = true; // garante que o autoplay (mudo) é permitido
+    const p = fv.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
   }, [refOf]);
 
   const onCanPlay = useCallback(
     (e: React.SyntheticEvent<HTMLVideoElement>) => {
       const v = e.currentTarget;
-      if (v === refOf(frontRef.current) && v.paused) v.play().catch(() => {});
+      if (v === refOf(frontRef.current) && v.paused) {
+        v.muted = true;
+        const p = v.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      }
     },
     [refOf],
   );
@@ -157,6 +163,23 @@ export function HeroReel({
     };
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
+  }, [kickFront]);
+
+  // Fallback final: alguns browsers bloqueiam o autoplay MESMO mudo até haver
+  // uma interação. Aqui o vídeo arranca à 1.ª interação do utilizador (scroll,
+  // toque, clique ou tecla) em qualquer ponto da página. {once} auto-remove.
+  useEffect(() => {
+    const kick = () => kickFront();
+    const evs: (keyof WindowEventMap)[] = [
+      "pointerdown",
+      "touchstart",
+      "keydown",
+      "wheel",
+      "scroll",
+    ];
+    const opts = { once: true, passive: true, capture: true } as const;
+    evs.forEach((e) => window.addEventListener(e, kick, opts));
+    return () => evs.forEach((e) => window.removeEventListener(e, kick, opts));
   }, [kickFront]);
 
   // ── mute da música de fundo: quando o vídeo do hero tem som, MUTA o site ──
@@ -395,13 +418,13 @@ export function HeroReel({
             ref={v0}
             src={VIDEOS[slots[0]].src}
             poster={VIDEOS[slots[0]].poster}
-            autoPlay
             muted
             playsInline
             preload="metadata"
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
             onCanPlay={onCanPlay}
+            onLoadedData={onCanPlay}
             className="absolute inset-0 w-full h-full object-cover"
             style={videoStyle(0)}
           />
@@ -409,13 +432,13 @@ export function HeroReel({
             ref={v1}
             src={VIDEOS[slots[1]].src}
             poster={VIDEOS[slots[1]].poster}
-            autoPlay
             muted
             playsInline
             preload="metadata"
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
             onCanPlay={onCanPlay}
+            onLoadedData={onCanPlay}
             className="absolute inset-0 w-full h-full object-cover"
             style={videoStyle(1)}
           />
