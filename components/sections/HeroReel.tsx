@@ -59,6 +59,7 @@ export function HeroReel({
   );
   const parallaxRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
 
   const [slots, setSlots] = useState<[number, number]>([0, 1]);
   const [front, setFront] = useState<0 | 1>(0);
@@ -131,31 +132,35 @@ export function HeroReel({
   }, [refOf, fadeAudio]);
 
   // ── arranque robusto do vídeo da frente ─────────────────────────
-  // O autoplay (muted) às vezes não dispara no 1.º paint e o vídeo só começa
-  // depois de mudar de tab e voltar. Causas: o React NÃO emite o atributo
-  // `muted` no SSR (autoplay SEM `muted` é bloqueado) e/ou o readyState ainda é
-  // 0 quando o play() corre. Garantimos o play em 3 momentos — mount, quando há
-  // dados (onCanPlay) e ao voltar à tab (visibilitychange). Só age se estiver
-  // `paused`, por isso nunca interrompe o áudio do hover.
+  // O vídeo tem `autoPlay muted` NATIVO (o `muted` vai no SSR, confirmado). Como
+  // alguns browsers adiam o autoplay, voltamos a tocar quando o hero fica
+  // VISÍVEL (IntersectionObserver), ao voltar à tab, e à 1.ª interação. Tudo só
+  // age se estiver `paused` → nunca há dois play() a competir (era isso que
+  // fazia o vídeo "crashar/bloquear") nem se mexe no áudio do hover.
   const kickFront = useCallback(() => {
     const fv = refOf(frontRef.current);
     if (!fv || !fv.paused) return;
-    fv.muted = true; // garante que o autoplay (mudo) é permitido
+    fv.muted = true; // garante que o play (mudo) é sempre permitido
     const p = fv.play();
     if (p && typeof p.catch === "function") p.catch(() => {});
   }, [refOf]);
 
-  const onCanPlay = useCallback(
-    (e: React.SyntheticEvent<HTMLVideoElement>) => {
-      const v = e.currentTarget;
-      if (v === refOf(frontRef.current) && v.paused) {
-        v.muted = true;
-        const p = v.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      }
-    },
-    [refOf],
-  );
+  // Toca quando o hero entra no ecrã — cobre o autoplay adiado, sem spam.
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      kickFront();
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) kickFront();
+      },
+      { threshold: 0.1 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [kickFront]);
 
   useEffect(() => {
     const onVis = () => {
@@ -220,11 +225,10 @@ export function HeroReel({
       // o autoplay a ser permitido logo no 1.º paint, antes de qualquer retry.
       fv.defaultMuted = true;
     }
-    kickFront();
     return () => {
       if (fadeTimer.current) clearInterval(fadeTimer.current);
     };
-  }, [refOf, kickFront]);
+  }, [refOf]);
 
   // ciclo de posters no modo fallback
   useEffect(() => {
@@ -384,6 +388,7 @@ export function HeroReel({
 
   return (
     <section
+      ref={heroRef}
       aria-label="25 Horas Agency"
       data-hero-reel="true"
       className="relative w-full h-[110svh] md:h-[115svh] min-h-[640px] overflow-hidden bg-canvas-black"
@@ -418,13 +423,12 @@ export function HeroReel({
             ref={v0}
             src={VIDEOS[slots[0]].src}
             poster={VIDEOS[slots[0]].poster}
+            autoPlay
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
-            onCanPlay={onCanPlay}
-            onLoadedData={onCanPlay}
             className="absolute inset-0 w-full h-full object-cover"
             style={videoStyle(0)}
           />
@@ -432,13 +436,12 @@ export function HeroReel({
             ref={v1}
             src={VIDEOS[slots[1]].src}
             poster={VIDEOS[slots[1]].poster}
+            autoPlay
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             onTimeUpdate={onTimeUpdate}
             onEnded={onVideoEnded}
-            onCanPlay={onCanPlay}
-            onLoadedData={onCanPlay}
             className="absolute inset-0 w-full h-full object-cover"
             style={videoStyle(1)}
           />
