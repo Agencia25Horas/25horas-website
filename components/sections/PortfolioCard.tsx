@@ -59,9 +59,18 @@ export function PortfolioCard({
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
   // YouTube inline: thumbnail por defeito; clicar monta o iframe e toca com som.
+  // `active` = iframe montado; `playing` = a tocar (vs. em pausa). 2.º clique
+  // pausa (mantém posição); 3.º retoma de onde estava — via API do YT (postMessage).
   const [active, setActive] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const activeRef = useRef(active);
   activeRef.current = active;
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const ytPost = (func: string) =>
+    iframeRef.current?.contentWindow?.postMessage(
+      JSON.stringify({ event: "command", func, args: [] }),
+      "*",
+    );
 
   const title =
     (lang === "es"
@@ -107,19 +116,22 @@ export function PortfolioCard({
     }
   }, [open, media]);
 
-  // Duck da música de fundo quando um vídeo toca com som (YT inline ou modal vimeo).
-  const videoSound = active || (open && media?.kind === "vimeo");
+  // Duck da música de fundo quando um vídeo toca com som (YT a tocar, ou modal vimeo).
+  const videoSound = (active && playing) || (open && media?.kind === "vimeo");
   useEffect(() => {
     if (!videoSound) return;
     duck(true);
     return () => duck(false);
   }, [videoSound, duck]);
 
-  // Só um vídeo activo de cada vez: ao activar, manda os outros pararem.
+  // Só um vídeo activo de cada vez: ao activar outro, este pára (volta à thumbnail).
   useEffect(() => {
     const onOther = (e: Event) => {
       const id = (e as CustomEvent<{ id: string }>).detail?.id;
-      if (id !== item._id && activeRef.current) setActive(false);
+      if (id !== item._id && activeRef.current) {
+        setActive(false);
+        setPlaying(false);
+      }
     };
     window.addEventListener(VIDEO_ACTIVATE, onOther);
     return () => window.removeEventListener(VIDEO_ACTIVATE, onOther);
@@ -127,15 +139,25 @@ export function PortfolioCard({
 
   const onVideoClick = () => {
     onFocus?.(); // centra o slide no carrossel
-    setActive((a) => {
-      const next = !a;
-      if (next) {
-        window.dispatchEvent(
-          new CustomEvent(VIDEO_ACTIVATE, { detail: { id: item._id } }),
-        );
-      }
-      return next;
-    });
+    if (!active) {
+      // 1.º clique: monta o iframe e toca
+      window.dispatchEvent(
+        new CustomEvent(VIDEO_ACTIVATE, { detail: { id: item._id } }),
+      );
+      setActive(true);
+      setPlaying(true);
+    } else if (playing) {
+      // a tocar → PAUSA (mantém a posição; o iframe não desmonta)
+      ytPost("pauseVideo");
+      setPlaying(false);
+    } else {
+      // em pausa → RETOMA de onde estava
+      window.dispatchEvent(
+        new CustomEvent(VIDEO_ACTIVATE, { detail: { id: item._id } }),
+      );
+      ytPost("playVideo");
+      setPlaying(true);
+    }
   };
 
   // Orientação: usa o campo explícito do item; fallback: shorts=vertical, resto=horizontal
@@ -202,7 +224,8 @@ export function PortfolioCard({
       >
         {active ? (
           <iframe
-            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0`}
+            ref={iframeRef}
+            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
             title={title || t("cat.video")}
             allow="autoplay; encrypted-media; picture-in-picture"
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -229,7 +252,7 @@ export function PortfolioCard({
           className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/60 backdrop-blur-sm text-[11px] transition-colors duration-200"
           style={{ color: active ? "var(--signal-live)" : "rgba(255,255,255,0.6)" }}
         >
-          {active ? "◼" : "▶"}
+          {playing ? "⏸" : "▶"}
         </span>
       </div>
     );
