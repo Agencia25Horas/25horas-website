@@ -2,7 +2,7 @@
 
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PortfolioCard } from "@/components/sections/PortfolioCard";
 import { PortfolioPhotoCard } from "@/components/sections/PortfolioPhotoCard";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
@@ -56,7 +56,12 @@ export function PortfolioCarousel({
         speed: 1,
         startDelay: 0,
         stopOnInteraction: false,
-        stopOnMouseEnter: false, // controlado manualmente no wrapper externo
+        stopOnMouseEnter: true,
+        // Deteta o hover no WRAPPER (pai do viewport do Embla) → inclui também as
+        // SETAS, que vivem no wrapper fora do viewport. stopOnMouseEnter:true marca
+        // o flag interno mouseIsOver → o clique (pointerUp) já NÃO volta a arrancar
+        // o auto-scroll (era ISTO que o fazia continuar a andar).
+        rootNode: (emblaRoot) => emblaRoot.parentElement,
       }),
     ],
   );
@@ -75,62 +80,10 @@ export function PortfolioCarousel({
     emblaApi.on("reInit", update);
   }, [emblaApi]);
 
-  // Referência cacheada ao plugin AutoScroll — disponível imediatamente após
-  // o emblaApi estar pronto, sem precisar de o re-resolver em cada evento.
-  type ASPlugin = { play: () => void; stop: () => void };
-  const asRef = useRef<ASPlugin | null>(null);
-  useEffect(() => {
-    if (!emblaApi) return;
-    const plugins = emblaApi.plugins() as unknown as Record<string, ASPlugin>;
-    asRef.current = plugins.autoScroll ?? null;
-  }, [emblaApi]);
-
-  // Pausa robusta do auto-scroll: enquanto o ponteiro estiver sobre a zona do
-  // carrossel (cards + setas) → PÁRA; só anda quando o rato sai. Usa a posição
-  // do ponteiro vs. bounding box (não mouseenter/leave) → imune ao iframe do
-  // vídeo que "rouba" o ponteiro: quando o rato está sobre o iframe o documento
-  // deixa de receber pointermove, logo o estado "dentro" mantém-se (fica parado).
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const insideRef = useRef(false);
-  useEffect(() => {
-    let raf = 0;
-    let last: { x: number; y: number } | null = null;
-    const HIT = 28; // inclui o overhang das setas
-    const process = () => {
-      raf = 0;
-      const el = wrapperRef.current;
-      const as = asRef.current;
-      if (!el || !as || !last) return;
-      const r = el.getBoundingClientRect();
-      const inside =
-        last.x >= r.left - HIT &&
-        last.x <= r.right + HIT &&
-        last.y >= r.top - HIT &&
-        last.y <= r.bottom + HIT;
-      if (inside === insideRef.current) return;
-      insideRef.current = inside;
-      if (inside) as.stop();
-      else as.play();
-    };
-    const onMove = (e: PointerEvent) => {
-      last = { x: e.clientX, y: e.clientY };
-      if (!raf) raf = requestAnimationFrame(process);
-    };
-    document.addEventListener("pointermove", onMove, { passive: true });
-    return () => {
-      document.removeEventListener("pointermove", onMove);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  const prev = useCallback(() => {
-    asRef.current?.stop();
-    emblaApi?.scrollPrev();
-  }, [emblaApi]);
-  const next = useCallback(() => {
-    asRef.current?.stop();
-    emblaApi?.scrollNext();
-  }, [emblaApi]);
+  // O auto-scroll pára nativamente no hover (stopOnMouseEnter + rootNode acima) e
+  // não retoma no clique. As setas só fazem scroll.
+  const prev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const next = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   void canPrev;
   void canNext;
@@ -141,7 +94,7 @@ export function PortfolioCarousel({
   if (isGrid) {
     const loopItems = hasItems ? padForLoop(items) : [];
     return (
-      <div ref={wrapperRef} className="relative">
+      <div className="relative">
         <div ref={emblaRef} className="overflow-hidden">
           <div className="flex -ml-4 md:-ml-6">
             {hasItems
@@ -201,7 +154,7 @@ export function PortfolioCarousel({
   // Slides de largura fixa (carousel standard, nicho pages) — também duplicados.
   const loopItems = hasItems ? padForLoop(items) : [];
   return (
-    <div ref={wrapperRef} className="relative">
+    <div className="relative">
       <div ref={emblaRef} className="overflow-hidden">
         <div className="flex -ml-4 md:-ml-6">
           {hasItems
