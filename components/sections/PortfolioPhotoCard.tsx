@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
 import { useLang } from "@/lib/language-context";
@@ -22,6 +23,8 @@ export function PortfolioPhotoCard({
 }) {
   const { lang } = useLang();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const title =
     (lang === "es"
@@ -47,14 +50,13 @@ export function PortfolioPhotoCard({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Fotos verticais profissionais usam 3:4 (mais largo que story 9:16)
+  // Grelha: caixa uniforme 3:4 para todas as fotos (object-cover centra e corta).
+  // Lightbox: isHorizontal decide o aspect-ratio do container (object-contain mostra tudo).
   const wrapperCls = gridMode
-    ? isHorizontal
-      ? "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-video"
-      : "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-[3/4]"
+    ? "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-[3/4]"
     : isHorizontal
-      ? "aspect-video"
-      : "aspect-[3/4]";
+      ? "w-full aspect-video"
+      : "w-full aspect-[3/4]";
 
   return (
     <>
@@ -84,27 +86,27 @@ export function PortfolioPhotoCard({
         )}
       </button>
 
-      {open && (
+      {/* Portal para document.body — evita que o transform do Embla quebre
+          position:fixed, que fica contido no container do carrossel sem portal */}
+      {open && mounted && createPortal(
         <div
           role="dialog"
           aria-modal="true"
           aria-label={title || "Fotografia"}
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-canvas-black/95 backdrop-blur-sm p-4 md:p-8"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-canvas-black/95 backdrop-blur-sm p-4 md:p-8"
         >
-          {/* Fechar */}
           <button
             type="button"
             aria-label="Fechar"
             onClick={(e) => { e.stopPropagation(); setOpen(false); }}
-            className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-canvas-white/10 text-canvas-white text-xl hover:bg-canvas-white/20 transition-colors flex items-center justify-center"
+            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-canvas-white/10 text-canvas-white text-xl hover:bg-canvas-white/20 transition-colors flex items-center justify-center"
           >
             ✕
           </button>
 
-          {/* Imagem a full — object-contain mostra a foto inteira */}
           <div
-            className="relative max-w-[min(95vw,1400px)] max-h-[88vh]"
+            className="relative w-full max-w-[1200px] max-h-[85vh]"
             style={{ aspectRatio: isHorizontal ? "16/9" : "3/4" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -126,7 +128,8 @@ export function PortfolioPhotoCard({
               {title}
             </p>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

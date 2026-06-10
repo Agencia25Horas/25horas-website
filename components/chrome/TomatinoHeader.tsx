@@ -86,42 +86,54 @@ export function TomatinoHeader() {
           >
             {NAV.map((n) =>
               n.key === "portfolio" ? (
+                /* Wrapper SEM padding → mesma altura/baseline que os <a> irmãos.
+                   A ponte de hover (sem zona morta) é o pt-3 transparente no
+                   container do dropdown, que encosta ao trigger via top-full. */
                 <div
                   key={n.key}
-                  className="relative"
+                  className="relative flex items-center"
                   onMouseEnter={openDropdown}
                   onMouseLeave={closeDropdown}
                 >
-                  <Link
-                    href={n.href}
-                    className="text-canvas-white hover:text-accent-grade transition-colors"
+                  <button
+                    type="button"
+                    className={`text-[12px] uppercase tracking-wider font-body font-semibold leading-normal cursor-pointer transition-colors ${
+                      portfolioDropdown
+                        ? "text-accent-grade"
+                        : "text-canvas-white hover:text-accent-grade"
+                    }`}
+                    style={portfolioDropdown ? {
+                      textShadow: "0 0 12px rgba(232,93,58,0.35)",
+                    } : undefined}
                   >
                     <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
-                  </Link>
+                  </button>
 
                   {portfolioDropdown && (
                     <div
                       onMouseEnter={openDropdown}
                       onMouseLeave={closeDropdown}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50 min-w-[160px] rounded-lg border border-canvas-white/15 bg-black/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden"
+                      className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50"
                     >
-                      <Link
-                        href="/portfolio/videos"
-                        onClick={() => setPortfolioDropdown(false)}
-                        className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
-                      >
-                        <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><polygon points="2,1 9,5 2,9"/></svg>
-                        {t("nav.videos")}
-                      </Link>
-                      <div className="h-px bg-canvas-white/10 mx-3" />
-                      <Link
-                        href="/portfolio/fotografias"
-                        onClick={() => setPortfolioDropdown(false)}
-                        className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
-                      >
-                        <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><rect x="1" y="1" width="8" height="8" rx="1"/></svg>
-                        {t("nav.fotografias")}
-                      </Link>
+                      <div className="min-w-[160px] rounded-lg border border-canvas-white/15 bg-black/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden">
+                        <Link
+                          href="/portfolio/fotografias"
+                          onClick={() => setPortfolioDropdown(false)}
+                          className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
+                        >
+                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><rect x="1" y="1" width="8" height="8" rx="1"/></svg>
+                          {t("nav.fotografias")}
+                        </Link>
+                        <div className="h-px bg-canvas-white/10 mx-3" />
+                        <Link
+                          href="/portfolio/videos"
+                          onClick={() => setPortfolioDropdown(false)}
+                          className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
+                        >
+                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><polygon points="2,1 9,5 2,9"/></svg>
+                          {t("nav.videos")}
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>

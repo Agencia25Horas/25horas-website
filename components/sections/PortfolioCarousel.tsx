@@ -8,8 +8,11 @@ import { PortfolioPhotoCard } from "@/components/sections/PortfolioPhotoCard";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
 import { useLang } from "@/lib/language-context";
 
+// Embla padding-gap approach: container has negative margin-left = GAP,
+// each slide has padding-left = GAP. This makes the loop seam get the
+// same spacing as all other slide transitions (CSS gap does not).
 const SLIDE_CLASS =
-  "flex-[0_0_calc(100%-1rem)] md:flex-[0_0_calc(33.333%-1rem)] min-w-0";
+  "flex-[0_0_calc(100%-1rem)] md:flex-[0_0_33.333%] min-w-0 pl-4 md:pl-6";
 
 // Embla precisa de slides suficientes para criar os clones do loop seamless.
 // 8 é o mínimo seguro para que o loop não mostre uma costura visível.
@@ -86,9 +89,11 @@ export function PortfolioCarousel({
   const onWrapperLeave = useCallback(() => asRef.current?.play(), []);
 
   const prev = useCallback(() => {
+    asRef.current?.stop();
     emblaApi?.scrollPrev();
   }, [emblaApi]);
   const next = useCallback(() => {
+    asRef.current?.stop();
     emblaApi?.scrollNext();
   }, [emblaApi]);
 
@@ -107,10 +112,10 @@ export function PortfolioCarousel({
         onMouseLeave={onWrapperLeave}
       >
         <div ref={emblaRef} className="overflow-hidden">
-          <div className="flex gap-4 md:gap-6">
+          <div className="flex -ml-4 md:-ml-6">
             {hasItems
               ? loopItems.map((item, i) => (
-                  <div key={`${item._id}-${i}`} className="flex-none">
+                  <div key={`${item._id}-${i}`} className="flex-none pl-4 md:pl-6">
                     {item.mediaType === "foto" ? (
                       <PortfolioPhotoCard
                         item={item}
@@ -127,7 +132,7 @@ export function PortfolioCarousel({
                   </div>
                 ))
               : Array.from({ length: placeholderCount }).map((_, idx) => (
-                  <div key={`ph-${idx}`} className="flex-none">
+                  <div key={`ph-${idx}`} className="flex-none pl-4 md:pl-6">
                     <div
                       className="h-[260px] md:h-[380px] xl:h-[527px] aspect-[9/16] relative overflow-hidden rounded-xl bg-canvas-white/5 border border-canvas-white/10 flex items-center justify-center"
                       aria-hidden
@@ -145,6 +150,7 @@ export function PortfolioCarousel({
           type="button"
           aria-label={t("common.prev")}
           onClick={prev}
+          onMouseEnter={onWrapperEnter}
           className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
         >
           ←
@@ -153,6 +159,7 @@ export function PortfolioCarousel({
           type="button"
           aria-label={t("common.next")}
           onClick={next}
+          onMouseEnter={onWrapperEnter}
           className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
         >
           →
@@ -173,7 +180,7 @@ export function PortfolioCarousel({
       onMouseLeave={onWrapperLeave}
     >
       <div ref={emblaRef} className="overflow-hidden">
-        <div className="flex gap-4 md:gap-6">
+        <div className="flex -ml-4 md:-ml-6">
           {hasItems
             ? loopItems.map((item, i) => (
                 <div key={`${item._id}-${i}`} className={SLIDE_CLASS}>
@@ -203,6 +210,7 @@ export function PortfolioCarousel({
         type="button"
         aria-label={t("common.prev")}
         onClick={prev}
+        onMouseEnter={onWrapperEnter}
         className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
       >
         ←
@@ -211,6 +219,7 @@ export function PortfolioCarousel({
         type="button"
         aria-label={t("common.next")}
         onClick={next}
+        onMouseEnter={onWrapperEnter}
         className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
       >
         →

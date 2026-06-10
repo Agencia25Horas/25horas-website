@@ -12,15 +12,20 @@ declare global {
   }
 }
 
-const VIDEOS: { src: string; poster: string; objectPosition?: string }[] = [
-  { src: "/hero/1realestate.mp4", poster: "/hero/1realestate.jpg" },
-  { src: "/hero/1restaurante.mp4", poster: "/hero/1restaurante.jpg" },
-  // desporto: baixar ~20px para não cortar a cabeça ao miúdo
-  {
-    src: "/hero/1desporto.mp4",
-    poster: "/hero/1desporto.jpg",
-    objectPosition: "center calc(50% - 20px)",
-  },
+// shiftY: desloca o vídeo verticalmente (px). NOTA: por causa do overscan
+// (camada mais alta que 16:9), object-cover corta os LADOS e a altura total do
+// vídeo cabe na caixa → object-position vertical é INERTE neste hero. Para
+// baixar/subir o enquadramento usa-se translateY (shiftY). +N = baixa (revela
+// mais topo do vídeo), -N = sobe.
+const VIDEOS: {
+  src: string;
+  poster: string;
+  objectPosition?: string;
+  shiftY?: number;
+}[] = [
+  { src: "/hero/1corp.mp4", poster: "/hero/1corp.jpg" },
+  { src: "/hero/1nig.mp4", poster: "/hero/1nig.jpg", shiftY: 120 },
+  { src: "/hero/1desporto.mp4", poster: "/hero/1desporto.jpg" },
   { src: "/hero/1educ.mp4", poster: "/hero/1educ.jpg" },
 ];
 const N = VIDEOS.length;
@@ -367,14 +372,20 @@ export function HeroReel({
     });
   }, [applyAudio]);
 
-  const videoStyle = (slot: 0 | 1): React.CSSProperties => ({
-    opacity: front === slot ? 1 : 0,
-    filter: colorOn ? "grayscale(0)" : "grayscale(1)",
-    objectPosition: VIDEOS[slotsRef.current[slot]]?.objectPosition ?? "center",
-    transitionProperty: "opacity, filter",
-    transitionDuration: `${XFADE_MS}ms, ${FADE_MS}ms`,
-    transitionTimingFunction: "ease",
-  });
+  const videoStyle = (slot: 0 | 1): React.CSSProperties => {
+    const v = VIDEOS[slotsRef.current[slot]];
+    return {
+      opacity: front === slot ? 1 : 0,
+      filter: colorOn ? "grayscale(0)" : "grayscale(1)",
+      objectPosition: v?.objectPosition ?? "center",
+      transform: v?.shiftY
+        ? `translate3d(0, ${v.shiftY}px, 0) scale(1.18)`
+        : undefined,
+      transitionProperty: "opacity, filter",
+      transitionDuration: `${XFADE_MS}ms, ${FADE_MS}ms`,
+      transitionTimingFunction: "ease",
+    };
+  };
 
   return (
     <section

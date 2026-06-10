@@ -35,6 +35,28 @@ export const PORTFOLIO_PHOTOS_FALLBACK: Record<string, SanityPortfolioItem[]> = 
   restaurantes: REST_PHOTO_NUMS.map((n, i) => restPhoto(n, i)),
 };
 
+// Fotos de nicho (corporate, desporto…) guardadas em /public/portfolio/<niche>/NN.jpeg.
+// `oris` é a orientação REAL de cada ficheiro por ordem (h=landscape, v=portrait) —
+// segue o aspecto real, não o nome da pasta de origem (yt/short nem sempre bate certo).
+function nichePhotos(
+  niche: string,
+  oris: string,
+  startOrder: number,
+): SanityPortfolioItem[] {
+  return oris.split("").map((o, i): SanityPortfolioItem => {
+    const n = String(i + 1).padStart(2, "0");
+    return {
+      _id: `fb-${niche}-photo-${n}`,
+      nicheSlug: niche,
+      imageUrl: `/portfolio/${niche}/${n}.jpeg`,
+      mediaType: "foto",
+      orientation: o === "h" ? "horizontal" : "vertical",
+      featured: true,
+      order: startOrder + i,
+    };
+  });
+}
+
 export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
   restaurantes: [
     {
@@ -78,11 +100,35 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
     {
       _id: "fb-corporate-3",
       nicheSlug: "corporate",
-      link: "https://www.youtube.com/shorts/6PV0FM2TRX0",
+      link: "https://www.youtube.com/watch?v=-RSB4zGZx5o",
       mediaType: "video",
-      orientation: "vertical",
+      orientation: "horizontal",
       featured: true,
       order: 2,
     },
+    {
+      _id: "fb-corporate-4",
+      nicheSlug: "corporate",
+      link: "https://www.youtube.com/watch?v=UUEyTanV8uI",
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: 3,
+    },
+    // Fotos do corporate: ytsize (9 landscape) + shortsize (9 portrait)
+    ...nichePhotos("corporate", "hhhhhhhhhvvvvvvvvv", 4),
   ],
+  educacao: [
+    {
+      _id: "fb-educacao-1",
+      nicheSlug: "educacao",
+      link: "https://www.youtube.com/watch?v=R0Ixc8btmgg",
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: 0,
+    },
+  ],
+  // Fotos de desporto (orientação real por ficheiro)
+  desporto: nichePhotos("desporto", "vvvvvhvhhh", 0),
 };

@@ -5,15 +5,13 @@ import { useState } from "react";
 import type { PhotoCategory } from "@/lib/portfolio-photos";
 import { useLang } from "@/lib/language-context";
 
-/**
- * Accordion horizontal — colunas que expandem para os lados no hover.
- * Fiel ao design de accordion-slider.html:
- *   • Container: display flex, height 70vh fixo.
- *   • Cada painel: flex 1 → flex 5 no hover (transição 600ms spring).
- *   • Título em writing-mode vertical quando colapsado.
- *   • Número + nome + count aparecem na expansão.
- *   • Clicar navega para a galeria da categoria.
- */
+// Zoom base (background-size height %) para capas que precisam de
+// enquadramento diferente. 100 = comportamento padrão.
+const COVER_ZOOM: Record<string, number> = {
+  sushi: 140,
+  hamburgers: 140,
+};
+
 export function AccordionSlider({
   categories,
   basePath,
@@ -41,6 +39,7 @@ export function AccordionSlider({
       {categories.map((cat, i) => {
         const isActive = active === cat.slug;
         const label = getLabel(cat);
+        const zoom = COVER_ZOOM[cat.slug] ?? 100;
 
         return (
           <Link
@@ -60,13 +59,13 @@ export function AccordionSlider({
               minWidth: 0,
             }}
           >
-            {/* Background — CSS background-image igual ao HTML original (sem zoom) */}
+            {/* Background — zoom base por categoria via COVER_ZOOM */}
             <div
               style={{
                 position: "absolute",
                 inset: 0,
                 backgroundImage: `url(${cat.cover})`,
-                backgroundSize: "auto 100%",
+                backgroundSize: `auto ${zoom}%`,
                 backgroundPosition: "center",
               }}
             />

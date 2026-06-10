@@ -60,7 +60,10 @@ export function VideosView({
       </section>
 
       {NICHOS.map((nicho, i) => {
-        const items = itemsByNiche[nicho.slug] ?? [];
+        // Só vídeos nesta página — as fotos de nicho ficam no /servicos/<nicho>/portfolio
+        const items = (itemsByNiche[nicho.slug] ?? []).filter(
+          (it) => it.mediaType !== "foto",
+        );
         const isLast = i === NICHOS.length - 1;
         const { label } = tNiche(nicho.slug);
         const accent = nicho.accentColor;

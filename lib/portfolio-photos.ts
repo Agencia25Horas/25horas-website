@@ -22,6 +22,7 @@ const VERTICAL: Record<string, number[]> = {
   carnes:   [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
   doces:    [4, 5, 6, 7],
   pizzas:   [4],
+  peixe:    [2, 3], // 01 é landscape (capa), 02/03 portrait
 };
 
 function makeItems(
@@ -50,8 +51,17 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     labelEn: "Sushi",
     labelEs: "Sushi",
     count: 6,
-    cover: "/portfolio/restaurantes/sushi/01.jpeg",
+    cover: "/portfolio/restaurantes/sushi/04.jpeg",
     items: makeItems("sushi", 6),
+  },
+  {
+    slug: "peixe",
+    label: "Peixe",
+    labelEn: "Fish",
+    labelEs: "Pescado",
+    count: 3,
+    cover: "/portfolio/restaurantes/peixe/01.jpeg",
+    items: makeItems("peixe", 3),
   },
   {
     slug: "pizzas",
@@ -59,7 +69,7 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     labelEn: "Pizzas",
     labelEs: "Pizzas",
     count: 4,
-    cover: "/portfolio/restaurantes/pizzas/01.jpeg",
+    cover: "/portfolio/restaurantes/pizzas/04.jpeg",
     items: makeItems("pizzas", 4),
   },
   {
@@ -76,9 +86,9 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     label: "Carnes",
     labelEn: "Meats",
     labelEs: "Carnes",
-    count: 14,
-    cover: "/portfolio/restaurantes/carnes/01.jpeg",
-    items: makeItems("carnes", 14),
+    count: 16,
+    cover: "/portfolio/restaurantes/carnes/04.jpeg",
+    items: makeItems("carnes", 16),
   },
   {
     slug: "massas",
@@ -86,7 +96,7 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     labelEn: "Pasta & Salads",
     labelEs: "Pastas y Ensaladas",
     count: 4,
-    cover: "/portfolio/restaurantes/massas/01.jpeg",
+    cover: "/portfolio/restaurantes/massas/04.jpeg",
     items: makeItems("massas", 4),
   },
   {
@@ -95,7 +105,7 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     labelEn: "Desserts",
     labelEs: "Postres",
     count: 7,
-    cover: "/portfolio/restaurantes/doces/01.jpeg",
+    cover: "/portfolio/restaurantes/doces/04.jpeg",
     items: makeItems("doces", 7),
   },
   {
@@ -104,7 +114,7 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     labelEn: "Various",
     labelEs: "Varios",
     count: 3,
-    cover: "/portfolio/restaurantes/diversos/01.jpeg",
+    cover: "/portfolio/restaurantes/diversos/04.jpeg",
     items: makeItems("diversos", 3),
   },
 ];
@@ -112,3 +122,45 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
 export function getCategoryBySlug(slug: string): PhotoCategory | undefined {
   return RESTAURANTES_CATEGORIES.find((c) => c.slug === slug);
 }
+
+// ── Fotos de outros nichos (desporto, corporate) na página de fotografia ──
+// `oris` = orientação REAL de cada ficheiro por ordem (h=landscape, v=portrait).
+function nicheFotos(niche: string, oris: string): SanityPortfolioItem[] {
+  return oris.split("").map((o, i): SanityPortfolioItem => {
+    const n = String(i + 1).padStart(2, "0");
+    return {
+      _id: `foto-${niche}-${n}`,
+      nicheSlug: niche,
+      imageUrl: `/portfolio/${niche}/${n}.jpeg`,
+      mediaType: "foto",
+      orientation: o === "h" ? "horizontal" : "vertical",
+      order: i,
+      featured: i < 3,
+    };
+  });
+}
+
+export interface NichoFotoSection {
+  slug: string;
+  label: string;
+  labelEn: string;
+  labelEs: string;
+  items: SanityPortfolioItem[];
+}
+
+export const OUTROS_NICHOS_FOTOS: NichoFotoSection[] = [
+  {
+    slug: "desporto",
+    label: "Desporto",
+    labelEn: "Sports",
+    labelEs: "Deporte",
+    items: nicheFotos("desporto", "vvvvvhvhhh"),
+  },
+  {
+    slug: "corporate",
+    label: "Corporate",
+    labelEn: "Corporate",
+    labelEs: "Corporativo",
+    items: nicheFotos("corporate", "hhhhhhhhhvvvvvvvvv"),
+  },
+];

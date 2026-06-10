@@ -85,30 +85,50 @@ export function SeamlessLoop() {
       .forEach((el) => {
         el.tabIndex = -1;
       });
-    // Vídeos no clone: são estáticos (sem React). Remover o src e desligar o
-    // preload para NÃO voltar a descarregar os vídeos do hero (só fica o poster).
-    clone.querySelectorAll("video").forEach((v) => {
-      const el = v as HTMLVideoElement;
-      el.removeAttribute("autoplay");
-      el.removeAttribute("src");
-      el.preload = "none";
-      el.muted = true;
-    });
-    // O hero clonado tem os vídeos neutralizados (sem re-download), por isso o
-    // hover nele não fazia nada. Re-activamos pointer-events SÓ nesta secção e
-    // ligamos o mouseenter/leave à API global → o hero REAL ganha áudio (fade),
-    // cor e muta a música de fundo. Optional chaining: hero desmontado → no-op.
+    // Hero do clone: o vídeo da FRENTE fica VIVO a tocar (do CACHE).
+    // ANTES neutralizávamos TODOS os <video> do clone (removia src) → o hero do
+    // clone ficava num FRAME CONGELADO no wrap. Mas os vídeos têm a MESMA URL dos
+    // reais → o browser serve-os do disk cache (304, SEM re-download). Por isso
+    // deixamos o vídeo da FRENTE a tocar (mudo, loop, playsinline) → o wrap parece
+    // vivo como o hero real. Os restantes vídeos do clone (slot de trás + cards do
+    // portfólio) ficam estáticos (poster) para poupar rede/decode.
     const heroClone = clone.querySelector<HTMLElement>("[data-hero-reel]");
-    // O clone é um snapshot do DOM: pode ter sido tirado quando o vídeo real
-    // ainda estava a cores (antes de o hover-gating resolver) → ficava a cores
-    // no fundo da página. Forçamos o estado de REPOUSO — desktop (hover) = P&B,
-    // mobile (sem hover) = cor — e fazemos o toggle de cor no hover do clone,
-    // espelhando o hero real (que ganha áudio + cor via __heroHover).
-    const hoverCapable = window.matchMedia("(hover: hover)").matches;
-    const restFilter = hoverCapable ? "grayscale(1)" : "grayscale(0)";
     const heroCloneVideos = heroClone
       ? Array.from(heroClone.querySelectorAll("video"))
       : [];
+    // Vídeo VIVO só no DESKTOP (hover-capable). No mobile o clone fica poster
+    // estático — mais leve, sem decode extra de vídeo num device mais fraco.
+    const hoverCapable = window.matchMedia("(hover: hover)").matches;
+    const liveVideo = hoverCapable
+      ? heroCloneVideos.find((v) => {
+          const op = (v as HTMLVideoElement).style.opacity;
+          return op === "1" || op === "";
+        }) ??
+        heroCloneVideos[0] ??
+        null
+      : null;
+
+    clone.querySelectorAll("video").forEach((v) => {
+      const el = v as HTMLVideoElement;
+      if (el === liveVideo) {
+        // VIVO: toca do cache (mesma URL), SEMPRE mudo (sem fuga de áudio), loop.
+        el.muted = true;
+        el.defaultMuted = true;
+        el.loop = true;
+        el.setAttribute("playsinline", "");
+        el.setAttribute("autoplay", "");
+        el.preload = "auto";
+      } else {
+        el.removeAttribute("autoplay");
+        el.removeAttribute("src");
+        el.preload = "none";
+        el.muted = true;
+      }
+    });
+    // Estado de cor: desktop (hover) = P&B em repouso → cor no hover; mobile (sem
+    // hover) = sempre cor. O toggle no hover do clone espelha o hero REAL (áudio +
+    // cor via __heroHover); o vídeo VIVO do clone permanece SEMPRE mudo.
+    const restFilter = hoverCapable ? "grayscale(1)" : "grayscale(0)";
     const setCloneFilter = (f: string) =>
       heroCloneVideos.forEach((v) => {
         (v as HTMLVideoElement).style.filter = f;
@@ -147,6 +167,13 @@ export function SeamlessLoop() {
     });
     original.parentNode?.insertBefore(clone, original.nextSibling);
     cloneRef.current = clone;
+
+    // Arranca o vídeo VIVO do clone (já no DOM). O atributo autoplay+muted já
+    // dispara sozinho na inserção; este play() é rede de segurança.
+    if (liveVideo) {
+      const p = liveVideo.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    }
 
     // ── Medir altura do original (recalcular em resize e load) ──
     const measure = () => {
@@ -221,6 +248,12 @@ export function SeamlessLoop() {
         heroClone.removeEventListener("mouseleave", onHeroLeave);
       }
       ro.disconnect();
+      // Pára o decoder do vídeo vivo antes de remover o clone (sem órfãos ao
+      // re-criar o clone em navegação / init do Lenis).
+      if (liveVideo) {
+        liveVideo.pause();
+        liveVideo.removeAttribute("src");
+      }
       clone.remove();
       cloneRef.current = null;
     };

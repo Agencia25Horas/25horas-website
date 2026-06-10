@@ -5,11 +5,15 @@ import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
 import Image from "next/image";
 import { AccordionSlider } from "@/components/sections/AccordionSlider";
+import { PortfolioCarousel } from "@/components/sections/PortfolioCarousel";
 import { useLang } from "@/lib/language-context";
-import { RESTAURANTES_CATEGORIES } from "@/lib/portfolio-photos";
+import {
+  RESTAURANTES_CATEGORIES,
+  OUTROS_NICHOS_FOTOS,
+} from "@/lib/portfolio-photos";
 
 export function FotografiasView() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">
@@ -76,6 +80,34 @@ export function FotografiasView() {
           </RevealOnScroll>
         </div>
       </section>
+
+      {/* Outros nichos (Desporto, Corporate) — carrossel de fotos */}
+      {OUTROS_NICHOS_FOTOS.map((sec) => {
+        const secLabel =
+          lang === "en" ? sec.labelEn : lang === "es" ? sec.labelEs : sec.label;
+        return (
+          <section
+            key={sec.slug}
+            className="px-6 md:px-16 py-16 md:py-20 border-b border-canvas-white/10"
+          >
+            <div className="max-w-[1320px] mx-auto">
+              <RevealOnScroll>
+                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/50 mb-2">
+                  {secLabel}
+                </p>
+              </RevealOnScroll>
+              <RevealOnScroll delay={60}>
+                <h2 className="font-display uppercase text-[clamp(2rem,4.5vw,3.5rem)] leading-[1] text-accent-grade mb-10 md:mb-14">
+                  {secLabel}
+                </h2>
+              </RevealOnScroll>
+              <RevealOnScroll delay={120}>
+                <PortfolioCarousel items={sec.items} variant="grid" />
+              </RevealOnScroll>
+            </div>
+          </section>
+        );
+      })}
 
       <SiteFooter />
     </main>

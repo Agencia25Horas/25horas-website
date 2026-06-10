@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import { useAudio } from "@/lib/audio-context";
@@ -54,6 +55,8 @@ export function PortfolioCard({
   const { lang, t } = useLang();
   const { duck } = useAudio();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [audioOn, setAudioOn] = useState(false);
   const audioOnRef = useRef(audioOn);
   audioOnRef.current = audioOn;
@@ -297,13 +300,13 @@ export function PortfolioCard({
         {cardInner}
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div
           role="dialog"
           aria-modal="true"
           aria-label={title || t("common.trabalho")}
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-canvas-black/95 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-12 bg-canvas-black/95 backdrop-blur-sm"
         >
           <button
             type="button"
@@ -312,7 +315,7 @@ export function PortfolioCard({
               e.stopPropagation();
               setOpen(false);
             }}
-            className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-canvas-white/10 text-canvas-white text-xl hover:bg-canvas-white/20"
+            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-canvas-white/10 text-canvas-white text-xl hover:bg-canvas-white/20"
           >
             ✕
           </button>
@@ -345,7 +348,7 @@ export function PortfolioCard({
             )}
 
             {!media && cover && (
-              <div className="relative w-full aspect-[4/5] max-h-[85vh]">
+              <div className="relative w-full max-h-[85vh] aspect-[4/5]">
                 <Image
                   src={cover}
                   alt={title || t("common.trabalho")}
@@ -365,7 +368,8 @@ export function PortfolioCard({
               {title}
             </p>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
