@@ -27,6 +27,10 @@ export function AccordionSlider({
 
   return (
     <div
+      // Limpa a seleção SÓ ao sair do accordion inteiro — não a cada painel.
+      // Senão, ao atravessar o gap de 8px entre painéis, o mouseleave do painel
+      // colapsava tudo, o layout reflowava e o cursor caía no painel SEGUINTE.
+      onMouseLeave={() => setActive(null)}
       style={{
         display: "flex",
         flexDirection: "row",
@@ -46,7 +50,6 @@ export function AccordionSlider({
             key={cat.slug}
             href={`${basePath}/${cat.slug}`}
             onMouseEnter={() => setActive(cat.slug)}
-            onMouseLeave={() => setActive(null)}
             aria-label={label}
             style={{
               flex: isActive ? 5 : 1,
