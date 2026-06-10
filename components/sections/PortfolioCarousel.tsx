@@ -85,8 +85,43 @@ export function PortfolioCarousel({
     asRef.current = plugins.autoScroll ?? null;
   }, [emblaApi]);
 
-  const onWrapperEnter = useCallback(() => asRef.current?.stop(), []);
-  const onWrapperLeave = useCallback(() => asRef.current?.play(), []);
+  // Pausa robusta do auto-scroll: enquanto o ponteiro estiver sobre a zona do
+  // carrossel (cards + setas) → PÁRA; só anda quando o rato sai. Usa a posição
+  // do ponteiro vs. bounding box (não mouseenter/leave) → imune ao iframe do
+  // vídeo que "rouba" o ponteiro: quando o rato está sobre o iframe o documento
+  // deixa de receber pointermove, logo o estado "dentro" mantém-se (fica parado).
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const insideRef = useRef(false);
+  useEffect(() => {
+    let raf = 0;
+    let last: { x: number; y: number } | null = null;
+    const HIT = 28; // inclui o overhang das setas
+    const process = () => {
+      raf = 0;
+      const el = wrapperRef.current;
+      const as = asRef.current;
+      if (!el || !as || !last) return;
+      const r = el.getBoundingClientRect();
+      const inside =
+        last.x >= r.left - HIT &&
+        last.x <= r.right + HIT &&
+        last.y >= r.top - HIT &&
+        last.y <= r.bottom + HIT;
+      if (inside === insideRef.current) return;
+      insideRef.current = inside;
+      if (inside) as.stop();
+      else as.play();
+    };
+    const onMove = (e: PointerEvent) => {
+      last = { x: e.clientX, y: e.clientY };
+      if (!raf) raf = requestAnimationFrame(process);
+    };
+    document.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      document.removeEventListener("pointermove", onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const prev = useCallback(() => {
     asRef.current?.stop();
@@ -106,11 +141,7 @@ export function PortfolioCarousel({
   if (isGrid) {
     const loopItems = hasItems ? padForLoop(items) : [];
     return (
-      <div
-        className="relative"
-        onMouseEnter={onWrapperEnter}
-        onMouseLeave={onWrapperLeave}
-      >
+      <div ref={wrapperRef} className="relative">
         <div ref={emblaRef} className="overflow-hidden">
           <div className="flex -ml-4 md:-ml-6">
             {hasItems
@@ -149,18 +180,14 @@ export function PortfolioCarousel({
         <button
           type="button"
           aria-label={t("common.prev")}
-          onClick={prev}
-          onMouseEnter={onWrapperEnter}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
+          onClick={prev}          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
         >
           ←
         </button>
         <button
           type="button"
           aria-label={t("common.next")}
-          onClick={next}
-          onMouseEnter={onWrapperEnter}
-          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
+          onClick={next}          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
         >
           →
         </button>
@@ -174,11 +201,7 @@ export function PortfolioCarousel({
   // Slides de largura fixa (carousel standard, nicho pages) — também duplicados.
   const loopItems = hasItems ? padForLoop(items) : [];
   return (
-    <div
-      className="relative"
-      onMouseEnter={onWrapperEnter}
-      onMouseLeave={onWrapperLeave}
-    >
+    <div ref={wrapperRef} className="relative">
       <div ref={emblaRef} className="overflow-hidden">
         <div className="flex -ml-4 md:-ml-6">
           {hasItems
@@ -209,18 +232,14 @@ export function PortfolioCarousel({
       <button
         type="button"
         aria-label={t("common.prev")}
-        onClick={prev}
-        onMouseEnter={onWrapperEnter}
-        className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
+        onClick={prev}        className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
       >
         ←
       </button>
       <button
         type="button"
         aria-label={t("common.next")}
-        onClick={next}
-        onMouseEnter={onWrapperEnter}
-        className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
+        onClick={next}        className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 w-12 h-12 items-center justify-center rounded-full bg-canvas-black/80 text-canvas-white text-xl hover:bg-canvas-black hover:scale-105 transition-all z-10"
       >
         →
       </button>
