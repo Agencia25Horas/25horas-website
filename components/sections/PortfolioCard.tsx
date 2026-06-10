@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import { useAudio } from "@/lib/audio-context";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
@@ -40,6 +40,9 @@ function parseMedia(link?: string): Media {
 
 const ytThumb = (id: string) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 
+// Só um vídeo do portefólio toca de cada vez.
+const VIDEO_ACTIVATE = "portfolio:video-activate";
+
 export function PortfolioCard({
   item,
   gridMode = false,
@@ -55,6 +58,10 @@ export function PortfolioCard({
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+  // YouTube inline: thumbnail por defeito; clicar monta o iframe e toca com som.
+  const [active, setActive] = useState(false);
+  const activeRef = useRef(active);
+  activeRef.current = active;
 
   const title =
     (lang === "es"
@@ -100,12 +107,36 @@ export function PortfolioCard({
     }
   }, [open, media]);
 
-  // Duck da música de fundo enquanto o modal de vídeo está aberto (tem som).
+  // Duck da música de fundo quando um vídeo toca com som (YT inline ou modal vimeo).
+  const videoSound = active || (open && media?.kind === "vimeo");
   useEffect(() => {
-    if (!open || !isVideo) return;
+    if (!videoSound) return;
     duck(true);
     return () => duck(false);
-  }, [open, isVideo, duck]);
+  }, [videoSound, duck]);
+
+  // Só um vídeo activo de cada vez: ao activar, manda os outros pararem.
+  useEffect(() => {
+    const onOther = (e: Event) => {
+      const id = (e as CustomEvent<{ id: string }>).detail?.id;
+      if (id !== item._id && activeRef.current) setActive(false);
+    };
+    window.addEventListener(VIDEO_ACTIVATE, onOther);
+    return () => window.removeEventListener(VIDEO_ACTIVATE, onOther);
+  }, [item._id]);
+
+  const onVideoClick = () => {
+    onFocus?.(); // centra o slide no carrossel
+    setActive((a) => {
+      const next = !a;
+      if (next) {
+        window.dispatchEvent(
+          new CustomEvent(VIDEO_ACTIVATE, { detail: { id: item._id } }),
+        );
+      }
+      return next;
+    });
+  };
 
   // Orientação: usa o campo explícito do item; fallback: shorts=vertical, resto=horizontal
   const ytShort = media?.kind === "youtube" && media.short;
@@ -153,6 +184,56 @@ export function PortfolioCard({
       )}
     </div>
   );
+
+  // (Y) YouTube → facade: thumbnail; clicar toca INLINE com som + centra (sem modal).
+  if (media?.kind === "youtube") {
+    const ytWrap = gridMode
+      ? `shrink-0 h-[260px] md:h-[380px] xl:h-[527px] ${
+          isHorizontal ? "aspect-video" : "aspect-[9/16]"
+        }`
+      : "aspect-[4/5]";
+    return (
+      <div
+        onClick={onVideoClick}
+        role="button"
+        tabIndex={0}
+        aria-label={`${t("common.verVideo")}: ${title || t("common.trabalho")}`}
+        className={`group relative ${ytWrap} overflow-hidden rounded-xl bg-canvas-black cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_0_2px_rgba(255,255,255,0.15),0_16px_48px_rgba(0,0,0,0.6)]`}
+      >
+        {active ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0`}
+            title={title || t("cat.video")}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+          />
+        ) : (
+          <Image
+            src={ytThumb(media.id)}
+            alt={title || t("cat.video")}
+            fill
+            sizes="(min-width: 1280px) 527px, (min-width: 768px) 380px, 260px"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-canvas-black/20 group-hover:bg-canvas-black/0 transition-colors duration-300" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-canvas-black/85 via-canvas-black/25 to-transparent">
+          {title && (
+            <p className="font-display uppercase text-canvas-white text-[clamp(0.95rem,1.4vw,1.15rem)] leading-tight">
+              {title}
+            </p>
+          )}
+        </div>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/60 backdrop-blur-sm text-[11px] transition-colors duration-200"
+          style={{ color: active ? "var(--signal-live)" : "rgba(255,255,255,0.6)" }}
+        >
+          {active ? "◼" : "▶"}
+        </span>
+      </div>
+    );
+  }
 
   // (A) Link externo simples (não-embed, ex.: TikTok/Twitter) → nova tab.
   if (media?.kind === "external") {
@@ -214,24 +295,6 @@ export function PortfolioCard({
             className="relative w-full max-w-[1100px]"
             onClick={(e) => e.stopPropagation()}
           >
-            {media?.kind === "youtube" && (
-              <div
-                className={`relative w-full overflow-hidden rounded-lg bg-black ${
-                  ytShort
-                    ? "max-w-[420px] mx-auto aspect-[9/16] max-h-[85vh]"
-                    : "aspect-video"
-                }`}
-              >
-                <iframe
-                  className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube.com/embed/${media.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-                  title={title || t("cat.video")}
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                />
-              </div>
-            )}
-
             {media?.kind === "vimeo" && (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
                 <iframe
