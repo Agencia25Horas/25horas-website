@@ -2,12 +2,10 @@
 
 import Image from "next/image";
 import { createPortal } from "react-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import { useAudio } from "@/lib/audio-context";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
-
-const MUTE_EVENT = "portfolio:audio-activate";
 
 /**
  * Card de portfolio adaptável a vários tipos de média (campo `link` no Sanity):
@@ -57,10 +55,6 @@ export function PortfolioCard({
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
-  const [audioOn, setAudioOn] = useState(false);
-  const audioOnRef = useRef(audioOn);
-  audioOnRef.current = audioOn;
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const title =
     (lang === "es"
@@ -106,46 +100,12 @@ export function PortfolioCard({
     }
   }, [open, media]);
 
-  // ── YouTube / Shorts INLINE: toca em loop silencioso; clique activa/desactiva som. ──
-  const ytPost = (func: string) =>
-    iframeRef.current?.contentWindow?.postMessage(
-      JSON.stringify({ event: "command", func, args: [] }),
-      "*",
-    );
-
-  // Quando outro card activa som → mutar este
+  // Duck da música de fundo enquanto o modal de vídeo está aberto (tem som).
   useEffect(() => {
-    if (media?.kind !== "youtube") return;
-    const handler = (e: Event) => {
-      const { id } = (e as CustomEvent<{ id: string }>).detail;
-      if (id !== item._id && audioOnRef.current) {
-        setAudioOn(false);
-        ytPost("mute");
-      }
-    };
-    window.addEventListener(MUTE_EVENT, handler);
-    return () => window.removeEventListener(MUTE_EVENT, handler);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item._id, media?.kind]);
-
-  // Duck da música de fundo enquanto este card tem som activo
-  useEffect(() => {
-    duck(audioOn);
-    return () => { if (audioOn) duck(false); };
-  }, [audioOn, duck]);
-
-  const onCardClick = () => {
-    onFocus?.();
-    const next = !audioOn;
-    setAudioOn(next);
-    ytPost(next ? "unMute" : "mute");
-    ytPost("playVideo");
-    if (next) {
-      window.dispatchEvent(
-        new CustomEvent(MUTE_EVENT, { detail: { id: item._id } }),
-      );
-    }
-  };
+    if (!open || !isVideo) return;
+    duck(true);
+    return () => duck(false);
+  }, [open, isVideo, duck]);
 
   // Orientação: usa o campo explícito do item; fallback: shorts=vertical, resto=horizontal
   const ytShort = media?.kind === "youtube" && media.short;
@@ -153,84 +113,14 @@ export function PortfolioCard({
     item.orientation === "horizontal" ||
     (item.orientation == null && !ytShort);
 
-  if (media?.kind === "youtube") {
-    const iframeSrc = `https://www.youtube.com/embed/${media.id}?autoplay=1&mute=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`;
-
-    if (gridMode) {
-      // Altura fixa em todos os breakpoints; largura deriva do aspect ratio.
-      // Sem w-full — deixa o carrossel determinar o espaço por slide.
-      const wrapperClass = isHorizontal
-        ? "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-video"
-        : "shrink-0 h-[260px] md:h-[380px] xl:h-[527px] aspect-[9/16]";
-
-      return (
-        <div
-          onClick={onCardClick}
-          className={`group relative ${wrapperClass} overflow-hidden rounded-xl bg-canvas-black cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_0_2px_rgba(255,255,255,0.15),0_16px_48px_rgba(0,0,0,0.6)]`}
-        >
-          <iframe
-            ref={iframeRef}
-            src={iframeSrc}
-            title={title || t("cat.video")}
-            allow="autoplay; encrypted-media; picture-in-picture"
-            className="absolute inset-0 w-full h-full pointer-events-none transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-          />
-          {/* Overlay escuro que some no hover — vídeo ganha brilho */}
-          <div className="pointer-events-none absolute inset-0 bg-canvas-black/20 group-hover:bg-canvas-black/0 transition-colors duration-300" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-canvas-black/85 via-canvas-black/25 to-transparent">
-            {title && (
-              <p className="font-display uppercase text-canvas-white text-[clamp(0.95rem,1.4vw,1.15rem)] leading-tight">
-                {title}
-              </p>
-            )}
-          </div>
-          <span
-            aria-hidden
-            className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/60 backdrop-blur-sm text-[11px] transition-colors duration-200"
-            style={{ color: audioOn ? "var(--signal-live)" : "rgba(255,255,255,0.6)" }}
-          >
-            {audioOn ? "◼" : "▶"}
-          </span>
-        </div>
-      );
-    }
-
-    return (
-      <div
-        onClick={onCardClick}
-        className="group relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-black cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_0_2px_rgba(255,255,255,0.2),0_20px_60px_rgba(0,0,0,0.7)]"
-      >
-        <iframe
-          ref={iframeRef}
-          src={iframeSrc}
-          title={title || t("cat.video")}
-          allow="autoplay; encrypted-media; picture-in-picture"
-          className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 ease-out group-hover:scale-[1.04] ${
-            isHorizontal ? "h-full aspect-video" : "w-full aspect-[9/16]"
-          }`}
-        />
-        {/* Overlay escuro que some no hover — vídeo ganha brilho */}
-        <div className="pointer-events-none absolute inset-0 bg-canvas-black/25 group-hover:bg-canvas-black/0 transition-colors duration-300" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-canvas-black/85 via-canvas-black/25 to-transparent">
-          {title && (
-            <p className="font-display uppercase text-canvas-white text-[clamp(0.95rem,1.4vw,1.15rem)] leading-tight">
-              {title}
-            </p>
-          )}
-        </div>
-        <span
-          aria-hidden
-          className="pointer-events-none absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/60 backdrop-blur-sm text-[11px] transition-colors duration-200"
-          style={{ color: audioOn ? "var(--signal-live)" : "rgba(255,255,255,0.6)" }}
-        >
-          {audioOn ? "◼" : "▶"}
-        </span>
-      </div>
-    );
-  }
-
+  // Grid: altura fixa + aspecto por orientação; fora da grid: 4:5.
+  const cardCls = gridMode
+    ? `shrink-0 h-[260px] md:h-[380px] xl:h-[527px] ${
+        isHorizontal ? "aspect-video" : "aspect-[9/16]"
+      }`
+    : "aspect-[4/5]";
   const cardInner = (
-    <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-white/5 group">
+    <div className={`relative ${cardCls} overflow-hidden rounded-lg bg-canvas-white/5 group`}>
       {cover ? (
         <Image
           src={cover}
@@ -287,7 +177,7 @@ export function PortfolioCard({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => { onFocus?.(); setOpen(true); }}
         aria-label={
           isVideo
             ? `${t("common.verVideo")}: ${title || t("common.trabalho")}`
@@ -324,6 +214,24 @@ export function PortfolioCard({
             className="relative w-full max-w-[1100px]"
             onClick={(e) => e.stopPropagation()}
           >
+            {media?.kind === "youtube" && (
+              <div
+                className={`relative w-full overflow-hidden rounded-lg bg-black ${
+                  ytShort
+                    ? "max-w-[420px] mx-auto aspect-[9/16] max-h-[85vh]"
+                    : "aspect-video"
+                }`}
+              >
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${media.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+                  title={title || t("cat.video")}
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+              </div>
+            )}
+
             {media?.kind === "vimeo" && (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
                 <iframe
