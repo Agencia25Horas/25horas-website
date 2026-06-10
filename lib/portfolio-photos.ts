@@ -18,7 +18,7 @@ export interface PhotoCategory {
 
 // Fotos verticais (3:4 — portrait profissional, não 9:16 story)
 const VERTICAL: Record<string, number[]> = {
-  sushi:    [3, 4, 5, 6],
+  sushi:    [3, 4, 5, 6, 7], // 07 = sashimi de atum (portrait); 08-12 landscape (12 é quadrada → lightbox 16:9)
   carnes:   [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
   doces:    [4, 5, 6, 7],
   pizzas:   [4],
@@ -50,9 +50,9 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
     label: "Sushi",
     labelEn: "Sushi",
     labelEs: "Sushi",
-    count: 6,
+    count: 12,
     cover: "/portfolio/restaurantes/sushi/04.jpeg",
-    items: makeItems("sushi", 6),
+    items: makeItems("sushi", 12),
   },
   {
     slug: "peixe",
