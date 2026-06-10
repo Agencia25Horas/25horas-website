@@ -130,5 +130,5 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
     },
   ],
   // Fotos de desporto (orientação real por ficheiro)
-  desporto: nichePhotos("desporto", "vvvvvhvhhh", 0),
+  desporto: nichePhotos("desporto", "vvvvvvhhh", 0),
 };

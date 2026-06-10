@@ -22,7 +22,7 @@ const VERTICAL: Record<string, number[]> = {
   carnes:   [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
   doces:    [4, 5, 6, 7],
   pizzas:   [4],
-  peixe:    [2, 3], // 01 é landscape (capa), 02/03 portrait
+  peixe:    [2, 3, 6], // 01 é landscape (capa), 02/03/06 portrait, 04/05/07/08 landscape
 };
 
 function makeItems(
@@ -56,12 +56,12 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
   },
   {
     slug: "peixe",
-    label: "Peixe",
-    labelEn: "Fish",
-    labelEs: "Pescado",
-    count: 3,
+    label: "Peixe e Marisco",
+    labelEn: "Fish & Seafood",
+    labelEs: "Pescado y Marisco",
+    count: 8,
     cover: "/portfolio/restaurantes/peixe/01.jpeg",
-    items: makeItems("peixe", 3),
+    items: makeItems("peixe", 8),
   },
   {
     slug: "pizzas",
@@ -92,9 +92,9 @@ export const RESTAURANTES_CATEGORIES: PhotoCategory[] = [
   },
   {
     slug: "massas",
-    label: "Massas & Saladas",
-    labelEn: "Pasta & Salads",
-    labelEs: "Pastas y Ensaladas",
+    label: "Massas, Saladas e Focaccias",
+    labelEn: "Pasta, Salads & Focaccias",
+    labelEs: "Pastas, Ensaladas y Focaccias",
     count: 4,
     cover: "/portfolio/restaurantes/massas/04.jpeg",
     items: makeItems("massas", 4),
@@ -154,7 +154,7 @@ export const OUTROS_NICHOS_FOTOS: NichoFotoSection[] = [
     label: "Desporto",
     labelEn: "Sports",
     labelEs: "Deporte",
-    items: nicheFotos("desporto", "vvvvvhvhhh"),
+    items: nicheFotos("desporto", "vvvvvvhhh"),
   },
   {
     slug: "corporate",
