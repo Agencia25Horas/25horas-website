@@ -2,7 +2,7 @@
 
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PortfolioCard } from "@/components/sections/PortfolioCard";
 import { PortfolioPhotoCard } from "@/components/sections/PortfolioPhotoCard";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
@@ -57,6 +57,11 @@ export function PortfolioCarousel({
         startDelay: 0,
         stopOnInteraction: false,
         stopOnMouseEnter: true,
+        // O default (true) regista um 'focusout' no container que REARRANCA o
+        // auto-scroll incondicionalmente (ignora mouseIsOver). Como os cartões
+        // são focáveis, trocar de vídeo disparava focusout no anterior → o
+        // carrossel voltava a andar e nenhum clique o parava.
+        stopOnFocusIn: false,
         // Deteta o hover no WRAPPER (pai do viewport do Embla) → inclui também as
         // SETAS, que vivem no wrapper fora do viewport. stopOnMouseEnter:true marca
         // o flag interno mouseIsOver → o clique (pointerUp) já NÃO volta a arrancar
@@ -85,6 +90,36 @@ export function PortfolioCarousel({
   const prev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const next = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
+  // A partir do 1.º clique num trabalho o auto-scroll fica desligado DE VEZ:
+  // o plugin tem caminhos internos que o rearrancam sozinhos (settle pós-drag,
+  // mouseleave, reInit em resize) e todos ignoram que há um vídeo a tocar.
+  const engagedRef = useRef(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const autoScroll = emblaApi.plugins().autoScroll;
+    if (!autoScroll) return;
+    const blockPlay = () => {
+      // 'autoScroll:play' é emitido ANTES de o arranque ficar efetivo, por isso
+      // um stop() síncrono seria ignorado; a microtask corre logo a seguir mas
+      // ainda antes do timer interno (startDelay) do plugin.
+      if (engagedRef.current) queueMicrotask(() => autoScroll.stop());
+    };
+    emblaApi.on("autoScroll:play", blockPlay);
+    return () => {
+      emblaApi.off("autoScroll:play", blockPlay);
+    };
+  }, [emblaApi]);
+
+  const focusSlide = useCallback(
+    (index: number) => {
+      engagedRef.current = true;
+      emblaApi?.plugins().autoScroll?.stop();
+      emblaApi?.scrollTo(index);
+    },
+    [emblaApi],
+  );
+
   void canPrev;
   void canNext;
 
@@ -104,13 +139,13 @@ export function PortfolioCarousel({
                       <PortfolioPhotoCard
                         item={item}
                         gridMode
-                        onFocus={() => emblaApi?.scrollTo(i)}
+                        onFocus={() => focusSlide(i)}
                       />
                     ) : (
                       <PortfolioCard
                         item={item}
                         gridMode
-                        onFocus={() => emblaApi?.scrollTo(i)}
+                        onFocus={() => focusSlide(i)}
                       />
                     )}
                   </div>
@@ -161,9 +196,9 @@ export function PortfolioCarousel({
             ? loopItems.map((item, i) => (
                 <div key={`${item._id}-${i}`} className={SLIDE_CLASS}>
                   {item.mediaType === "foto" ? (
-                    <PortfolioPhotoCard item={item} onFocus={() => emblaApi?.scrollTo(i)} />
+                    <PortfolioPhotoCard item={item} onFocus={() => focusSlide(i)} />
                   ) : (
-                    <PortfolioCard item={item} onFocus={() => emblaApi?.scrollTo(i)} />
+                    <PortfolioCard item={item} onFocus={() => focusSlide(i)} />
                   )}
                 </div>
               ))

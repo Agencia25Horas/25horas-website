@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { createPortal } from "react-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
 import { useAudio } from "@/lib/audio-context";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
@@ -55,6 +55,9 @@ export function PortfolioCard({
 }) {
   const { lang, t } = useLang();
   const { duck } = useAudio();
+  // Id por INSTÂNCIA (não item._id): o loop do carrossel duplica itens, e duas
+  // cópias do mesmo item partilhariam o _id — tocavam as duas ao mesmo tempo.
+  const uid = useId();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -128,21 +131,21 @@ export function PortfolioCard({
   useEffect(() => {
     const onOther = (e: Event) => {
       const id = (e as CustomEvent<{ id: string }>).detail?.id;
-      if (id !== item._id && activeRef.current) {
+      if (id !== uid && activeRef.current) {
         setActive(false);
         setPlaying(false);
       }
     };
     window.addEventListener(VIDEO_ACTIVATE, onOther);
     return () => window.removeEventListener(VIDEO_ACTIVATE, onOther);
-  }, [item._id]);
+  }, [uid]);
 
   const onVideoClick = () => {
     onFocus?.(); // centra o slide no carrossel
     if (!active) {
       // 1.º clique: monta o iframe e toca
       window.dispatchEvent(
-        new CustomEvent(VIDEO_ACTIVATE, { detail: { id: item._id } }),
+        new CustomEvent(VIDEO_ACTIVATE, { detail: { id: uid } }),
       );
       setActive(true);
       setPlaying(true);
@@ -153,7 +156,7 @@ export function PortfolioCard({
     } else {
       // em pausa → RETOMA de onde estava
       window.dispatchEvent(
-        new CustomEvent(VIDEO_ACTIVATE, { detail: { id: item._id } }),
+        new CustomEvent(VIDEO_ACTIVATE, { detail: { id: uid } }),
       );
       ytPost("playVideo");
       setPlaying(true);
