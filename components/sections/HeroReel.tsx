@@ -103,7 +103,19 @@ export function HeroReel({
       if (fadeTimer.current) clearInterval(fadeTimer.current);
       const start = el.volume;
       const t0 = performance.now();
-      if (target > 0) el.muted = false;
+      if (target > 0) {
+        el.muted = false;
+        // Chrome pausa o vídeo se for desmutado sem nenhum gesto do utilizador
+        // (política de autoplay). Se isso acontecer, volta a mutar e retoma a
+        // reprodução — o vídeo NUNCA pode ficar congelado por causa do som.
+        window.setTimeout(() => {
+          if (el.paused) {
+            el.muted = true;
+            const p = el.play();
+            if (p && typeof p.catch === "function") p.catch(() => {});
+          }
+        }, 60);
+      }
       const step = () => {
         const t = Math.min(1, (performance.now() - t0) / duration);
         el.volume = Math.max(0, Math.min(1, start + (target - start) * t));
@@ -191,6 +203,22 @@ export function HeroReel({
     evs.forEach((e) => window.addEventListener(e, kick, opts));
     return () => evs.forEach((e) => window.removeEventListener(e, kick, opts));
   }, [kickFront]);
+
+  // Ao 1.º gesto REAL (clique/tecla/toque — scroll não conta como ativação no
+  // Chrome) reaplica o áudio: se o rato já estiver sobre o hero, o som entra
+  // agora que o browser o permite.
+  useEffect(() => {
+    const onGesture = () => applyAudio();
+    const evs: (keyof WindowEventMap)[] = [
+      "pointerdown",
+      "keydown",
+      "touchstart",
+    ];
+    const opts = { once: true, passive: true, capture: true } as const;
+    evs.forEach((e) => window.addEventListener(e, onGesture, opts));
+    return () =>
+      evs.forEach((e) => window.removeEventListener(e, onGesture, opts));
+  }, [applyAudio]);
 
   // ── mute da música de fundo: quando o vídeo do hero tem som, MUTA o site ──
   const videoAudible = !muted && (hasHover ? hovering : true);
