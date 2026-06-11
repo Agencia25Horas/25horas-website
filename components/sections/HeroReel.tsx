@@ -126,7 +126,13 @@ export function HeroReel({
   const applyAudio = useCallback(() => {
     const fv = refOf(frontRef.current);
     if (!fv) return;
-    const target = mutedRef.current ? 0 : 1;
+    const target = mutedRef.current
+      ? 0
+      : hasHoverRef.current
+        ? hoveringRef.current
+          ? 1
+          : 0
+        : 1;
     fadeAudio(fv, target, FADE_MS);
   }, [refOf, fadeAudio]);
 
@@ -187,7 +193,7 @@ export function HeroReel({
   }, [kickFront]);
 
   // ── mute da música de fundo: quando o vídeo do hero tem som, MUTA o site ──
-  const videoAudible = !muted;
+  const videoAudible = !muted && (hasHover ? hovering : true);
   useEffect(() => {
     duck(videoAudible);
   }, [videoAudible, duck]);
@@ -214,7 +220,9 @@ export function HeroReel({
     const hh = window.matchMedia("(hover: hover)").matches;
     setHasHover(hh);
     hasHoverRef.current = hh;
-    // começa sempre mudo — o botão é o único controlo de áudio
+    // desktop: som permitido (toca no hover); mobile: mudo até tap no botão
+    setMuted(!hh);
+    mutedRef.current = !hh;
     const fv = refOf(0);
     if (fv) {
       fv.muted = true;
@@ -338,18 +346,20 @@ export function HeroReel({
     [refOf, advance],
   );
 
-  // ── hover (desktop) — só muda cor, não afecta áudio ──────────────
+  // ── hover (desktop) — cor + som (rato em cima = som, fora = mute) ──
   const onEnter = useCallback(() => {
     if (!hasHoverRef.current) return;
     setHovering(true);
     hoveringRef.current = true;
-  }, []);
+    applyAudio();
+  }, [applyAudio]);
 
   const onLeave = useCallback(() => {
     if (!hasHoverRef.current) return;
     setHovering(false);
     hoveringRef.current = false;
-  }, []);
+    applyAudio();
+  }, [applyAudio]);
 
   // ── API global: o CLONE do SeamlessLoop (scroll infinito) chama isto p/
   // accionar o MESMO hover no hero REAL — áudio + cor + ducking — mesmo que o

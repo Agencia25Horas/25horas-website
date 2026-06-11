@@ -82,9 +82,9 @@ export function HomeView({
       {/* ═══════════ 01 — HERO REEL (vídeo por nicho + logo + som no hover) ═══════════ */}
       <HeroReel heroLines={[heroL1, heroL2, heroL3].filter(Boolean)} />
 
-      {/* ═══════════ 02-07 — SEIS NICHOS ═══════════ */}
+      {/* ═══════════ 02+ — NICHOS (sem o Studio: tem entrada própria na nav) ═══════════ */}
       <div id="nichos">
-        {NICHOS.map((nicho, i) => {
+        {NICHOS.filter((n) => n.slug !== "studio").map((nicho, i) => {
           const logo = LOGOS.find(
             (l) => l.href === `/servicos/${nicho.slug}`,
           );

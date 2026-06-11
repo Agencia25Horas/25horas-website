@@ -118,8 +118,8 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
     },
     // Fotos do corporate: ytsize (9 landscape) + shortsize (9 portrait)
     ...nichePhotos("corporate", "hhhhhhhhhvvvvvvvvv", 4),
-    // Fotos novas do corporate (Marbella) — ficheiros 19-28
-    ...nichePhotos("corporate", "hvhvvhhhhh", 22, 19),
+    // Fotos novas do corporate (Marbella) — ficheiros 19-22
+    ...nichePhotos("corporate", "hvhh", 22, 19),
   ],
   educacao: [
     {
@@ -136,10 +136,10 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
   desporto: nichePhotos("desporto", "vvvvvvhhh", 0),
   // Travel — fotos Marbella (01-09)
   travel: nichePhotos("travel", "hvhhvhvvv", 0),
-  // Eventos — fotos Marbella (01-28)
+  // Eventos — fotos Marbella (01-27)
   eventos: nichePhotos(
     "eventos",
-    "vvvhvhvhhhvhhhhvvvvvhhvvvvhv",
+    "vvhvhvhhhvhhhhvvvvvhhvvvvhv",
     0,
   ),
 };
