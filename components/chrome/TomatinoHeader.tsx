@@ -8,6 +8,7 @@ import { Timecode } from "./Timecode";
 import { AudioToggle } from "./AudioToggle";
 import { LangToggle } from "./LangToggle";
 import { useLang } from "@/lib/language-context";
+import { NICHOS } from "@/lib/servicos";
 import { StableLabel } from "./StableLabel";
 
 /**
@@ -23,7 +24,7 @@ export function TomatinoHeader() {
   const [open, setOpen] = useState(false);
   const [portfolioDropdown, setPortfolioDropdown] = useState(false);
   const dropdownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { lang, t } = useLang();
+  const { lang, t, tNiche } = useLang();
 
   const openDropdown = () => {
     if (dropdownTimer.current) clearTimeout(dropdownTimer.current);
@@ -95,8 +96,9 @@ export function TomatinoHeader() {
                   onMouseEnter={openDropdown}
                   onMouseLeave={closeDropdown}
                 >
-                  <button
-                    type="button"
+                  <Link
+                    href="/portfolio"
+                    onClick={() => setPortfolioDropdown(false)}
                     className={`text-[12px] uppercase tracking-wider font-body font-semibold leading-normal cursor-pointer transition-colors ${
                       portfolioDropdown
                         ? "text-accent-grade"
@@ -107,7 +109,7 @@ export function TomatinoHeader() {
                     } : undefined}
                   >
                     <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
-                  </button>
+                  </Link>
 
                   {portfolioDropdown && (
                     <div
@@ -115,24 +117,22 @@ export function TomatinoHeader() {
                       onMouseLeave={closeDropdown}
                       className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50"
                     >
-                      <div className="min-w-[160px] rounded-lg border border-canvas-white/15 bg-black/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden">
-                        <Link
-                          href="/portfolio/fotografias"
-                          onClick={() => setPortfolioDropdown(false)}
-                          className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
-                        >
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><rect x="1" y="1" width="8" height="8" rx="1"/></svg>
-                          {t("nav.fotografias")}
-                        </Link>
-                        <div className="h-px bg-canvas-white/10 mx-3" />
-                        <Link
-                          href="/portfolio/videos"
-                          onClick={() => setPortfolioDropdown(false)}
-                          className="flex items-center gap-2.5 px-5 py-3 text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
-                        >
-                          <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 fill-current shrink-0" aria-hidden><polygon points="2,1 9,5 2,9"/></svg>
-                          {t("nav.videos")}
-                        </Link>
+                      <div className="min-w-[210px] rounded-lg border border-canvas-white/15 bg-black/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden py-1">
+                        {NICHOS.map((nicho) => (
+                          <Link
+                            key={nicho.slug}
+                            href={`/portfolio/${nicho.slug}`}
+                            onClick={() => setPortfolioDropdown(false)}
+                            className="flex items-center gap-2.5 px-5 py-2.5 text-[12px] uppercase tracking-wider text-canvas-white/80 hover:text-canvas-white hover:bg-canvas-white/[0.08] transition-colors"
+                          >
+                            <span
+                              className="w-1.5 h-1.5 rounded-full shrink-0"
+                              style={{ backgroundColor: nicho.accentColor }}
+                              aria-hidden
+                            />
+                            {tNiche(nicho.slug).label}
+                          </Link>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -187,38 +187,17 @@ export function TomatinoHeader() {
           aria-label="Principal — mobile"
         >
           <ul className="flex flex-col py-2">
-            {NAV.map((n) =>
-              n.key === "portfolio" ? (
-                <li key={n.key}>
-                  <Link
-                    href="/portfolio/videos"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
-                  >
-                    <span className="text-[10px] text-canvas-white/50">▶</span>
-                    {t("nav.videos")}
-                  </Link>
-                  <Link
-                    href="/portfolio/fotografias"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
-                  >
-                    <span className="text-[10px] text-canvas-white/50">◼</span>
-                    {t("nav.fotografias")}
-                  </Link>
-                </li>
-              ) : (
-                <li key={n.key}>
-                  <Link
-                    href={n.href}
-                    onClick={() => setOpen(false)}
-                    className="block py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
-                  >
-                    <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
-                  </Link>
-                </li>
-              )
-            )}
+            {NAV.map((n) => (
+              <li key={n.key}>
+                <Link
+                  href={n.href}
+                  onClick={() => setOpen(false)}
+                  className="block py-3 px-6 text-[14px] uppercase tracking-wider font-body font-semibold text-canvas-white hover:bg-canvas-white/10 hover:text-accent-grade transition-colors"
+                >
+                  <StableLabel pt={n.pt} en={n.en} es={n.es} lang={lang} />
+                </Link>
+              </li>
+            ))}
           </ul>
           <div className="flex items-center justify-between px-6 py-4 border-t border-canvas-white/10">
             <LangToggle />

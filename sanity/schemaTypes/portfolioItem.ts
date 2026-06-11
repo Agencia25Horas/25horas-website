@@ -57,6 +57,7 @@ export const portfolioItem = defineType({
         list: [
           { title: "Vídeo", value: "video" },
           { title: "Fotografia", value: "foto" },
+          { title: "Redes Sociais", value: "social" },
         ],
         layout: "radio",
       },

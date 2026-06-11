@@ -9,8 +9,15 @@ import { PortfolioCarousel } from "@/components/sections/PortfolioCarousel";
 import { useLang } from "@/lib/language-context";
 import type { PhotoCategory } from "@/lib/portfolio-photos";
 
-export function CategoriaGalleryView({ category }: { category: PhotoCategory }) {
-  const { lang } = useLang();
+export function CategoriaGalleryView({
+  category,
+  nicheSlug,
+}: {
+  category: PhotoCategory;
+  nicheSlug: string;
+}) {
+  const { lang, tNiche } = useLang();
+  const { label: nicheLabel } = tNiche(nicheSlug);
 
   const label =
     lang === "en" ? category.labelEn
@@ -44,7 +51,7 @@ export function CategoriaGalleryView({ category }: { category: PhotoCategory }) 
           <div className="max-w-[1320px] mx-auto">
             <RevealOnScroll>
               <Link
-                href="/portfolio/fotografias"
+                href={`/portfolio/${nicheSlug}?tab=fotografias`}
                 className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/50 hover:text-canvas-white/80 transition-colors mb-4"
               >
                 ← {lang === "en" ? "Photography" : lang === "es" ? "Fotografía" : "Fotografia"}
@@ -52,9 +59,11 @@ export function CategoriaGalleryView({ category }: { category: PhotoCategory }) 
             </RevealOnScroll>
             <RevealOnScroll delay={60}>
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/60">
-                {lang === "en" ? "Portfolio · Photography · Restaurantes"
-                : lang === "es" ? "Portafolio · Fotografía · Restaurantes"
-                : "Portefolio · Fotografia · Restaurantes"}
+                {lang === "en" ? "Portfolio" : lang === "es" ? "Portafolio" : "Portefolio"}
+                {" · "}
+                {lang === "en" ? "Photography" : lang === "es" ? "Fotografía" : "Fotografia"}
+                {" · "}
+                {nicheLabel}
               </p>
             </RevealOnScroll>
             <RevealOnScroll delay={120}>

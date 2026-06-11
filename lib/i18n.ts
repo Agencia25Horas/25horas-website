@@ -159,6 +159,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     // /portfolio/videos + /portfolio/fotografias
     "nav.videos": "VÍDEOS",
     "nav.fotografias": "FOTOGRAFIAS",
+    "nav.redes": "REDES SOCIAIS",
+    "portfolio.hub.cta": "Ver nicho →",
+    "portfolio.redes.vazio":
+      "Em breve — estamos a preparar a galeria de redes sociais.",
     "portfolio.videos.eyebrow": "Portefolio · Vídeo",
     "portfolio.videos.title": "Os nossos\nvídeos.",
     "portfolio.videos.subtitle": "Filmes e campanhas por nicho.",
@@ -307,6 +311,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     "nav.videos": "VIDEOS",
     "nav.fotografias": "PHOTOS",
+    "nav.redes": "SOCIAL MEDIA",
+    "portfolio.hub.cta": "View sector →",
+    "portfolio.redes.vazio":
+      "Coming soon — we're preparing the social media gallery.",
     "portfolio.videos.eyebrow": "Portfolio · Video",
     "portfolio.videos.title": "Our\nvideos.",
     "portfolio.videos.subtitle": "Films and campaigns by sector.",
@@ -467,6 +475,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
 
     "nav.videos": "VÍDEOS",
     "nav.fotografias": "FOTOGRAFÍAS",
+    "nav.redes": "REDES SOCIALES",
+    "portfolio.hub.cta": "Ver sector →",
+    "portfolio.redes.vazio":
+      "Próximamente — estamos preparando la galería de redes sociales.",
     "portfolio.videos.eyebrow": "Portafolio · Vídeo",
     "portfolio.videos.title": "Nuestros\nvídeos.",
     "portfolio.videos.subtitle": "Películas y campañas por sector.",

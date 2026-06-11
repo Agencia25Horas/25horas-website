@@ -63,7 +63,7 @@ export type SanityPortfolioItem = {
   nicheSlug?: string;
   imageUrl?: string;
   link?: string;
-  mediaType?: "video" | "foto";
+  mediaType?: "video" | "foto" | "social";
   orientation?: "vertical" | "horizontal";
   order?: number;
   featured?: boolean;

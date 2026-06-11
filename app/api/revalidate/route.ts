@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
     if (body._type === "niche" && slugValue) {
       paths.add(`/servicos/${slugValue}`);
       paths.add(`/servicos/${slugValue}/portfolio`);
+      paths.add(`/portfolio/${slugValue}`);
     }
     if (body._type === "pack" && body.nicheSlug) {
       paths.add(`/servicos/${body.nicheSlug}`);
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
       if (body.nicheSlug) {
         paths.add(`/servicos/${body.nicheSlug}`);
         paths.add(`/servicos/${body.nicheSlug}/portfolio`);
+        paths.add(`/portfolio/${body.nicheSlug}`);
       }
     }
     if (body._type === "siteContent") {

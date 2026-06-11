@@ -123,44 +123,7 @@ export function getCategoryBySlug(slug: string): PhotoCategory | undefined {
   return RESTAURANTES_CATEGORIES.find((c) => c.slug === slug);
 }
 
-// ── Fotos de outros nichos (desporto, corporate) na página de fotografia ──
-// `oris` = orientação REAL de cada ficheiro por ordem (h=landscape, v=portrait).
-function nicheFotos(niche: string, oris: string): SanityPortfolioItem[] {
-  return oris.split("").map((o, i): SanityPortfolioItem => {
-    const n = String(i + 1).padStart(2, "0");
-    return {
-      _id: `foto-${niche}-${n}`,
-      nicheSlug: niche,
-      imageUrl: `/portfolio/${niche}/${n}.jpeg`,
-      mediaType: "foto",
-      orientation: o === "h" ? "horizontal" : "vertical",
-      order: i,
-      featured: i < 3,
-    };
-  });
-}
-
-export interface NichoFotoSection {
-  slug: string;
-  label: string;
-  labelEn: string;
-  labelEs: string;
-  items: SanityPortfolioItem[];
-}
-
-export const OUTROS_NICHOS_FOTOS: NichoFotoSection[] = [
-  {
-    slug: "desporto",
-    label: "Desporto",
-    labelEn: "Sports",
-    labelEs: "Deporte",
-    items: nicheFotos("desporto", "vvvvvvhhh"),
-  },
-  {
-    slug: "corporate",
-    label: "Corporate",
-    labelEn: "Corporate",
-    labelEs: "Corporativo",
-    items: nicheFotos("corporate", "hhhhhhhhhvvvvvvvvv"),
-  },
-];
+// Nota: as fotos de outros nichos (desporto, corporate, …) vêm de
+// PORTFOLIO_FALLBACK (lib/portfolio-fallback.ts) via fetchPortfolioByNiche, já
+// com mediaType="foto" — a tab FOTOGRAFIAS do nicho fá-las passar daí. Não
+// duplicar essa lista aqui.

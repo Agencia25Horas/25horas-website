@@ -1,12 +1,6 @@
-import type { Metadata } from "next";
-import { FotografiasView } from "./FotografiasView";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Fotografia — Portfólio",
-  description: "Fotografia de marca da 25 Horas Agency por nicho.",
-  alternates: { canonical: "/portfolio/fotografias" },
-};
-
-export default function FotografiasPage() {
-  return <FotografiasView />;
+// Rota antiga (FOTOGRAFIAS/VÍDEOS no topo) → agora o portefólio é nicho-primeiro.
+export default function FotografiasRedirect() {
+  redirect("/portfolio");
 }
