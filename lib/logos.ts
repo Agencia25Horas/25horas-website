@@ -68,4 +68,16 @@ export const LOGOS: LogoEntry[] = [
     desc: "Escolas, formadores e conhecimento — em forma de cinema.",
     href: "/servicos/educacao",
   },
+  {
+    src: "/media/logos/b25eventos.png",
+    label: "EVENTOS",
+    desc: "Aftermovies, cobertura e reels — em registo de cinema.",
+    href: "/servicos/eventos",
+  },
+  {
+    src: "/media/logos/b25studio.png",
+    label: "STUDIO",
+    desc: "Retratos, podcast e produto no nosso estúdio.",
+    href: "/servicos/studio",
+  },
 ];

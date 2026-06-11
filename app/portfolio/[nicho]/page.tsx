@@ -31,6 +31,20 @@ function parseTab(raw?: string): PortfolioTab {
   return "videos";
 }
 
+/** Sem ?tab= explícito, abre na primeira tab com conteúdo (um nicho só com
+ *  fotos abre em FOTOGRAFIAS em vez de mostrar a tab VÍDEOS vazia). */
+function pickInitialTab(
+  raw: string | undefined,
+  counts: { videos: number; fotos: number; socials: number },
+  isRestaurantes: boolean,
+): PortfolioTab {
+  if (raw) return parseTab(raw);
+  if (counts.videos > 0) return "videos";
+  if (counts.fotos > 0 || isRestaurantes) return "fotografias";
+  if (counts.socials > 0) return "redes";
+  return "videos";
+}
+
 export default async function NichoPortfolioPage({
   params,
   searchParams,
@@ -45,13 +59,18 @@ export default async function NichoPortfolioPage({
   const { tab } = await searchParams;
   const items = await fetchPortfolioByNiche(n.slug as NichoSlug);
   const { videos, fotos, socials } = splitPortfolioItems(items);
+  const initialTab = pickInitialTab(
+    tab,
+    { videos: videos.length, fotos: fotos.length, socials: socials.length },
+    n.slug === "restaurantes",
+  );
 
   return (
     <NichePortfolioView
       slug={n.slug}
       accent={n.accentColor}
       heroImage={STATIC_NICHE_PHOTOS[n.slug] ?? "/media/nichos/portfolio.webp"}
-      initialTab={parseTab(tab)}
+      initialTab={initialTab}
       videos={videos}
       fotos={fotos}
       socials={socials}

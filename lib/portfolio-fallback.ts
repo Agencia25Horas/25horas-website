@@ -42,9 +42,10 @@ function nichePhotos(
   niche: string,
   oris: string,
   startOrder: number,
+  startNum = 1,
 ): SanityPortfolioItem[] {
   return oris.split("").map((o, i): SanityPortfolioItem => {
-    const n = String(i + 1).padStart(2, "0");
+    const n = String(startNum + i).padStart(2, "0");
     return {
       _id: `fb-${niche}-photo-${n}`,
       nicheSlug: niche,
@@ -117,6 +118,8 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
     },
     // Fotos do corporate: ytsize (9 landscape) + shortsize (9 portrait)
     ...nichePhotos("corporate", "hhhhhhhhhvvvvvvvvv", 4),
+    // Fotos novas do corporate (Marbella) — ficheiros 19-28
+    ...nichePhotos("corporate", "hvhvvhhhhh", 22, 19),
   ],
   educacao: [
     {
@@ -131,4 +134,12 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
   ],
   // Fotos de desporto (orientação real por ficheiro)
   desporto: nichePhotos("desporto", "vvvvvvhhh", 0),
+  // Travel — fotos Marbella (01-09)
+  travel: nichePhotos("travel", "hvhhvhvvv", 0),
+  // Eventos — fotos Marbella (01-28)
+  eventos: nichePhotos(
+    "eventos",
+    "vvvhvhvhhhvhhhhvvvvvhhvvvvhv",
+    0,
+  ),
 };

@@ -11,7 +11,9 @@ export type NichoSlug =
   | "corporate"
   | "saude"
   | "saude-bem-estar"
-  | "educacao";
+  | "educacao"
+  | "eventos"
+  | "studio";
 
 export type Nicho = {
   code: string;
@@ -337,6 +339,65 @@ export const NICHOS: Nicho[] = [
       "Stories",
       "Campanhas de inscrição",
       "Apresentações",
+    ],
+  },
+  {
+    code: "09",
+    slug: "eventos",
+    label: "EVENTOS",
+    emoji: "🎉",
+    tagline: "Festivais, marcas e momentos — cobertura em registo de cinema.",
+    image: "/media/nichos/eventosop.jpg",
+    accentColor: "#009688",
+    video: [
+      "Aftermovie",
+      "Cobertura de evento",
+      "Reels",
+      "Highlights",
+      "Entrevistas",
+      "Drone cinematic",
+    ],
+    fotografia: [
+      "Cobertura",
+      "Ambiente",
+      "Convidados",
+      "Branding",
+      "Lifestyle",
+    ],
+    design: [
+      "Cartazes",
+      "Stories",
+      "Posts",
+      "Campanhas",
+    ],
+  },
+  {
+    code: "10",
+    slug: "studio",
+    label: "STUDIO",
+    emoji: "🎬",
+    tagline: "Retratos, podcast e produto — no nosso estúdio.",
+    image: "/media/nichos/studioop.jpg",
+    accentColor: "#76F020",
+    video: [
+      "Podcast",
+      "Vídeos institucionais",
+      "Entrevistas",
+      "Reels",
+      "Branding",
+      "Behind the scenes",
+    ],
+    fotografia: [
+      "Retratos profissionais",
+      "Produto",
+      "Branding",
+      "Ambiente de estúdio",
+    ],
+    design: [
+      "Stories",
+      "Posts",
+      "Campanhas",
+      "Branding visual",
     ],
   },
 ];

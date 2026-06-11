@@ -504,6 +504,68 @@ export const PACKS_BY_NICHE: Record<NichoSlug, NichePack> = {
       es: "¡Hola! Quiero saber más sobre los packs para escuelas y formación.",
     },
   }),
+
+  eventos: makeNichePack({
+    logoSrc: "/media/logos/b25eventos.png",
+    visitCadence: {
+      title: { pt: "Cobertura por evento", en: "Per-event coverage", es: "Cobertura por evento" },
+      desc: {
+        pt: "Equipa no terreno no dia do evento — combinada contigo.",
+        en: "Crew on the ground on event day — arranged with you.",
+        es: "Equipo sobre el terreno el día del evento — acordado contigo.",
+      },
+    },
+    packACapture: {
+      pt: "vídeo, fotografia e conteúdo vertical, palco, convidados, ambiente e bastidores.",
+      en: "video, photography and vertical content, stage, guests, atmosphere and behind the scenes.",
+      es: "vídeo, fotografía y contenido vertical, escenario, invitados, ambiente y backstage.",
+    },
+    objective: {
+      pt: "Encher eventos, criar hype e eternizar cada edição.",
+      en: "Fill events, build hype and immortalise every edition.",
+      es: "Llenar eventos, crear hype y eternizar cada edición.",
+    },
+    tagline: {
+      l1: { pt: "O evento.", en: "The event.", es: "El evento." },
+      l2: { pt: "O nosso cinema.", en: "Our cinema.", es: "Nuestro cine." },
+    },
+    whatsappText: {
+      pt: "Olá! Quero saber mais sobre os packs para eventos.",
+      en: "Hi! I'd like to know more about your event packs.",
+      es: "¡Hola! Quiero saber más sobre los packs para eventos.",
+    },
+  }),
+
+  studio: makeNichePack({
+    logoSrc: "/media/logos/b25studio.png",
+    visitCadence: {
+      title: { pt: "Sessões no estúdio", en: "Studio sessions", es: "Sesiones en el estudio" },
+      desc: {
+        pt: "Marcas a tua sessão no estúdio 25 Horas.",
+        en: "Book your session at the 25 Horas studio.",
+        es: "Reservas tu sesión en el estudio 25 Horas.",
+      },
+    },
+    packACapture: {
+      pt: "retratos, produto, podcast e conteúdo de marca no estúdio.",
+      en: "portraits, product, podcast and brand content in the studio.",
+      es: "retratos, producto, podcast y contenido de marca en el estudio.",
+    },
+    objective: {
+      pt: "Elevar a marca com produção de estúdio profissional.",
+      en: "Elevate the brand with professional studio production.",
+      es: "Elevar la marca con producción de estudio profesional.",
+    },
+    tagline: {
+      l1: { pt: "O teu estúdio.", en: "Your studio.", es: "Tu estudio." },
+      l2: { pt: "A nossa produção.", en: "Our production.", es: "Nuestra producción." },
+    },
+    whatsappText: {
+      pt: "Olá! Quero saber mais sobre o estúdio e os packs.",
+      en: "Hi! I'd like to know more about the studio and packs.",
+      es: "¡Hola! Quiero saber más sobre el estudio y los packs.",
+    },
+  }),
 };
 
 export function getNichePack(slug: NichoSlug): NichePack {

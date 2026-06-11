@@ -73,10 +73,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l3": "AS IMAGENS SÃO NOSSAS.",
 
     // /servicos (índice)
-    "servicos.eyebrow": "08 Nichos",
+    "servicos.eyebrow": "10 Nichos",
     "servicos.title": "Onde fazemos magia.",
     "servicos.subtitle":
-      "Oito sectores, um vocabulário cinematográfico. Carrega num para ver o que fazemos em cada.",
+      "Dez sectores, um vocabulário cinematográfico. Carrega num para ver o que fazemos em cada.",
 
     // /servicos/[nicho] (deep)
     "nichoPage.oQueFazemos": "O que fazemos",
@@ -96,7 +96,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.comoTrabalhamosTitle": "Do briefing\nao corte final.",
     "sobre.comoTrabalhamosBody":
       "Conhecemos o cliente, o produto, a equipa e o sítio antes de pegar na câmara. Cada projecto tem um realizador responsável. Direcção de fotografia, som, edição e colorização pensados em conjunto e sempre afinados.",
-    "sobre.sectoresEyebrow": "Os 8 sectores em que trabalhamos",
+    "sobre.sectoresEyebrow": "Os 10 sectores em que trabalhamos",
     "sobre.sectoresTitle": "As nossas sub-marcas.",
 
     // /contactos
@@ -231,10 +231,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l2": "BELONG TO THE BRANDS.",
     "home.hero.title.l3": "THE IMAGES ARE OURS.",
 
-    "servicos.eyebrow": "08 Sectors",
+    "servicos.eyebrow": "10 Sectors",
     "servicos.title": "Where we make magic.",
     "servicos.subtitle":
-      "Eight sectors, one cinematic vocabulary. Click one to see what we do for each.",
+      "Ten sectors, one cinematic vocabulary. Click one to see what we do for each.",
 
     "nichoPage.oQueFazemos": "What we do",
     "nichoPage.para": "For",
@@ -252,7 +252,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.comoTrabalhamosTitle": "From briefing\nto final cut.",
     "sobre.comoTrabalhamosBody":
       "We get to know the client, product, team and location before we pick up the camera. Each project has a dedicated director. Cinematography, sound, edit and colour grading are all thought through together and always tuned in.",
-    "sobre.sectoresEyebrow": "The 8 sectors we work in",
+    "sobre.sectoresEyebrow": "The 10 sectors we work in",
     "sobre.sectoresTitle": "Our sub-brands.",
 
     "contactos.eyebrow": "Contact",
@@ -390,10 +390,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l3": "LAS IMÁGENES SON NUESTRAS.",
 
     // /servicos (índice)
-    "servicos.eyebrow": "08 Sectores",
+    "servicos.eyebrow": "10 Sectores",
     "servicos.title": "Donde hacemos magia.",
     "servicos.subtitle":
-      "Ocho sectores, un mismo vocabulario cinematográfico. Pulsa en uno para ver lo que hacemos en cada caso.",
+      "Diez sectores, un mismo vocabulario cinematográfico. Pulsa en uno para ver lo que hacemos en cada caso.",
 
     // /servicos/[nicho] (deep)
     "nichoPage.oQueFazemos": "Qué hacemos",
@@ -413,7 +413,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "sobre.comoTrabalhamosTitle": "Del briefing\nal montaje final.",
     "sobre.comoTrabalhamosBody":
       "Conocemos al cliente, el producto, el equipo y el lugar antes de coger la cámara. Cada proyecto tiene un director responsable. Dirección de fotografía, sonido, edición y etalonaje pensados en conjunto y siempre afinados.",
-    "sobre.sectoresEyebrow": "Los 8 sectores en los que trabajamos",
+    "sobre.sectoresEyebrow": "Los 10 sectores en los que trabajamos",
     "sobre.sectoresTitle": "Nuestras submarcas.",
 
     // /contactos
@@ -527,6 +527,14 @@ export const NICHE_CONTENT: Record<
       label: "EDUCAÇÃO",
       tagline: "Escolas, formadores e conhecimento — em forma de cinema.",
     },
+    eventos: {
+      label: "EVENTOS",
+      tagline: "Festivais, marcas e momentos — cobertura em registo de cinema.",
+    },
+    studio: {
+      label: "STUDIO",
+      tagline: "Retratos, podcast e produto — no nosso estúdio.",
+    },
   },
   en: {
     restaurantes: {
@@ -560,6 +568,14 @@ export const NICHE_CONTENT: Record<
     educacao: {
       label: "EDUCATION",
       tagline: "Schools, educators and knowledge — in cinema form.",
+    },
+    eventos: {
+      label: "EVENTS",
+      tagline: "Festivals, brands and moments — coverage in cinematic register.",
+    },
+    studio: {
+      label: "STUDIO",
+      tagline: "Portraits, podcast and product — in our studio.",
     },
   },
   es: {
@@ -595,6 +611,14 @@ export const NICHE_CONTENT: Record<
     educacao: {
       label: "EDUCACIÓN",
       tagline: "Escuelas, formadores y conocimiento — en forma de cine.",
+    },
+    eventos: {
+      label: "EVENTOS",
+      tagline: "Festivales, marcas y momentos — cobertura en registro de cine.",
+    },
+    studio: {
+      label: "STUDIO",
+      tagline: "Retratos, podcast y producto — en nuestro estudio.",
     },
   },
 };
@@ -712,6 +736,15 @@ export const SERVICE_ITEMS_EN: Record<string, string> = {
   "Apresentações": "Presentations",
   "Convites": "Invitations",
   "Álbuns": "Albums",
+  // Eventos / Studio
+  "Aftermovie": "Aftermovie",
+  "Cobertura de evento": "Event coverage",
+  "Cobertura": "Coverage",
+  "Convidados": "Guests",
+  "Cartazes": "Posters",
+  "Produto": "Product",
+  "Ambiente de estúdio": "Studio atmosphere",
+  "Vídeos institucionais": "Institutional videos",
 };
 
 /** Service items translation map — PT key → ES value (es-ES, informal). */
@@ -840,4 +873,12 @@ export const SERVICE_ITEMS_ES: Record<string, string> = {
   "Apresentações": "Presentaciones",
   "Convites": "Invitaciones",
   "Álbuns": "Álbumes",
+  // Eventos / Studio
+  "Aftermovie": "Aftermovie",
+  "Cobertura de evento": "Cobertura de evento",
+  "Cobertura": "Cobertura",
+  "Convidados": "Invitados",
+  "Cartazes": "Carteles",
+  "Produto": "Producto",
+  "Ambiente de estúdio": "Ambiente de estudio",
 };

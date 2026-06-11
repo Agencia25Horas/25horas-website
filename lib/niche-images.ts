@@ -17,4 +17,6 @@ export const STATIC_NICHE_PHOTOS: Record<string, string> = {
   saude: "/media/nichos/familyop.png", // slug "saude" = nicho FAMÍLIA
   "saude-bem-estar": "/media/nichos/saudeop.png", // slug "saude-bem-estar" = nicho SAÚDE
   educacao: "/media/nichos/testeop.png",
+  eventos: "/media/nichos/eventosop.jpg",
+  studio: "/media/nichos/studioop.jpg",
 };
