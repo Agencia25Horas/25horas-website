@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
@@ -10,16 +11,24 @@ import type { Lang } from "@/lib/i18n";
 
 const ACCENT = "#76F020"; // verde do nicho STUDIO (lib/servicos.ts)
 
-// Fotos reais do estúdio (public/studio), indexadas pela ordem dos espaços em
+// Media real do estúdio (public/studio), indexada pela ordem dos espaços em
 // COPY[lang].spaces: fotografia, vídeo, podcast, música, ensaio vocal,
-// formação. null = espaço ainda sem foto.
-const SPACE_PHOTOS: (string | null)[] = [
-  "/studio/fotografia.jpeg",
-  null, // vídeo — sem foto própria por agora
-  "/studio/podcast.jpeg",
-  "/studio/musica.jpeg",
-  "/studio/ensaio-vocal.jpeg",
-  "/studio/formacao.jpeg",
+// formação. Tudo vertical 9:16. Clicar abre em ecrã inteiro (lightbox).
+type SpaceMedia =
+  | { type: "image"; src: string }
+  | { type: "video"; src: string; poster: string };
+
+const SPACE_MEDIA: (SpaceMedia | null)[] = [
+  { type: "image", src: "/studio/fotografia.jpeg" },
+  {
+    type: "video",
+    src: "/studio/video-estudio.mp4",
+    poster: "/studio/video-poster.jpg",
+  },
+  { type: "image", src: "/studio/podcast.jpeg" },
+  { type: "image", src: "/studio/musica.jpeg" },
+  { type: "image", src: "/studio/ensaio-vocal.jpeg" },
+  { type: "image", src: "/studio/formacao.jpeg" },
 ];
 
 type Space = {
@@ -313,6 +322,25 @@ export function StudioView() {
   const { lang } = useLang();
   const c = COPY[lang];
 
+  // Lightbox: media aberta em ecrã inteiro (null = fechado). Fecha com Esc,
+  // com o X ou clicando fora da imagem.
+  const [lightbox, setLightbox] = useState<SpaceMedia | null>(null);
+  const close = useCallback(() => setLightbox(null), []);
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    // trava o scroll da página enquanto o lightbox está aberto
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [lightbox, close]);
+
   return (
     <main id="main" className="bg-canvas-black text-canvas-white">
       <TomatinoHeader />
@@ -379,21 +407,62 @@ export function StudioView() {
             <RevealOnScroll key={space.title} delay={i * 40}>
               <article
                 className={`border-t border-canvas-white/10 py-12 md:py-14 grid gap-8 md:gap-12 ${
-                  SPACE_PHOTOS[i]
-                    ? "md:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)]"
+                  SPACE_MEDIA[i]
+                    ? i % 2 === 0
+                      ? "md:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)]"
+                      : "md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_260px]"
                     : "md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
                 }`}
               >
-                {SPACE_PHOTOS[i] && (
-                  <div className="relative aspect-[9/16] max-w-[280px] md:max-w-none w-full rounded-lg overflow-hidden border border-canvas-white/10">
-                    <Image
-                      src={SPACE_PHOTOS[i]}
-                      alt={space.title}
-                      fill
-                      sizes="(min-width: 768px) 240px, 280px"
-                      className="object-cover"
-                    />
-                  </div>
+                {SPACE_MEDIA[i] && (
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(SPACE_MEDIA[i])}
+                    aria-label={`${space.title} — fullscreen`}
+                    className={`group relative aspect-[9/16] max-w-[280px] md:max-w-none w-full rounded-lg overflow-hidden border border-canvas-white/10 cursor-zoom-in text-left ${
+                      i % 2 === 0 ? "" : "md:order-last"
+                    }`}
+                  >
+                    {SPACE_MEDIA[i].type === "image" ? (
+                      <Image
+                        src={SPACE_MEDIA[i].src}
+                        alt={space.title}
+                        fill
+                        sizes="(min-width: 768px) 260px, 280px"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      /* Vídeo inline: SEMPRE mudo (decisão de produto) — o som
+                         fica disponível nos controlos do lightbox. */
+                      <video
+                        src={SPACE_MEDIA[i].src}
+                        poster={SPACE_MEDIA[i].poster}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      />
+                    )}
+                    {/* Indicador de zoom no hover */}
+                    <span
+                      aria-hidden
+                      className="absolute bottom-2.5 right-2.5 inline-flex items-center justify-center w-8 h-8 rounded-full bg-canvas-black/55 backdrop-blur-sm text-canvas-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                      </svg>
+                    </span>
+                  </button>
                 )}
                 <div>
                   <p
@@ -479,6 +548,53 @@ export function StudioView() {
       </section>
 
       <SiteFooter />
+
+      {/* ── Lightbox ecrã inteiro (clique fora / X / Esc fecha) ── */}
+      {lightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={close}
+          className="fixed inset-0 z-[100] bg-canvas-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-10"
+        >
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Fechar"
+            className="absolute top-4 right-4 md:top-6 md:right-8 z-10 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 text-canvas-white text-2xl leading-none hover:bg-canvas-black/70 transition-colors"
+          >
+            <span className="-mt-0.5">×</span>
+          </button>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative h-full max-h-[92svh] aspect-[9/16] max-w-full"
+          >
+            {lightbox.type === "image" ? (
+              <Image
+                src={lightbox.src}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 52svh, 100vw"
+                quality={90}
+                className="object-contain"
+              />
+            ) : (
+              /* No lightbox o vídeo tem CONTROLOS — o user decide o som
+                 (continua a começar mudo, coerente com o resto do site). */
+              <video
+                src={lightbox.src}
+                poster={lightbox.poster}
+                autoPlay
+                muted
+                loop
+                controls
+                playsInline
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
