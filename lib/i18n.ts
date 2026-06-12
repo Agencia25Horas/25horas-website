@@ -9,7 +9,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
   pt: {
     // Header
     "header.sobre": "Sobre",
-    "header.portfolio": "Portefolio",
+    "header.portfolio": "Portfólio",
     "header.contactos": "Contactos",
     "header.orcamento": "Pedir orçamento",
 
@@ -55,7 +55,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "common.proximoPasso": "Próximo passo",
     "common.anterior": "← Anterior",
     "common.seguinte": "Seguinte →",
-    "common.todosNichos": "← Todos os nichos",
+    "common.todosNichos": "← Todas as áreas de negócio",
     "common.verPortfolioCompleto": "Ver portfolio completo de",
     "common.voltar": "← Voltar",
     "common.continuar": "Continuar →",
@@ -73,7 +73,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "home.hero.title.l3": "AS IMAGENS SÃO NOSSAS.",
 
     // /servicos (índice)
-    "servicos.eyebrow": "10 Nichos",
+    "servicos.eyebrow": "10 Áreas de Negócio",
     "servicos.title": "Onde fazemos magia.",
     "servicos.subtitle":
       "Dez sectores, um vocabulário cinematográfico. Carrega num para ver o que fazemos em cada.",
@@ -118,12 +118,13 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "orcamento.eyebrow": "Pedir orçamento",
     "orcamento.title": "Quatro perguntas.\nResposta em 24h.",
     "orcamento.subtitle":
-      "Diz-nos o nicho, o entregável e o prazo. Respondemos em PT ou EN no prazo de um dia útil.",
+      "Diz-nos a área de negócio, o entregável e o prazo. Respondemos em PT ou EN no prazo de um dia útil.",
     "orcamento.form.title": "Pedir orçamento",
     "orcamento.form.passo": "Passo",
     "orcamento.form.de": "de",
-    "orcamento.form.q1": "Qual o nicho do teu projecto?",
+    "orcamento.form.q1": "Qual a área de negócio do teu projecto?",
     "orcamento.form.q2": "Que tipo de entregável?",
+    "orcamento.form.multi": "Podes escolher mais do que uma opção.",
     "orcamento.form.q3": "Em que prazo?",
     "orcamento.form.q4": "Como vos contactamos?",
     "orcamento.form.nome": "Nome",
@@ -147,10 +148,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "orcamento.form.timeline.long": "> 3 meses",
 
     // /portfolio (índice)
-    "portfolio.eyebrow": "Portefolio",
-    "portfolio.title": "Trabalhos por nicho.",
+    "portfolio.eyebrow": "Portfólio",
+    "portfolio.title": "Trabalhos por área de negócio.",
     "portfolio.subtitle":
-      "Selecção de filmes, campanhas e fotografia. Cada nicho tem a sua secção.",
+      "Selecção de filmes, campanhas e fotografia. Cada área de negócio tem a sua secção.",
     "portfolio.emConstrucao": "Em construção",
     "portfolio.brevemente": "Brevemente, os trabalhos de",
     "portfolio.preparar":
@@ -160,15 +161,15 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "nav.videos": "VÍDEOS",
     "nav.fotografias": "FOTOGRAFIAS",
     "nav.redes": "REDES SOCIAIS",
-    "portfolio.hub.cta": "Ver nicho →",
+    "portfolio.hub.cta": "Ver área de negócio →",
     "portfolio.redes.vazio":
       "Em breve — estamos a preparar a galeria de redes sociais.",
-    "portfolio.videos.eyebrow": "Portefolio · Vídeo",
+    "portfolio.videos.eyebrow": "Portfólio · Vídeo",
     "portfolio.videos.title": "Os nossos\nvídeos.",
-    "portfolio.videos.subtitle": "Filmes e campanhas por nicho.",
-    "portfolio.fotografias.eyebrow": "Portefolio · Fotografia",
+    "portfolio.videos.subtitle": "Filmes e campanhas por área de negócio.",
+    "portfolio.fotografias.eyebrow": "Portfólio · Fotografia",
     "portfolio.fotografias.title": "A nossa\nfotografia.",
-    "portfolio.fotografias.subtitle": "Fotografia de marca por nicho.",
+    "portfolio.fotografias.subtitle": "Fotografia de marca por área de negócio.",
     "portfolio.fotografias.vazio": "Em breve — estamos a preparar a galeria de fotografia.",
   },
 
@@ -278,6 +279,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "orcamento.form.de": "of",
     "orcamento.form.q1": "What sector is your project in?",
     "orcamento.form.q2": "What type of deliverable?",
+    "orcamento.form.multi": "You can pick more than one option.",
     "orcamento.form.q3": "What's the timeline?",
     "orcamento.form.q4": "How do we reach you?",
     "orcamento.form.nome": "Name",
@@ -441,6 +443,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "orcamento.form.de": "de",
     "orcamento.form.q1": "¿En qué sector está tu proyecto?",
     "orcamento.form.q2": "¿Qué tipo de entregable?",
+    "orcamento.form.multi": "Puedes elegir más de una opción.",
     "orcamento.form.q3": "¿En qué plazo?",
     "orcamento.form.q4": "¿Cómo te contactamos?",
     "orcamento.form.nome": "Nombre",

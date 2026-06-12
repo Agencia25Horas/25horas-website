@@ -120,9 +120,9 @@ export function PoliticaPrivacidadeView() {
                   {tr("pedido de orçamento", "quote request form", "solicitud de presupuesto")}
                 </Link>
                 {tr(
-                  ": nome, email, telefone, mensagem/detalhes do pedido, e o nicho e pack que escolheste.",
-                  ": name, email, phone number, message/details of your request, and the niche and package you selected.",
-                  ": nombre, email, teléfono, mensaje/detalles de la solicitud, y el nicho y pack que has elegido.",
+                  ": nome, email, telefone, mensagem/detalhes do pedido, e a área de negócio e pack que escolheste.",
+                  ": name, email, phone number, message/details of your request, and the business area and package you selected.",
+                  ": nombre, email, teléfono, mensaje/detalles de la solicitud, y el área de negocio y pack que has elegido.",
                 )}
               </p>
               <p>

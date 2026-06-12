@@ -68,8 +68,8 @@ export function HeroReel({
 
   const [slots, setSlots] = useState<[number, number]>([0, 1]);
   const [front, setFront] = useState<0 | 1>(0);
-  // `muted` = o botão de som está em mute. SSR-safe: começa mudo, ajustado no
-  // mount (desktop → som permitido + GATED PELO HOVER; mobile → mudo até tap).
+  // `muted` = o botão de som está em mute. Começa SEMPRE mudo em qualquer
+  // dispositivo — o vídeo só tem som depois de o utilizador tocar no botão.
   const [muted, setMuted] = useState(true);
   const [hovering, setHovering] = useState(false);
   const [hasHover, setHasHover] = useState(false);
@@ -131,20 +131,13 @@ export function HeroReel({
     [],
   );
 
-  // Caminho ÚNICO do áudio do vídeo da frente:
-  //   • em mute → sempre calado;
-  //   • desktop → segue o hover (em cima = som, fora = mute);
-  //   • mobile (sem hover) → ligado (o botão é o único controlo).
+  // Caminho ÚNICO do áudio do vídeo da frente: começa SEMPRE em mute em
+  // qualquer dispositivo, e o botão de som é o ÚNICO controlo. O hover só
+  // muda a cor — nunca liga o áudio.
   const applyAudio = useCallback(() => {
     const fv = refOf(frontRef.current);
     if (!fv) return;
-    const target = mutedRef.current
-      ? 0
-      : hasHoverRef.current
-        ? hoveringRef.current
-          ? 1
-          : 0
-        : 1;
+    const target = mutedRef.current ? 0 : 1;
     fadeAudio(fv, target, FADE_MS);
   }, [refOf, fadeAudio]);
 
@@ -204,24 +197,8 @@ export function HeroReel({
     return () => evs.forEach((e) => window.removeEventListener(e, kick, opts));
   }, [kickFront]);
 
-  // Ao 1.º gesto REAL (clique/tecla/toque — scroll não conta como ativação no
-  // Chrome) reaplica o áudio: se o rato já estiver sobre o hero, o som entra
-  // agora que o browser o permite.
-  useEffect(() => {
-    const onGesture = () => applyAudio();
-    const evs: (keyof WindowEventMap)[] = [
-      "pointerdown",
-      "keydown",
-      "touchstart",
-    ];
-    const opts = { once: true, passive: true, capture: true } as const;
-    evs.forEach((e) => window.addEventListener(e, onGesture, opts));
-    return () =>
-      evs.forEach((e) => window.removeEventListener(e, onGesture, opts));
-  }, [applyAudio]);
-
   // ── mute da música de fundo: quando o vídeo do hero tem som, MUTA o site ──
-  const videoAudible = !muted && (hasHover ? hovering : true);
+  const videoAudible = !muted;
   useEffect(() => {
     duck(videoAudible);
   }, [videoAudible, duck]);
@@ -248,9 +225,7 @@ export function HeroReel({
     const hh = window.matchMedia("(hover: hover)").matches;
     setHasHover(hh);
     hasHoverRef.current = hh;
-    // desktop: som permitido (toca no hover); mobile: mudo até tap no botão
-    setMuted(!hh);
-    mutedRef.current = !hh;
+    // começa sempre mudo — o botão é o único controlo de áudio
     const fv = refOf(0);
     if (fv) {
       fv.muted = true;
@@ -374,20 +349,18 @@ export function HeroReel({
     [refOf, advance],
   );
 
-  // ── hover (desktop) — cor + som (rato em cima = som, fora = mute) ──
+  // ── hover (desktop) — só muda cor, não afecta áudio ──────────────
   const onEnter = useCallback(() => {
     if (!hasHoverRef.current) return;
     setHovering(true);
     hoveringRef.current = true;
-    applyAudio();
-  }, [applyAudio]);
+  }, []);
 
   const onLeave = useCallback(() => {
     if (!hasHoverRef.current) return;
     setHovering(false);
     hoveringRef.current = false;
-    applyAudio();
-  }, [applyAudio]);
+  }, []);
 
   // ── API global: o CLONE do SeamlessLoop (scroll infinito) chama isto p/
   // accionar o MESMO hover no hero REAL — áudio + cor + ducking — mesmo que o
@@ -400,7 +373,7 @@ export function HeroReel({
     };
   }, [onEnter, onLeave]);
 
-  // ── botão de som: liga/desliga (em desktop o hover é que toca) ──
+  // ── botão de som: liga/desliga o áudio do vídeo (único controlo) ──
   const toggleMute = useCallback(() => {
     setMuted((m) => {
       const next = !m;

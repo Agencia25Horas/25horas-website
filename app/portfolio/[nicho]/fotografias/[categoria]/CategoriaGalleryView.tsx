@@ -59,7 +59,7 @@ export function CategoriaGalleryView({
             </RevealOnScroll>
             <RevealOnScroll delay={60}>
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/60">
-                {lang === "en" ? "Portfolio" : lang === "es" ? "Portafolio" : "Portefolio"}
+                {lang === "en" ? "Portfolio" : lang === "es" ? "Portafolio" : "Portfólio"}
                 {" · "}
                 {lang === "en" ? "Photography" : lang === "es" ? "Fotografía" : "Fotografia"}
                 {" · "}

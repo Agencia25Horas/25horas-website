@@ -36,7 +36,7 @@ export function TomatinoHeader() {
 
   const NAV = [
     { key: "sobre",     pt: "Sobre",           en: "About",       es: "Nosotros",          href: "/sobre" },
-    { key: "portfolio", pt: "Portefolio",       en: "Portfolio",   es: "Portafolio",        href: "/portfolio" },
+    { key: "portfolio", pt: "Portfólio",        en: "Portfolio",   es: "Portafolio",        href: "/portfolio" },
     { key: "studio",    pt: "Studio",           en: "Studio",      es: "Studio",            href: "/servicos/studio" },
     { key: "contactos", pt: "Contactos",        en: "Contact",     es: "Contacto",          href: "/contactos" },
     { key: "orcamento", pt: "Pedir orçamento",  en: "Get a quote", es: "Pedir presupuesto", href: "/orcamento" },

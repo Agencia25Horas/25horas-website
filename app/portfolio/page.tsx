@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { PortfolioHubView } from "./PortfolioHubView";
 
 export const metadata: Metadata = {
-  title: "Portefólio — Trabalhos por nicho",
+  title: "Portfólio — Trabalhos por área de negócio",
   description:
-    "Vídeos, fotografia e redes sociais da 25 Horas Agency, organizados por nicho.",
+    "Vídeos, fotografia e redes sociais da 25 Horas Agency, organizados por área de negócio.",
   alternates: { canonical: "/portfolio" },
 };
 

@@ -46,7 +46,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const onRef = useRef(on);
   onRef.current = on;
 
-  // ── cria o elemento de áudio (uma vez) ──────────────────────────
+  // ── cria o elemento de áudio (uma vez) + AUTOPLAY ───────────────
+  // A música arranca sozinha ao entrar no site (a menos que o utilizador a
+  // tenha desligado numa visita anterior — localStorage "off"). Os browsers
+  // bloqueiam autoplay com som antes do 1.º gesto, por isso: tenta já, e se
+  // falhar volta a tentar ao 1.º clique/tecla/toque na página.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const a = new Audio(TRACK);
@@ -54,7 +58,39 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     a.loop = true; // loop nativo — faixa única, sem sincronização
     a.volume = TRACK_VOLUME;
     audioRef.current = a;
+
+    const evs: (keyof WindowEventMap)[] = [
+      "pointerdown",
+      "keydown",
+      "touchstart",
+    ];
+    const opts = { passive: true, capture: true } as const;
+    const removeGestureListeners = () =>
+      evs.forEach((e) => window.removeEventListener(e, onGesture, opts));
+    const tryStart = () => {
+      if (onRef.current) return; // já está a tocar
+      a.muted = duckedRef.current; // respeita o hero se já tiver som
+      a.play()
+        .then(() => {
+          setOn(true);
+          setBlocked(false);
+          removeGestureListeners();
+        })
+        .catch(() => {
+          /* bloqueado — fica à espera do 1.º gesto */
+        });
+    };
+    function onGesture() {
+      tryStart();
+    }
+
+    if (window.localStorage.getItem(LS_KEY) !== "off") {
+      tryStart();
+      evs.forEach((e) => window.addEventListener(e, onGesture, opts));
+    }
+
     return () => {
+      removeGestureListeners();
       if (fadeRaf.current) cancelAnimationFrame(fadeRaf.current);
       a.pause();
       a.src = "";

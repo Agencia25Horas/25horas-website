@@ -23,7 +23,7 @@ export async function generateMetadata({
   const cat = getCategoryBySlug(categoria);
   if (!cat || nicho !== "restaurantes") return {};
   return {
-    title: `${cat.label} — Fotografia · Portefólio`,
+    title: `${cat.label} — Fotografia · Portfólio`,
     description: `Galeria de fotografia de ${cat.label} da 25 Horas Agency.`,
     alternates: { canonical: `/portfolio/${nicho}/fotografias/${categoria}` },
   };

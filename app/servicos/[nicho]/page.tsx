@@ -7,7 +7,10 @@ import { fetchNichePack } from "@/lib/sanity/fetch";
 type Params = { nicho: string };
 
 export function generateStaticParams() {
-  return NICHOS.map((n) => ({ nicho: n.slug }));
+  // O studio tem página própria (app/servicos/studio — aluguer do estúdio).
+  return NICHOS.filter((n) => n.slug !== "studio").map((n) => ({
+    nicho: n.slug,
+  }));
 }
 
 export async function generateMetadata({

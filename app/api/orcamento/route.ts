@@ -85,7 +85,7 @@ function htmlBody(b: Body) {
   <div style="max-width:560px;margin:0 auto;padding:32px 24px">
     <h1 style="font-family:sans-serif;font-size:18px;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 24px;color:#111">Novo pedido de orçamento</h1>
     <table style="border-collapse:collapse;width:100%;border-top:1px solid #eee">
-      ${row("Nicho", b.projectType)}
+      ${row("Área de negócio", b.projectType)}
       ${row("Entregável", b.deliverable)}
       ${row("Prazo", b.timeline)}
       ${row("Nome", b.name)}

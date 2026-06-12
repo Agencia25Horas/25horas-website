@@ -9,8 +9,10 @@ type Step = 1 | 2 | 3 | 4 | 5;
 
 type State = {
   step: Step;
-  projectType?: string;
-  deliverable?: string;
+  // Multi-select: o cliente pode querer várias áreas de negócio e vários
+  // entregáveis num só pedido (ex.: um pacote vídeo + fotografia).
+  projectTypes: string[];
+  deliverables: string[];
   timeline?: string;
   name: string;
   email: string;
@@ -23,6 +25,8 @@ export function BudgetForm() {
   const { t, tNiche } = useLang();
   const [s, set] = useState<State>({
     step: 1,
+    projectTypes: [],
+    deliverables: [],
     name: "",
     email: "",
     phone: "",
@@ -67,8 +71,9 @@ export function BudgetForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          projectType: s.projectType,
-          deliverable: s.deliverable,
+          // A API recebe strings — várias escolhas vão juntas por vírgula.
+          projectType: s.projectTypes.join(", "),
+          deliverable: s.deliverables.join(", "),
           timeline: s.timeline,
           name: s.name,
           email: s.email,
@@ -92,8 +97,8 @@ export function BudgetForm() {
       // O form de orçamento não escolhe "pack" (isso é nas páginas de nicho);
       // enviamos o nicho + entregável + prazo.
       trackEvent("form_submit", {
-        nicho: s.projectType ?? "",
-        deliverable: s.deliverable ?? "",
+        nicho: s.projectTypes.join(", "),
+        deliverable: s.deliverables.join(", "),
         timeline: s.timeline ?? "",
       });
       set((p) => ({ ...p, step: 5 }));
@@ -105,8 +110,8 @@ export function BudgetForm() {
   };
 
   const canContinue = (() => {
-    if (s.step === 1) return !!s.projectType;
-    if (s.step === 2) return !!s.deliverable;
+    if (s.step === 1) return s.projectTypes.length > 0;
+    if (s.step === 2) return s.deliverables.length > 0;
     if (s.step === 3) return !!s.timeline;
     if (s.step === 4)
       return (
@@ -181,18 +186,24 @@ export function BudgetForm() {
       {s.step === 1 && (
         <ChipStep
           question={t("orcamento.form.q1")}
+          hint={t("orcamento.form.multi")}
           options={projectTypes}
-          value={s.projectType}
-          onChange={(v) => set((p) => ({ ...p, projectType: v }))}
+          values={s.projectTypes}
+          onToggle={(v) =>
+            set((p) => ({ ...p, projectTypes: toggleValue(p.projectTypes, v) }))
+          }
           columns="grid-cols-2 md:grid-cols-3"
         />
       )}
       {s.step === 2 && (
         <ChipStep
           question={t("orcamento.form.q2")}
+          hint={t("orcamento.form.multi")}
           options={deliverables}
-          value={s.deliverable}
-          onChange={(v) => set((p) => ({ ...p, deliverable: v }))}
+          values={s.deliverables}
+          onToggle={(v) =>
+            set((p) => ({ ...p, deliverables: toggleValue(p.deliverables, v) }))
+          }
           columns="grid-cols-1 md:grid-cols-2"
         />
       )}
@@ -200,8 +211,8 @@ export function BudgetForm() {
         <ChipStep
           question={t("orcamento.form.q3")}
           options={timelines}
-          value={s.timeline}
-          onChange={(v) => set((p) => ({ ...p, timeline: v }))}
+          values={s.timeline ? [s.timeline] : []}
+          onToggle={(v) => set((p) => ({ ...p, timeline: v }))}
           columns="grid-cols-1 md:grid-cols-3"
         />
       )}
@@ -243,31 +254,44 @@ export function BudgetForm() {
   );
 }
 
+/** Acrescenta/remove um valor de uma lista (toggle de chip multi-select). */
+function toggleValue(list: string[], v: string): string[] {
+  return list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
+}
+
 function ChipStep({
   question,
+  hint,
   options,
-  value,
-  onChange,
+  values,
+  onToggle,
   columns,
 }: {
   question: string;
+  /** Nota por baixo da pergunta (ex.: "podes escolher mais do que uma"). */
+  hint?: string;
   options: string[];
-  value?: string;
-  onChange: (v: string) => void;
+  values: string[];
+  onToggle: (v: string) => void;
   columns: string;
 }) {
   return (
     <>
-      <h2 className="font-display uppercase text-[clamp(1.75rem,3.5vw,2.75rem)] leading-[1.05] text-canvas-white mb-8">
+      <h2 className="font-display uppercase text-[clamp(1.75rem,3.5vw,2.75rem)] leading-[1.05] text-canvas-white mb-3">
         {question}
       </h2>
-      <div className={`grid ${columns} gap-3`}>
+      {hint && (
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-canvas-white/45 mb-8">
+          {hint}
+        </p>
+      )}
+      <div className={`grid ${columns} gap-3 ${hint ? "" : "mt-5"}`}>
         {options.map((opt) => {
-          const active = opt === value;
+          const active = values.includes(opt);
           return (
             <button
               key={opt}
-              onClick={() => onChange(opt)}
+              onClick={() => onToggle(opt)}
               aria-pressed={active}
               className={`px-6 py-5 border font-mono text-[12px] uppercase tracking-[0.15em] text-center min-h-[64px] flex items-center justify-center transition-colors ${
                 active

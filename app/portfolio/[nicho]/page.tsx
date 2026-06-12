@@ -16,9 +16,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { nicho } = await params;
   const n = findNicho(nicho);
-  if (!n) return { title: "Portefólio" };
+  if (!n) return { title: "Portfólio" };
   return {
-    title: `${n.label} — Portefólio`,
+    title: `${n.label} — Portfólio`,
     description: `Vídeos, fotografia e redes sociais de ${n.label.toLowerCase()} da 25 Horas Agency.`,
     alternates: { canonical: `/portfolio/${n.slug}` },
   };
