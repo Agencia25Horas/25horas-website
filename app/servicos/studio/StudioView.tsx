@@ -10,6 +10,18 @@ import type { Lang } from "@/lib/i18n";
 
 const ACCENT = "#76F020"; // verde do nicho STUDIO (lib/servicos.ts)
 
+// Fotos reais do estúdio (public/studio), indexadas pela ordem dos espaços em
+// COPY[lang].spaces: fotografia, vídeo, podcast, música, ensaio vocal,
+// formação. null = espaço ainda sem foto.
+const SPACE_PHOTOS: (string | null)[] = [
+  "/studio/fotografia.jpeg",
+  null, // vídeo — sem foto própria por agora
+  "/studio/podcast.jpeg",
+  "/studio/musica.jpeg",
+  "/studio/ensaio-vocal.jpeg",
+  "/studio/formacao.jpeg",
+];
+
 type Space = {
   title: string;
   body: string;
@@ -365,7 +377,24 @@ export function StudioView() {
         <div className="max-w-[1100px] mx-auto space-y-0">
           {c.spaces.map((space, i) => (
             <RevealOnScroll key={space.title} delay={i * 40}>
-              <article className="border-t border-canvas-white/10 py-12 md:py-14 grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-8 md:gap-12">
+              <article
+                className={`border-t border-canvas-white/10 py-12 md:py-14 grid gap-8 md:gap-12 ${
+                  SPACE_PHOTOS[i]
+                    ? "md:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)]"
+                    : "md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
+                }`}
+              >
+                {SPACE_PHOTOS[i] && (
+                  <div className="relative aspect-[9/16] max-w-[280px] md:max-w-none w-full rounded-lg overflow-hidden border border-canvas-white/10">
+                    <Image
+                      src={SPACE_PHOTOS[i]}
+                      alt={space.title}
+                      fill
+                      sizes="(min-width: 768px) 240px, 280px"
+                      className="object-cover"
+                    />
+                  </div>
+                )}
                 <div>
                   <p
                     className="font-mono text-[11px] uppercase tracking-[0.2em]"
