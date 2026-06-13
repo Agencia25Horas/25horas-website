@@ -149,6 +149,15 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
       featured: true,
       order: 0,
     },
+    {
+      _id: "fb-educacao-2",
+      nicheSlug: "educacao",
+      link: "https://www.youtube.com/watch?v=r5PsvChEGoY",
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: 1,
+    },
   ],
   desporto: [
     // Vídeos do cliente (YouTube horizontal)
