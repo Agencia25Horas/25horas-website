@@ -78,6 +78,24 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
       featured: true,
       order: 1,
     },
+    // Vídeos do cliente (YouTube horizontal)
+    ...[
+      "WjGtVXmzXj0",
+      "zvQGcwPlcDU",
+      "HXm20YH1Eg4",
+      "l8SsWH7eysg",
+      "-uZWXj_MhsY",
+      "mWWKWsf47ss",
+      "xR-Lp7VW7QE",
+    ].map((id, i): SanityPortfolioItem => ({
+      _id: `fb-restaurantes-video-${i + 3}`,
+      nicheSlug: "restaurantes",
+      link: `https://www.youtube.com/watch?v=${id}`,
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: i + 2,
+    })),
   ],
   corporate: [
     {
