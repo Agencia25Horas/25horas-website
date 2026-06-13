@@ -132,14 +132,55 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
       order: 0,
     },
   ],
-  // Fotos de desporto (orientação real por ficheiro)
-  desporto: nichePhotos("desporto", "vvvvvvhhh", 0),
+  desporto: [
+    // Vídeos do cliente (YouTube horizontal)
+    ...[
+      "O_0Ev1qHk7Q",
+      "lW2NeRWI2d8",
+      "i4DWPbAnt2E",
+      "9I6VCdN3pEM",
+      "AOuJGBaeLHY",
+      "xtnOwIe_GI4",
+    ].map((id, i): SanityPortfolioItem => ({
+      _id: `fb-desporto-video-${i + 1}`,
+      nicheSlug: "desporto",
+      link: `https://www.youtube.com/watch?v=${id}`,
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: i,
+    })),
+    // Fotos de desporto (orientação real por ficheiro) — após os vídeos
+    ...nichePhotos("desporto", "vvvvvvhhh", 6),
+  ],
+  // FAMÍLIA / 25Horas Family (slug "saude") — vídeos do cliente
+  saude: ["74K83Spyg0M", "xoOKvOqNLJg"].map(
+    (id, i): SanityPortfolioItem => ({
+      _id: `fb-saude-video-${i + 1}`,
+      nicheSlug: "saude",
+      link: `https://www.youtube.com/watch?v=${id}`,
+      mediaType: "video",
+      orientation: "horizontal",
+      featured: true,
+      order: i,
+    }),
+  ),
   // Travel — fotos Marbella (01-09)
   travel: nichePhotos("travel", "hvhhvhvvv", 0),
-  // Eventos — fotos Marbella (01-27)
-  eventos: nichePhotos(
-    "eventos",
-    "vvhvhvhhhvhhhhvvvvvhhvvvvhv",
-    0,
-  ),
+  eventos: [
+    // Vídeos do cliente (YouTube horizontal)
+    ...["9RoErs_qH78", "Z55_RjVkY2U", "pVtY0aMmXgo"].map(
+      (id, i): SanityPortfolioItem => ({
+        _id: `fb-eventos-video-${i + 1}`,
+        nicheSlug: "eventos",
+        link: `https://www.youtube.com/watch?v=${id}`,
+        mediaType: "video",
+        orientation: "horizontal",
+        featured: true,
+        order: i,
+      }),
+    ),
+    // Eventos — fotos Marbella (01-27) — após os vídeos
+    ...nichePhotos("eventos", "vvhvhvhhhvhhhhvvvvvhhvvvvhv", 3),
+  ],
 };
