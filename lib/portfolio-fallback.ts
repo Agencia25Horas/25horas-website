@@ -168,6 +168,11 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
       "9I6VCdN3pEM",
       "AOuJGBaeLHY",
       "xtnOwIe_GI4",
+      // Novos vídeos do cliente (jun. 2026)
+      "moy0q-C38Tg",
+      "ig4oAY-qiXg",
+      "jGc1OaIPl-4",
+      "Nr5MWSR8YjM",
     ].map((id, i): SanityPortfolioItem => ({
       _id: `fb-desporto-video-${i + 1}`,
       nicheSlug: "desporto",
@@ -178,7 +183,7 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
       order: i,
     })),
     // Fotos de desporto (orientação real por ficheiro) — após os vídeos
-    ...nichePhotos("desporto", "vvvvvvhhh", 6),
+    ...nichePhotos("desporto", "vvvvvvhhh", 10),
   ],
   // FAMÍLIA / 25Horas Family (slug "saude") — vídeos do cliente
   saude: ["74K83Spyg0M", "xoOKvOqNLJg"].map(

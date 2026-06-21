@@ -140,6 +140,51 @@ export function PortfolioCard({
     return () => window.removeEventListener(VIDEO_ACTIVATE, onOther);
   }, [uid]);
 
+  // Quando o vídeo CHEGA AO FIM, pára — nunca avança para o vídeo seguinte nem
+  // entra em loop. Ouve os eventos da API do YouTube (playerState: 0 = terminou,
+  // 1 = a tocar, 2 = pausa) e, ao terminar, volta à thumbnail (clicar reinicia).
+  useEffect(() => {
+    if (!active) return;
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const startListening = () =>
+      iframe.contentWindow?.postMessage(
+        JSON.stringify({ event: "listening", id: uid, channel: "widget" }),
+        "*",
+      );
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== iframe.contentWindow || typeof e.data !== "string") return;
+      let payload: { event?: string; info?: { playerState?: number } | number };
+      try {
+        payload = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      const state =
+        typeof payload.info === "object"
+          ? payload.info?.playerState
+          : payload.event === "onStateChange"
+            ? payload.info
+            : undefined;
+      if (state === 0) {
+        // terminou → PÁRA e volta à thumbnail (sem auto-avançar)
+        setActive(false);
+        setPlaying(false);
+      } else if (state === 2) {
+        setPlaying(false);
+      } else if (state === 1) {
+        setPlaying(true);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    iframe.addEventListener("load", startListening);
+    startListening();
+    return () => {
+      window.removeEventListener("message", onMessage);
+      iframe.removeEventListener("load", startListening);
+    };
+  }, [active, uid]);
+
   const onVideoClick = () => {
     onFocus?.(); // centra o slide no carrossel
     if (!active) {
@@ -228,7 +273,7 @@ export function PortfolioCard({
         {active ? (
           <iframe
             ref={iframeRef}
-            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&loop=1&playlist=${media.id}&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
+            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
             title={title || t("cat.video")}
             allow="autoplay; encrypted-media; picture-in-picture"
             className="absolute inset-0 w-full h-full pointer-events-none"
