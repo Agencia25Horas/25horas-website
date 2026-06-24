@@ -199,6 +199,13 @@ export const PORTFOLIO_FALLBACK: Record<string, SanityPortfolioItem[]> = {
   ),
   // Travel — fotos Marbella (01-09)
   travel: nichePhotos("travel", "hvhhvhvvv", 0),
+  // Real Estate — quinta (3 casas): 8 melhores fotos de cada (01-24, todas
+  // landscape). Otimizadas em /public/portfolio/real-estate/NN.jpeg.
+  "real-estate": nichePhotos(
+    "real-estate",
+    "hhhhhhhhhhhhhhhhhhhhhhhh",
+    0,
+  ),
   eventos: [
     // Vídeos do cliente (YouTube horizontal)
     ...["9RoErs_qH78", "Z55_RjVkY2U", "pVtY0aMmXgo"].map(
