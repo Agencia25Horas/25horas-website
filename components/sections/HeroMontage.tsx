@@ -8,10 +8,11 @@ import { useLang } from "@/lib/language-context";
  *
  * Vive DENTRO do HeroReel, como uma camada (z-15) por baixo do logo (z-20): o
  * logo e o header ficam visíveis o tempo todo, o match-cut toca atrás deles, e
- * no fim dissolve para o reel normal (que monta por baixo). Não é uma "cena
- * separada" — é o hero a abrir já a bombar e a continuar para os vídeos.
+ * no fim dissolve para o reel normal (que monta por baixo).
  *
- * Toca uma vez; saltável (clique / scroll / Esc).
+ * DESKTOP: cortes em VÍDEO. MOBILE: cortes nas IMAGENS-poster — os browsers de
+ * telemóvel não tocam 4 vídeos em simultâneo de forma fiável (ficava preto/
+ * engasgado); as imagens são leves e o "whip" dá a mesma energia. Toca uma vez.
  */
 
 const ACCENT = "#e85d3a";
@@ -40,10 +41,21 @@ const SEQ: Beat[] = [
 const STEP_MS = 820;
 const FADE_MS = 600;
 
+function detectMobile() {
+  if (typeof window === "undefined") return false;
+  return (
+    !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+    window.innerWidth <= 768
+  );
+}
+
 export function HeroMontage({ onDone }: { onDone: () => void }) {
   const { lang } = useLang();
+  // HeroMontage só monta no cliente (playMontage começa false no SSR), por isso
+  // ler `window` aqui é seguro (sem mismatch de hidratação).
+  const [isMobile] = useState(detectMobile);
 
-  const vidsRef = useRef<(HTMLVideoElement | null)[]>([]);
+  const mediaRef = useRef<(HTMLVideoElement | HTMLImageElement | null)[]>([]);
   const kickerRef = useRef<HTMLSpanElement>(null);
   const intervalRef = useRef<number | null>(null);
   const exitRef = useRef<number | null>(null);
@@ -64,14 +76,19 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
   const finishRef = useRef(finish);
   finishRef.current = finish;
 
-  // timeline — começa quando o 1.º vídeo tem frame (fallback 1200ms)
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => setShown(true));
-    vidsRef.current.forEach((el) => {
-      if (!el) return;
+  // toca um media SE for vídeo (imagens não têm play()).
+  const playMedia = (el: HTMLVideoElement | HTMLImageElement | null) => {
+    if (el && "play" in el) {
       const p = el.play();
       if (p && typeof p.catch === "function") p.catch(() => {});
-    });
+    }
+  };
+
+  // timeline — corre UMA vez. No desktop espera o 1.º vídeo ter frame (fallback
+  // 1200ms); no mobile (imagens) arranca já.
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setShown(true));
+    mediaRef.current.forEach(playMedia);
 
     let started = false;
     let b = 0;
@@ -84,30 +101,37 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
         else finishRef.current();
       }, STEP_MS);
     };
-    const first = vidsRef.current[SEQ[0].v];
-    const startT = window.setTimeout(begin, 1200);
-    if (first && first.readyState >= 2) begin();
-    else first?.addEventListener("canplay", begin, { once: true });
+
+    const startT = window.setTimeout(begin, 1200); // fallback sempre
+    const first = mediaRef.current[SEQ[0].v];
+    if (isMobile) {
+      begin(); // imagens: arranca imediatamente
+    } else if (first && "readyState" in first && first.readyState >= 2) {
+      begin();
+    } else if (first && "addEventListener" in first) {
+      (first as HTMLVideoElement).addEventListener("canplay", begin, {
+        once: true,
+      });
+    }
 
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(startT);
-      first?.removeEventListener("canplay", begin);
+      if (first && "removeEventListener" in first) {
+        (first as HTMLVideoElement).removeEventListener("canplay", begin);
+      }
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (exitRef.current) clearTimeout(exitRef.current);
     };
-    // corre UMA vez — não depende de `finish` (lido via finishRef) para que
-    // mudar de língua não reinicie a sequência.
-  }, []);
+  }, [isMobile]);
 
   // corte (opacidade) + whip + palavra a cada beat
   useEffect(() => {
     if (exiting) return;
     const v = SEQ[beat].v;
-    const el = vidsRef.current[v];
+    const el = mediaRef.current[v];
     if (el) {
-      const p = el.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
+      playMedia(el);
       el.animate(
         [
           { opacity: 0, transform: "scale(1.22)", filter: "blur(8px)" },
@@ -116,8 +140,6 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
         { duration: 550, easing: "cubic-bezier(.2,.8,.2,1)" },
       );
     }
-    // só translateY — a centragem é feita pelo flex do contentor (não mexer no X
-    // aqui senão entra em conflito e descentra a palavra).
     kickerRef.current?.animate(
       [
         { opacity: 0, transform: "translateY(16px)" },
@@ -128,6 +150,13 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
   }, [beat, exiting]);
 
   const current = SEQ[beat];
+  const mediaClass =
+    "absolute inset-0 w-full h-full object-cover will-change-transform";
+  const mediaStyle = (k: number): React.CSSProperties => ({
+    opacity: current.v === k ? 1 : 0,
+    filter: "saturate(1.12) contrast(1.08)",
+    transition: "opacity 200ms ease",
+  });
 
   return (
     <div
@@ -139,26 +168,40 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
         transition: `opacity ${exiting ? FADE_MS : 300}ms ease`,
       }}
     >
-      {CLIPS.map((c, k) => (
-        <video
-          key={c.src}
-          ref={(el) => {
-            vidsRef.current[k] = el;
-          }}
-          src={c.src}
-          poster={c.poster}
-          muted
-          playsInline
-          loop
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover will-change-transform"
-          style={{
-            opacity: current.v === k ? 1 : 0,
-            filter: "saturate(1.12) contrast(1.08)",
-            transition: "opacity 200ms ease",
-          }}
-        />
-      ))}
+      {CLIPS.map((c, k) =>
+        isMobile ? (
+          // MOBILE: imagem-poster (leve, fiável)
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={c.src}
+            ref={(el) => {
+              mediaRef.current[k] = el;
+            }}
+            src={c.poster}
+            alt=""
+            loading="eager"
+            decoding="async"
+            className={mediaClass}
+            style={mediaStyle(k)}
+          />
+        ) : (
+          // DESKTOP: vídeo
+          <video
+            key={c.src}
+            ref={(el) => {
+              mediaRef.current[k] = el;
+            }}
+            src={c.src}
+            poster={c.poster}
+            muted
+            playsInline
+            loop
+            preload="auto"
+            className={mediaClass}
+            style={mediaStyle(k)}
+          />
+        ),
+      )}
 
       {/* scrim — legibilidade da palavra (coerente com o scrim do hero) */}
       <div
