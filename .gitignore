@@ -46,3 +46,6 @@ public/media/*
 # hero — vídeos-fonte pesados ficam locais; só os outputs (public/hero/) vão p/ git
 /items/
 /Items/
+
+# backups dos vídeos originais do hero (pré-compressão)
+.hero-originals/

@@ -79,10 +79,11 @@ export function HomeView({
         25 Horas Agency — cinema para marcas em Lisboa
       </h1>
 
-      {/* ═══════════ 01 — HERO REEL (vídeo por nicho + logo + som no hover) ═══════════ */}
+      {/* ═══════════ 01 — HERO REEL: abre com o match-cut (1.º vídeo) e segue
+          para o reel normal. O match-cut é gerido dentro do HeroReel. ═══ */}
       <HeroReel heroLines={[heroL1, heroL2, heroL3].filter(Boolean)} />
 
-      {/* ═══════════ 02+ — NICHOS (sem o Studio: tem entrada própria na nav) ═══════════ */}
+      {/* ═══════════ 02+ — NICHOS (sem o Studio: tem entrada própria na nav) ═══ */}
       <div id="nichos">
         {NICHOS.filter((n) => n.slug !== "studio").map((nicho, i) => {
           const logo = LOGOS.find(

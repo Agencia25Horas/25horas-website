@@ -1,14 +1,35 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import { useLang } from "@/lib/language-context";
 import { useAudio } from "@/lib/audio-context";
+import { HeroMontage } from "./HeroMontage";
+
+// Flag em memória (não persistida): o match-cut de abertura toca UMA vez por
+// carregamento de página. F5 repõe o módulo → repete (bom p/ demos); navegar e
+// voltar à home (client-side) não repete.
+let montagePlayed = false;
+
+// useLayoutEffect no cliente (decide antes do paint → sem flash do hero normal),
+// useEffect no servidor (evita o warning de SSR).
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 declare global {
   interface Window {
     /** Accionado pelo clone do SeamlessLoop p/ replicar o hover no hero real. */
     __heroHover?: (active: boolean) => void;
+    /** true ENQUANTO o match-cut de abertura toca. O SeamlessLoop ignora os
+     *  teleportes do scroll infinito enquanto isto for true → sem quebras/saltos
+     *  durante a abertura. O clone do loop é criado normalmente (no arranque). */
+    __montageActive?: boolean;
   }
 }
 
@@ -54,7 +75,7 @@ export function HeroReel({
 }) {
   const { lang } = useLang();
   const en = lang === "en";
-  const { duck } = useAudio();
+  const { duck, registerDucker } = useAudio();
 
   const v0 = useRef<HTMLVideoElement>(null);
   const v1 = useRef<HTMLVideoElement>(null);
@@ -75,6 +96,8 @@ export function HeroReel({
   const [hasHover, setHasHover] = useState(false);
   const [fallback, setFallback] = useState(false);
   const [fbIdx, setFbIdx] = useState(0);
+  // Match-cut de abertura: 1.º "vídeo" do hero. Decidido no mount.
+  const [playMontage, setPlayMontage] = useState(false);
 
   // espelhos para os handlers (evita closures obsoletos)
   const mutedRef = useRef(muted);
@@ -204,6 +227,24 @@ export function HeroReel({
   }, [videoAudible, duck]);
   useEffect(() => () => duck(false), [duck]); // repõe ao desmontar
 
+  // ── mutuamente exclusivo: se o utilizador LIGA a música (botão SOM) enquanto
+  // o vídeo toca com som, o contexto chama esta função para silenciar o vídeo
+  // (em vez de ouvir-se música + vídeo ao mesmo tempo). Ao mutar, o efeito de
+  // cima corre duck(false) e a música retoma de onde estava. ──────────────────
+  useEffect(() => {
+    return registerDucker(() => {
+      if (mutedRef.current) return; // já está mudo → nada a fazer
+      const fv = refOf(frontRef.current);
+      if (fv) fv.muted = true; // corte imediato do som do vídeo
+      if (fadeTimer.current) {
+        clearInterval(fadeTimer.current);
+        fadeTimer.current = null;
+      }
+      mutedRef.current = true;
+      setMuted(true); // sincroniza o ícone do altifalante
+    });
+  }, [registerDucker, refOf]);
+
   // ── arranque + deteção de capacidades ───────────────────────────
   useEffect(() => {
     const conn = (
@@ -237,6 +278,53 @@ export function HeroReel({
       if (fadeTimer.current) clearInterval(fadeTimer.current);
     };
   }, [refOf]);
+
+  // ── decide o match-cut de abertura (uma vez por carregamento) ────
+  // Antes do paint p/ não piscar o hero normal. Salta em reduced-motion /
+  // ligação lenta (aí o hero já cai para posters).
+  useIsoLayoutEffect(() => {
+    if (montagePlayed) return;
+    montagePlayed = true;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const conn = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+    const slow =
+      !!conn &&
+      (conn.saveData === true ||
+        ["slow-2g", "2g", "3g"].includes(conn.effectiveType ?? ""));
+    if (!reduce && !slow) {
+      window.__montageActive = true; // desliga o teleporte do scroll já no arranque
+      setPlayMontage(true);
+    }
+  }, []);
+
+  // Durante o match-cut, os 2 vídeos do reel ficam PAUSADOS (a montagem tapa-os e
+  // tem os seus próprios 4) e o teleporte do scroll fica desligado. Ao acabar,
+  // arrancam e o scroll infinito volta ao normal.
+  useEffect(() => {
+    if (playMontage) {
+      window.__montageActive = true;
+      [v0.current, v1.current].forEach((v) => {
+        if (v && !v.paused) v.pause();
+      });
+      return;
+    }
+    window.__montageActive = false;
+    const id = window.setTimeout(() => kickFront(), 60);
+    return () => clearTimeout(id);
+  }, [playMontage, kickFront]);
+
+  // Se o utilizador sair da home DURANTE o match-cut, garante que a flag não
+  // fica presa em `true` (senão o scroll infinito ficava morto nas outras
+  // páginas, porque o SeamlessLoop ignora teleportes enquanto for true).
+  useEffect(() => {
+    return () => {
+      window.__montageActive = false;
+    };
+  }, []);
 
   // ciclo de posters no modo fallback
   useEffect(() => {
@@ -431,6 +519,8 @@ export function HeroReel({
             sizes="100vw"
             className="object-cover"
           />
+          {/* Os vídeos do reel ficam SEMPRE montados (para o clone do scroll
+              infinito os apanhar). Durante o match-cut são apenas PAUSADOS. */}
           <video
             ref={v0}
             src={VIDEOS[slots[0]].src}
@@ -486,6 +576,10 @@ export function HeroReel({
         }}
       />
 
+      {/* ── Match-cut de abertura (z-15): toca por baixo do logo e dissolve
+            para o reel quando termina. O logo (z-20) fica fixo por cima. ── */}
+      {playMontage && <HeroMontage onDone={() => setPlayMontage(false)} />}
+
       {/* ── Logo (z-20) + tagline — depth próprio (move mais + fade) ── */}
       <div
         ref={logoRef}
@@ -502,7 +596,7 @@ export function HeroReel({
             className="object-contain drop-shadow-[0_8px_30px_rgba(0,0,0,0.55)]"
           />
         </div>
-        {heroLines.length > 0 && (
+        {!playMontage && heroLines.length > 0 && (
           <div className="-mt-1 md:mt-0 text-center max-w-2xl">
             {heroLines.map((line, i) => (
               <p

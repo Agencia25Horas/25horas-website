@@ -52,6 +52,12 @@ export function SeamlessLoop() {
     // Como `pathname` está nas deps, ao navegar PARA cá o cleanup do efeito
     // anterior já correu e removeu o clone da página de onde viemos.
     if (shouldSkip(pathname)) return;
+
+    // ── REGRA DE OURO: nada aqui pode deixar o utilizador sem scroll. Toda a
+    // init/medição/teleport está protegida; se QUALQUER coisa falhar, fazemos
+    // fallback para scroll nativo (a página fica sempre scrollável). ─────────
+    let dispose: (() => void) | null = null;
+    try {
     const original = document.getElementById("main");
     if (!original) return;
 
@@ -175,37 +181,49 @@ export function SeamlessLoop() {
       if (p && typeof p.catch === "function") p.catch(() => {});
     }
 
-    // ── Medir altura do original (recalcular em resize e load) ──
-    const measure = () => {
-      origHRef.current = original.offsetHeight;
+    // ── Medir altura do original — NÃO depende do vídeo estar carregado.
+    // Se vier 0 (layout ainda não assentou), repete via rAF até ter valor
+    // válido. Enquanto h<=0 o loop fica inerte (sem teleportes) → scroll nativo.
+    const setH = () => {
+      const h = original.offsetHeight;
+      if (h > 0) origHRef.current = h;
     };
-    measure();
-    const ro = new ResizeObserver(measure);
+    let measureRaf = 0;
+    const measureInit = () => {
+      const h = original.offsetHeight;
+      if (h > 0) origHRef.current = h;
+      else measureRaf = requestAnimationFrame(measureInit);
+    };
+    measureInit();
+    const ro = new ResizeObserver(setH);
     ro.observe(original);
-    window.addEventListener("load", measure);
+    window.addEventListener("load", setH);
 
-    // ── Teleporte helper ────────────────────────────────────────
+    // ── Teleporte helper (protegido) ────────────────────────────
     const teleport = (y: number) => {
-      if (lenis) {
-        // Sem `lock` → o momentum do smooth-scroll continua a partir da nova
-        // posição em vez de parar no wrap (menos "break"). `immediate` mantém
-        // o salto instantâneo e invisível (o clone é igual ao original).
-        lenis.scrollTo(y, { immediate: true, force: true });
-      } else {
-        window.scrollTo({ top: y, behavior: "auto" });
+      try {
+        if (lenis) {
+          lenis.scrollTo(y, { immediate: true, force: true });
+        } else {
+          window.scrollTo({ top: y, behavior: "auto" });
+        }
+      } catch {
+        /* nunca deixar o teleport partir o scroll */
       }
     };
 
     // ── Scroll listener: wrap quando passamos o original ────────
     let ticking = false;
     const onScroll = () => {
-      if (ticking) return;
+      if (ticking || window.__montageActive) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const y = window.scrollY;
-        const h = origHRef.current;
-        if (h > 0 && y >= h) {
-          teleport(y - h);
+        try {
+          const y = window.scrollY;
+          const h = origHRef.current;
+          if (h > 0 && y >= h) teleport(y - h);
+        } catch {
+          /* ignora */
         }
         ticking = false;
       });
@@ -213,11 +231,15 @@ export function SeamlessLoop() {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     // ── Wheel up no topo: jumpa para perto do fim do original ───
+    // SÓ intercepta (preventDefault) se o loop está mesmo pronto a teleportar
+    // (altura válida + clone existe). Caso contrário deixa o scroll nativo —
+    // NUNCA prender o utilizador no topo.
     const onWheel = (e: WheelEvent) => {
-      if (window.scrollY <= 0 && e.deltaY < 0) {
+      if (window.__montageActive) return;
+      const h = origHRef.current;
+      if (window.scrollY <= 0 && e.deltaY < 0 && h > 0 && cloneRef.current) {
         e.preventDefault();
-        const h = origHRef.current;
-        if (h > 0) teleport(h + e.deltaY); // deltaY negativo → posição antes do fim
+        teleport(h + e.deltaY); // deltaY negativo → posição antes do fim
       }
     };
     window.addEventListener("wheel", onWheel, {
@@ -227,22 +249,26 @@ export function SeamlessLoop() {
 
     // ── Keyboard up no topo ─────────────────────────────────────
     const onKey = (e: KeyboardEvent) => {
+      if (window.__montageActive) return;
+      const h = origHRef.current;
       if (
         window.scrollY <= 0 &&
+        h > 0 &&
+        cloneRef.current &&
         ["ArrowUp", "PageUp", "Home"].includes(e.key)
       ) {
         e.preventDefault();
-        const h = origHRef.current;
-        if (h > 0) teleport(h - window.innerHeight);
+        teleport(h - window.innerHeight);
       }
     };
     window.addEventListener("keydown", onKey, { capture: true });
 
-    return () => {
+    dispose = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("keydown", onKey, { capture: true });
-      window.removeEventListener("load", measure);
+      window.removeEventListener("load", setH);
+      if (measureRaf) cancelAnimationFrame(measureRaf);
       if (heroClone) {
         heroClone.removeEventListener("mouseenter", onHeroEnter);
         heroClone.removeEventListener("mouseleave", onHeroLeave);
@@ -257,10 +283,40 @@ export function SeamlessLoop() {
       clone.remove();
       cloneRef.current = null;
     };
+    } catch (err) {
+      // Init do loop falhou → FALLBACK total para scroll nativo. Limpa o que
+      // tiver sido criado (clone órfão incluído) e não atribui listeners.
+      if (typeof console !== "undefined") {
+        console.warn(
+          "[SeamlessLoop] desligado — fallback para scroll nativo:",
+          err,
+        );
+      }
+      try {
+        dispose?.();
+      } catch {
+        /* ignora */
+      }
+      try {
+        cloneRef.current?.remove();
+        cloneRef.current = null;
+      } catch {
+        /* ignora */
+      }
+      dispose = null;
+    }
+
     // (#13) `pathname` na dep array → o efeito re-corre em cada navegação
     // client-side: o cleanup remove o clone antigo e recria-se um fresco para
     // a nova página (ou salta, se for rota destination). Acaba com o bug do
     // "bloqueia depois de navegar entre várias páginas" (clone fantasma stale).
+    return () => {
+      try {
+        dispose?.();
+      } catch {
+        /* ignora */
+      }
+    };
   }, [lenis, lang, pathname, router]);
 
   return null;
