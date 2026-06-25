@@ -1,21 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useLang } from "@/lib/language-context";
 
 /**
  * HeroMontage — o "match-cut trailer" como PRIMEIRO vídeo do hero.
  *
- * Vive DENTRO do HeroReel, como uma camada (z-15) por baixo do logo (z-20): o
- * logo e o header ficam visíveis o tempo todo, o match-cut toca atrás deles, e
- * no fim dissolve para o reel normal (que monta por baixo).
+ * Vive DENTRO do HeroReel, como uma camada (z-15) que dissolve para o reel no
+ * fim. SEM TEXTO (pedido do cliente: "sem NENHUM texto") — é dinâmica de vídeo
+ * pura: cortes rápidos entre os 4 nichos.
  *
  * DESKTOP: cortes em VÍDEO. MOBILE: cortes nas IMAGENS-poster — os browsers de
  * telemóvel não tocam 4 vídeos em simultâneo de forma fiável (ficava preto/
  * engasgado); as imagens são leves e o "whip" dá a mesma energia. Toca uma vez.
  */
-
-const ACCENT = "#e85d3a";
 
 const CLIPS = [
   { src: "/hero/1corp.mp4", poster: "/hero/1corp.jpg" }, // 0
@@ -50,13 +47,11 @@ function detectMobile() {
 }
 
 export function HeroMontage({ onDone }: { onDone: () => void }) {
-  const { lang } = useLang();
   // HeroMontage só monta no cliente (playMontage começa false no SSR), por isso
   // ler `window` aqui é seguro (sem mismatch de hidratação).
   const [isMobile] = useState(detectMobile);
 
   const mediaRef = useRef<(HTMLVideoElement | HTMLImageElement | null)[]>([]);
-  const kickerRef = useRef<HTMLSpanElement>(null);
   const intervalRef = useRef<number | null>(null);
   const exitRef = useRef<number | null>(null);
 
@@ -125,7 +120,7 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
     };
   }, [isMobile]);
 
-  // corte (opacidade) + whip + palavra a cada beat
+  // corte (opacidade) + whip a cada beat (sem texto)
   useEffect(() => {
     if (exiting) return;
     const v = SEQ[beat].v;
@@ -140,13 +135,6 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
         { duration: 550, easing: "cubic-bezier(.2,.8,.2,1)" },
       );
     }
-    kickerRef.current?.animate(
-      [
-        { opacity: 0, transform: "translateY(16px)" },
-        { opacity: 1, transform: "translateY(0)" },
-      ],
-      { duration: 500, easing: "ease", fill: "backwards" },
-    );
   }, [beat, exiting]);
 
   const current = SEQ[beat];
@@ -203,7 +191,7 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
         ),
       )}
 
-      {/* scrim — legibilidade da palavra (coerente com o scrim do hero) */}
+      {/* scrim — coerente com o scrim do hero */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -211,24 +199,6 @@ export function HeroMontage({ onDone }: { onDone: () => void }) {
             "linear-gradient(180deg,rgba(10,10,10,.4),transparent 38%,rgba(10,10,10,.55))",
         }}
       />
-
-      {/* palavra do corte — contentor com altura do VIEWPORT (100svh) e alinhado
-          em baixo, para a palavra ficar SEMPRE visível (o hero é mais alto que o
-          ecrã). Centrada por flex; line-height com folga p/ acentos (Ã, Ç). */}
-      <div className="absolute inset-x-0 top-0 h-[100svh] flex items-end justify-center pb-[18svh] px-6 pointer-events-none">
-        <span
-          ref={kickerRef}
-          className="inline-block font-display uppercase text-center leading-[1.08]"
-          style={{
-            fontSize: "clamp(1.5rem,6vw,4rem)",
-            color: current.accent ? ACCENT : "#fff",
-            textShadow: "0 4px 24px rgba(0,0,0,.55)",
-            maxWidth: "92vw",
-          }}
-        >
-          {current[lang] ?? current.pt}
-        </span>
-      </div>
     </div>
   );
 }

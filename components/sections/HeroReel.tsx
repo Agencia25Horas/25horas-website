@@ -53,7 +53,6 @@ const N = VIDEOS.length;
 const FADE_MS = 600; // fade de áudio + grayscale
 const XFADE_MS = 500; // crossfade entre vídeos
 const VIDEO_PARALLAX = 0.12; // depth do vídeo (fundo, move devagar)
-const LOGO_PARALLAX = 0.3; // depth do logo (move mais → proximidade)
 const OVERSCAN = 24; // % que a camada de vídeo estica além do hero (sem gap)
 
 const SpeakerOn = () => (
@@ -68,9 +67,9 @@ const SpeakerOff = () => (
 );
 export function HeroReel({
   logoSrc = "/media/logos/b25agency.webp",
-  heroLines = [],
 }: {
   logoSrc?: string;
+  /** Mantido por compat com HomeView — já não é renderizado (cliente: sem texto). */
   heroLines?: string[];
 }) {
   const { lang } = useLang();
@@ -84,7 +83,6 @@ export function HeroReel({
     [],
   );
   const parallaxRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
 
   const [slots, setSlots] = useState<[number, number]>([0, 1]);
@@ -98,6 +96,11 @@ export function HeroReel({
   const [fbIdx, setFbIdx] = useState(0);
   // Match-cut de abertura: 1.º "vídeo" do hero. Decidido no mount.
   const [playMontage, setPlayMontage] = useState(false);
+  // Relógio 25:00:SS do REC bug (canto inf. direito).
+  const [clock, setClock] = useState("25:00:00");
+  // Revelação one-time do logótipo central depois da intro → handoff p/ o header.
+  const [reveal, setReveal] = useState<"off" | "hidden" | "in" | "out">("off");
+  const montageDidPlay = useRef(false);
 
   // espelhos para os handlers (evita closures obsoletos)
   const mutedRef = useRef(muted);
@@ -326,6 +329,56 @@ export function HeroReel({
     };
   }, []);
 
+  // ── relógio 25:00:SS do REC bug ─────────────────────────────────
+  useEffect(() => {
+    const tick = () =>
+      setClock("25:00:" + String(new Date().getSeconds()).padStart(2, "0"));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // ── revelação do logótipo central + HANDOFF para o header ────────
+  // O logo do HEADER começa escondido (classe `hero-intro` posta antes do paint
+  // pelo script em layout.tsx). Aqui removemo-la no instante em que o logótipo
+  // central se dissolve → o do header faz fade-in (o "handoff" pedido).
+  const revealHeaderLogo = useCallback(() => {
+    if (typeof document !== "undefined")
+      document.documentElement.classList.remove("hero-intro");
+  }, []);
+
+  useEffect(() => {
+    if (playMontage) {
+      montageDidPlay.current = true;
+      return;
+    }
+    if (!montageDidPlay.current) {
+      // intro não tocou (reduced-motion / ligação lenta / re-navegação) → mostra
+      // já o logo do header, sem revelação central.
+      revealHeaderLogo();
+      return;
+    }
+    // a intro acabou agora → logótipo central entra e dissolve-se; ao sair, o
+    // logótipo do header entra no canto sup. esquerdo (handoff).
+    setReveal("hidden");
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => setReveal("in")),
+    );
+    const tOut = window.setTimeout(() => {
+      setReveal("out");
+      revealHeaderLogo();
+    }, 1800);
+    const tDone = window.setTimeout(() => setReveal("off"), 1800 + 950);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(tOut);
+      clearTimeout(tDone);
+    };
+  }, [playMontage, revealHeaderLogo]);
+
+  // Sair da home a meio da intro não pode deixar o logo do header escondido.
+  useEffect(() => () => revealHeaderLogo(), [revealHeaderLogo]);
+
   // ciclo de posters no modo fallback
   useEffect(() => {
     if (!fallback) return;
@@ -342,15 +395,8 @@ export function HeroReel({
       if (raf) return;
       raf = requestAnimationFrame(() => {
         const y = window.scrollY || 0;
-        const vh = window.innerHeight || 1;
         const vid = parallaxRef.current;
-        const logo = logoRef.current;
         if (vid) vid.style.transform = `translate3d(0,${y * VIDEO_PARALLAX}px,0)`;
-        if (logo) {
-          const p = Math.min(1, Math.max(0, (y / vh - 0.5) / 0.5));
-          logo.style.transform = `translate3d(0,${y * LOGO_PARALLAX}px,0)`;
-          logo.style.opacity = String(1 - p * 0.4); // 1 → 0.6 após 50%
-        }
         raf = 0;
       });
     };
@@ -580,39 +626,59 @@ export function HeroReel({
             para o reel quando termina. O logo (z-20) fica fixo por cima. ── */}
       {playMontage && <HeroMontage onDone={() => setPlayMontage(false)} />}
 
-      {/* ── Logo (z-20) + tagline — depth próprio (move mais + fade) ── */}
-      <div
-        ref={logoRef}
-        className="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 pb-[9svh] md:pb-[11svh] pointer-events-none will-change-transform"
-      >
-        <div className="relative w-[min(74vw,720px)] aspect-[3/2]">
-          <Image
-            src={logoSrc}
-            alt="25 Horas Agency"
-            fill
-            priority
-            sizes="(min-width: 768px) 720px, 74vw"
-            quality={75}
-            className="object-contain drop-shadow-[0_8px_30px_rgba(0,0,0,0.55)]"
-          />
-        </div>
-        {!playMontage && heroLines.length > 0 && (
-          <div className="-mt-1 md:mt-0 text-center max-w-2xl">
-            {heroLines.map((line, i) => (
-              <p
-                key={i}
-                className={`font-display uppercase leading-tight text-canvas-white ${
-                  i === heroLines.length - 1
-                    ? "mt-1 text-[clamp(0.8rem,1.6vw,1.15rem)] text-canvas-white/75"
-                    : "text-[clamp(0.95rem,1.9vw,1.4rem)]"
-                }`}
-              >
-                {line}
-              </p>
-            ))}
+      {/* ── Revelação one-time do logótipo (z-30, data-no-clone): aparece no
+            centro depois da intro e DISSOLVE-SE; nesse instante o logótipo do
+            HEADER entra no canto sup. esquerdo (handoff). Sem texto. ── */}
+      {reveal !== "off" && (
+        <div
+          aria-hidden
+          data-no-clone
+          className="absolute inset-x-0 top-0 h-[100svh] z-30 flex items-center justify-center px-6 pointer-events-none"
+        >
+          <div
+            className="relative w-[min(56vw,440px)] aspect-[3/2] will-change-transform"
+            style={{
+              opacity: reveal === "in" ? 1 : 0,
+              transform: reveal === "out" ? "scale(1.12)" : "scale(1)",
+              filter: reveal === "out" ? "blur(8px)" : "blur(0)",
+              transition:
+                "opacity 800ms ease, transform 900ms cubic-bezier(.7,0,.2,1), filter 900ms ease",
+            }}
+          >
+            <Image
+              src={logoSrc}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 768px) 440px, 56vw"
+              quality={80}
+              className="object-contain drop-shadow-[0_10px_34px_rgba(0,0,0,0.6)]"
+            />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* ── REC + relógio 25:00:SS (z-12, canto inf. direito). Fica por baixo da
+            intro (z-15): aparece quando a intro se dissolve. No clone (intro
+            removida) está sempre visível. ── */}
+      {!fallback && (
+        <div
+          aria-hidden
+          className="absolute z-[12] bottom-[16svh] right-6 md:bottom-[19svh] md:right-12 flex items-center gap-2.5 font-mono tabular-nums text-[12px] md:text-[13px] tracking-[0.14em] text-canvas-white/90"
+        >
+          <span
+            className="w-2 h-2 rounded-full bg-signal-live"
+            style={{
+              boxShadow: "0 0 10px var(--signal-live)",
+              animation: "heroRecBlink 1.1s steps(2) infinite",
+            }}
+          />
+          <span className="text-canvas-white/65">REC</span>
+          <span className="text-accent-grade font-medium tracking-[0.06em]">
+            {clock}
+          </span>
+        </div>
+      )}
 
       {/* ── Setas prev/next (z-20) — saltar vídeos do hero ── */}
       {!fallback && (
@@ -666,7 +732,7 @@ export function HeroReel({
                   ? "Turn sound off"
                   : "Desligar som"
           }
-          className="absolute z-20 bottom-[16svh] right-6 md:bottom-[19svh] md:right-12 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
+          className="absolute z-20 bottom-[16svh] left-6 md:bottom-[19svh] md:left-12 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
         >
           {muted ? <SpeakerOff /> : <SpeakerOn />}
         </button>
