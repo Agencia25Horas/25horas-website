@@ -115,9 +115,9 @@ export function HeroReel({
   const slotsRef = useRef(slots);
   slotsRef.current = slots;
 
-  // Desktop: cor segue o hover (b&w por defeito, cor ao passar o rato — mesmo
-  // em mute). Mobile (sem hover): SEMPRE com cor, nunca fica cinzento.
-  const colorOn = !hasHover || hovering;
+  // SEMPRE a cores (pedido do cliente: "o vídeo deve vir a cores"). Mantemos o
+  // tracking de hover para o áudio/clone, mas a cor já não depende dele.
+  const colorOn = true;
 
   // ── fade de áudio (helper) ──────────────────────────────────────
   const fadeAudio = useCallback(
@@ -307,6 +307,7 @@ export function HeroReel({
     if (!reduce && !slow) {
       window.__montageActive = true; // desliga o teleporte do scroll já no arranque
       setPlayMontage(true);
+      startCenterLogo(); // logótipo aparece JÁ no centro, por cima da montagem
     } else {
       showHeaderLogo(); // sem montage → logo do header visível já (sem handoff)
     }
@@ -357,21 +358,31 @@ export function HeroReel({
   }, []);
 
   const revealTimers = useRef<number[]>([]);
-  const startReveal = useCallback(() => {
+  const handoffStarted = useRef(false);
+
+  // HANDOFF: o logótipo central dissolve-se e, no mesmo instante, o logótipo do
+  // HEADER acende no canto sup. esquerdo. Disparado pelo fim do match-cut.
+  const finishHandoff = useCallback(() => {
+    if (handoffStarted.current) return;
+    handoffStarted.current = true;
+    setReveal("out");
+    revealHeaderLogo();
+    const t = window.setTimeout(() => setReveal("off"), 950);
+    revealTimers.current.push(t);
+  }, [revealHeaderLogo]);
+
+  // Mostra o logótipo JÁ no centro (camada por CIMA da montagem) no arranque.
+  const startCenterLogo = useCallback(() => {
     setReveal("hidden");
     requestAnimationFrame(() =>
       requestAnimationFrame(() => setReveal("in")),
     );
-    const t1 = window.setTimeout(() => {
-      setReveal("out");
-      revealHeaderLogo(); // handoff: o header acende quando o central dissolve
-    }, 1800);
-    const t2 = window.setTimeout(() => setReveal("off"), 2750);
-    revealTimers.current.push(t1, t2);
-  }, [revealHeaderLogo]);
+    // rede de segurança: se o onDone do match-cut falhar, faz o handoff à mesma.
+    const safety = window.setTimeout(() => finishHandoff(), 12000);
+    revealTimers.current.push(safety);
+  }, [finishHandoff]);
 
-  // Ao desmontar (sair da home): limpa timers e garante o logo do header
-  // visível nas outras páginas.
+  // Ao desmontar (sair da home): limpa timers e garante o logo do header visível.
   useEffect(
     () => () => {
       revealTimers.current.forEach((t) => clearTimeout(t));
@@ -550,7 +561,7 @@ export function HeroReel({
           fill
           priority
           sizes="100vw"
-          className="object-cover grayscale transition-opacity duration-700"
+          className="object-cover transition-opacity duration-700"
         />
       ) : (
         <div
@@ -629,7 +640,7 @@ export function HeroReel({
         <HeroMontage
           onDone={() => {
             setPlayMontage(false);
-            startReveal();
+            finishHandoff();
           }}
         />
       )}
@@ -643,18 +654,19 @@ export function HeroReel({
           data-no-clone
           className="absolute inset-0 z-30 flex items-center justify-center px-6 pointer-events-none"
         >
-          {/* véu escuro p/ o logótipo (contorno branco) ler bem sobre o vídeo */}
+          {/* vinheta LOCALIZADA: o logótipo (contorno branco) lê-se bem, mas a
+              dinâmica do vídeo continua visível à volta (não escurece o ecrã) */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(120% 80% at 50% 46%, rgba(10,10,10,.82), rgba(10,10,10,.55) 55%, rgba(10,10,10,.25))",
+                "radial-gradient(46% 46% at 50% 48%, rgba(10,10,10,.8), rgba(10,10,10,.4) 55%, transparent 80%)",
               opacity: reveal === "in" ? 1 : 0,
               transition: "opacity 700ms ease",
             }}
           />
           <div
-            className="relative w-[min(64vw,420px)] aspect-[3/2] will-change-transform"
+            className="relative w-[min(60vw,380px)] aspect-[3/2] will-change-transform"
             style={{
               opacity: reveal === "in" ? 1 : 0,
               transform: reveal === "out" ? "scale(1.1)" : "scale(1)",
@@ -668,21 +680,20 @@ export function HeroReel({
               alt=""
               fill
               priority
-              sizes="(min-width: 768px) 420px, 64vw"
+              sizes="(min-width: 768px) 380px, 60vw"
               quality={90}
-              className="object-contain drop-shadow-[0_10px_34px_rgba(0,0,0,0.6)]"
+              className="object-contain drop-shadow-[0_8px_30px_rgba(0,0,0,0.7)]"
             />
           </div>
         </div>
       )}
 
-      {/* ── REC + relógio 25:00:SS (z-12, canto inf. direito). Fica por baixo da
-            intro (z-15): aparece quando a intro se dissolve. No clone (intro
-            removida) está sempre visível. ── */}
+      {/* ── REC + relógio 25:00:SS (z-40 — SEMPRE por CIMA do vídeo e da intro,
+            canto inf. direito, acima do StickyCTA em mobile/tablet). ── */}
       {!fallback && (
         <div
           aria-hidden
-          className="absolute z-[12] bottom-[92px] right-5 lg:bottom-9 lg:right-10 flex items-center gap-2.5 font-mono tabular-nums text-[12px] md:text-[13px] tracking-[0.14em] text-canvas-white/90"
+          className="absolute z-40 bottom-[92px] right-5 lg:bottom-9 lg:right-10 flex items-center gap-2.5 font-mono tabular-nums text-[12px] md:text-[13px] tracking-[0.14em] text-canvas-white/90"
         >
           <span
             className="w-2 h-2 rounded-full bg-signal-live"
@@ -750,7 +761,7 @@ export function HeroReel({
                   ? "Turn sound off"
                   : "Desligar som"
           }
-          className="absolute z-20 bottom-[92px] left-5 lg:bottom-9 lg:left-10 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
+          className="absolute z-40 bottom-[92px] left-5 lg:bottom-9 lg:left-10 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
         >
           {muted ? <SpeakerOff /> : <SpeakerOn />}
         </button>

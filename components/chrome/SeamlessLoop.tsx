@@ -134,7 +134,7 @@ export function SeamlessLoop() {
     // Estado de cor: desktop (hover) = P&B em repouso → cor no hover; mobile (sem
     // hover) = sempre cor. O toggle no hover do clone espelha o hero REAL (áudio +
     // cor via __heroHover); o vídeo VIVO do clone permanece SEMPRE mudo.
-    const restFilter = hoverCapable ? "grayscale(1)" : "grayscale(0)";
+    const restFilter = "grayscale(0)"; // hero sempre a cores (alinhado c/ o real)
     const setCloneFilter = (f: string) =>
       heroCloneVideos.forEach((v) => {
         (v as HTMLVideoElement).style.filter = f;
