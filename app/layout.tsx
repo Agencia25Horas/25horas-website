@@ -172,22 +172,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: "html.cc-consented .cookie-banner{display:none!important}",
           }}
         />
-        {/* Handoff do logótipo: na home (sem reduced-motion / ligação lenta)
-            esconde o logo do HEADER antes do paint. O HeroReel revela-o no
-            instante em que o logótipo central se dissolve (remove a classe). */}
-        <script
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var c=navigator.connection;if(location.pathname==='/'&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&!(c&&(c.saveData||['slow-2g','2g','3g'].indexOf(c.effectiveType)>=0)))document.documentElement.classList.add('hero-intro')}catch(e){}",
-          }}
-        />
-        <style
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: "html.hero-intro #main-header .hdr-logo{opacity:0}",
-          }}
-        />
       </head>
       <body
         className="font-body bg-canvas-black text-canvas-white antialiased"

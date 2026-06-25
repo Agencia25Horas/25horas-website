@@ -98,8 +98,6 @@ export function HeroReel({
   const [playMontage, setPlayMontage] = useState(false);
   // Relógio 25:00:SS do REC bug (canto inf. direito).
   const [clock, setClock] = useState("25:00:00");
-  // Revelação one-time do logótipo central depois da intro → handoff p/ o header.
-  const [reveal, setReveal] = useState<"off" | "hidden" | "in" | "out">("off");
 
   // espelhos para os handlers (evita closures obsoletos)
   const mutedRef = useRef(muted);
@@ -285,14 +283,7 @@ export function HeroReel({
   // Antes do paint p/ não piscar o hero normal. Salta em reduced-motion /
   // ligação lenta (aí o hero já cai para posters).
   useIsoLayoutEffect(() => {
-    // Mostra o logo do header (tira o gate `hero-intro`). Inline porque o
-    // revealHeaderLogo (useCallback) ainda não está no closure deste efeito.
-    const showHeaderLogo = () =>
-      document.documentElement.classList.remove("hero-intro");
-    if (montagePlayed) {
-      showHeaderLogo(); // re-navegação p/ home: sem montage → mostra já o logo
-      return;
-    }
+    if (montagePlayed) return;
     montagePlayed = true;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const conn = (
@@ -307,9 +298,6 @@ export function HeroReel({
     if (!reduce && !slow) {
       window.__montageActive = true; // desliga o teleporte do scroll já no arranque
       setPlayMontage(true);
-      startCenterLogo(); // logótipo aparece JÁ no centro, por cima da montagem
-    } else {
-      showHeaderLogo(); // sem montage → logo do header visível já (sem handoff)
     }
   }, []);
 
@@ -346,51 +334,6 @@ export function HeroReel({
     const id = window.setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-
-  // ── revelação do logótipo central + HANDOFF para o header ────────
-  // Disparada pelo onDone do match-cut (determinístico — sem corrida de
-  // efeitos). O logo do HEADER começa escondido (classe `hero-intro` posta
-  // antes do paint em layout.tsx); removemo-la quando o logótipo central se
-  // dissolve → o do header faz fade-in no canto sup. esquerdo.
-  const revealHeaderLogo = useCallback(() => {
-    if (typeof document !== "undefined")
-      document.documentElement.classList.remove("hero-intro");
-  }, []);
-
-  const revealTimers = useRef<number[]>([]);
-  const handoffStarted = useRef(false);
-
-  // HANDOFF: o logótipo central dissolve-se e, no mesmo instante, o logótipo do
-  // HEADER acende no canto sup. esquerdo. Disparado pelo fim do match-cut.
-  const finishHandoff = useCallback(() => {
-    if (handoffStarted.current) return;
-    handoffStarted.current = true;
-    setReveal("out");
-    revealHeaderLogo();
-    const t = window.setTimeout(() => setReveal("off"), 950);
-    revealTimers.current.push(t);
-  }, [revealHeaderLogo]);
-
-  // Mostra o logótipo JÁ no centro (camada por CIMA da montagem) no arranque, e
-  // faz o handoff ~2s depois (pedido: o logótipo NÃO fica o vídeo todo). O
-  // onDone do match-cut é só fallback — finishHandoff é idempotente.
-  const startCenterLogo = useCallback(() => {
-    setReveal("hidden");
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => setReveal("in")),
-    );
-    const t = window.setTimeout(() => finishHandoff(), 2200);
-    revealTimers.current.push(t);
-  }, [finishHandoff]);
-
-  // Ao desmontar (sair da home): limpa timers e garante o logo do header visível.
-  useEffect(
-    () => () => {
-      revealTimers.current.forEach((t) => clearTimeout(t));
-      revealHeaderLogo();
-    },
-    [revealHeaderLogo],
-  );
 
   // ciclo de posters no modo fallback
   useEffect(() => {
@@ -637,57 +580,7 @@ export function HeroReel({
 
       {/* ── Match-cut de abertura (z-15): toca por baixo do logo e dissolve
             para o reel quando termina. O logo (z-20) fica fixo por cima. ── */}
-      {playMontage && (
-        <HeroMontage
-          onDone={() => {
-            setPlayMontage(false);
-            finishHandoff();
-          }}
-        />
-      )}
-
-      {/* ── Revelação one-time do logótipo (z-30, data-no-clone): aparece no
-            centro depois da intro e DISSOLVE-SE; nesse instante o logótipo do
-            HEADER entra no canto sup. esquerdo (handoff). Sem texto. ── */}
-      {reveal !== "off" && (
-        <div
-          aria-hidden
-          data-no-clone
-          className="absolute inset-0 z-30 flex items-center justify-center px-6 pointer-events-none"
-        >
-          {/* vinheta LOCALIZADA: o logótipo (contorno branco) lê-se bem, mas a
-              dinâmica do vídeo continua visível à volta (não escurece o ecrã) */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(46% 46% at 50% 48%, rgba(10,10,10,.8), rgba(10,10,10,.4) 55%, transparent 80%)",
-              opacity: reveal === "in" ? 1 : 0,
-              transition: "opacity 700ms ease",
-            }}
-          />
-          <div
-            className="relative w-[min(60vw,380px)] aspect-[3/2] will-change-transform"
-            style={{
-              opacity: reveal === "in" ? 1 : 0,
-              transform: reveal === "out" ? "scale(1.1)" : "scale(1)",
-              filter: reveal === "out" ? "blur(8px)" : "blur(0)",
-              transition:
-                "opacity 700ms ease, transform 900ms cubic-bezier(.7,0,.2,1), filter 900ms ease",
-            }}
-          >
-            <Image
-              src={logoSrc}
-              alt=""
-              fill
-              priority
-              sizes="(min-width: 768px) 380px, 60vw"
-              quality={90}
-              className="object-contain drop-shadow-[0_8px_30px_rgba(0,0,0,0.7)]"
-            />
-          </div>
-        </div>
-      )}
+      {playMontage && <HeroMontage onDone={() => setPlayMontage(false)} />}
 
       {/* ── REC + relógio 25:00:SS (z-40 — SEMPRE por CIMA do vídeo e da intro,
             canto inf. direito, acima do StickyCTA em mobile/tablet). ── */}

@@ -81,13 +81,7 @@ body {
 }
 
 
-/* ─── Hero: handoff do logótipo (header) + REC bug ────────────────────── */
-/* O logo do header começa escondido na home (classe `hero-intro` no <html>,
-   posta antes do paint em layout.tsx) e faz fade-in quando o HeroReel a remove
-   — no instante em que o logótipo central se dissolve. */
-#main-header .hdr-logo {
-  transition: opacity 0.8s ease;
-}
+/* ─── Hero: REC bug (pisca) ───────────────────────────────────────────── */
 @keyframes heroRecBlink {
   50% {
     opacity: 0.2;

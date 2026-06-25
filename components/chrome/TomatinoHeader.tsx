@@ -57,7 +57,7 @@ export function TomatinoHeader() {
             href="/"
             aria-label={t("chrome.inicio")}
             onClick={() => setOpen(false)}
-            className="hdr-logo inline-flex items-center -ml-1 md:-ml-2 shrink-0"
+            className="inline-flex items-center -ml-1 md:-ml-2 shrink-0"
           >
             <div className="relative h-20 md:h-24 w-[200px] md:w-[260px] flex items-center justify-start">
               <Image
