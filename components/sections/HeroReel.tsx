@@ -100,7 +100,6 @@ export function HeroReel({
   const [clock, setClock] = useState("25:00:00");
   // Revelação one-time do logótipo central depois da intro → handoff p/ o header.
   const [reveal, setReveal] = useState<"off" | "hidden" | "in" | "out">("off");
-  const montageDidPlay = useRef(false);
 
   // espelhos para os handlers (evita closures obsoletos)
   const mutedRef = useRef(muted);
@@ -286,7 +285,14 @@ export function HeroReel({
   // Antes do paint p/ não piscar o hero normal. Salta em reduced-motion /
   // ligação lenta (aí o hero já cai para posters).
   useIsoLayoutEffect(() => {
-    if (montagePlayed) return;
+    // Mostra o logo do header (tira o gate `hero-intro`). Inline porque o
+    // revealHeaderLogo (useCallback) ainda não está no closure deste efeito.
+    const showHeaderLogo = () =>
+      document.documentElement.classList.remove("hero-intro");
+    if (montagePlayed) {
+      showHeaderLogo(); // re-navegação p/ home: sem montage → mostra já o logo
+      return;
+    }
     montagePlayed = true;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const conn = (
@@ -301,6 +307,8 @@ export function HeroReel({
     if (!reduce && !slow) {
       window.__montageActive = true; // desliga o teleporte do scroll já no arranque
       setPlayMontage(true);
+    } else {
+      showHeaderLogo(); // sem montage → logo do header visível já (sem handoff)
     }
   }, []);
 
@@ -339,45 +347,38 @@ export function HeroReel({
   }, []);
 
   // ── revelação do logótipo central + HANDOFF para o header ────────
-  // O logo do HEADER começa escondido (classe `hero-intro` posta antes do paint
-  // pelo script em layout.tsx). Aqui removemo-la no instante em que o logótipo
-  // central se dissolve → o do header faz fade-in (o "handoff" pedido).
+  // Disparada pelo onDone do match-cut (determinístico — sem corrida de
+  // efeitos). O logo do HEADER começa escondido (classe `hero-intro` posta
+  // antes do paint em layout.tsx); removemo-la quando o logótipo central se
+  // dissolve → o do header faz fade-in no canto sup. esquerdo.
   const revealHeaderLogo = useCallback(() => {
     if (typeof document !== "undefined")
       document.documentElement.classList.remove("hero-intro");
   }, []);
 
-  useEffect(() => {
-    if (playMontage) {
-      montageDidPlay.current = true;
-      return;
-    }
-    if (!montageDidPlay.current) {
-      // intro não tocou (reduced-motion / ligação lenta / re-navegação) → mostra
-      // já o logo do header, sem revelação central.
-      revealHeaderLogo();
-      return;
-    }
-    // a intro acabou agora → logótipo central entra e dissolve-se; ao sair, o
-    // logótipo do header entra no canto sup. esquerdo (handoff).
+  const revealTimers = useRef<number[]>([]);
+  const startReveal = useCallback(() => {
     setReveal("hidden");
-    const raf = requestAnimationFrame(() =>
+    requestAnimationFrame(() =>
       requestAnimationFrame(() => setReveal("in")),
     );
-    const tOut = window.setTimeout(() => {
+    const t1 = window.setTimeout(() => {
       setReveal("out");
-      revealHeaderLogo();
+      revealHeaderLogo(); // handoff: o header acende quando o central dissolve
     }, 1800);
-    const tDone = window.setTimeout(() => setReveal("off"), 1800 + 950);
-    return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(tOut);
-      clearTimeout(tDone);
-    };
-  }, [playMontage, revealHeaderLogo]);
+    const t2 = window.setTimeout(() => setReveal("off"), 2750);
+    revealTimers.current.push(t1, t2);
+  }, [revealHeaderLogo]);
 
-  // Sair da home a meio da intro não pode deixar o logo do header escondido.
-  useEffect(() => () => revealHeaderLogo(), [revealHeaderLogo]);
+  // Ao desmontar (sair da home): limpa timers e garante o logo do header
+  // visível nas outras páginas.
+  useEffect(
+    () => () => {
+      revealTimers.current.forEach((t) => clearTimeout(t));
+      revealHeaderLogo();
+    },
+    [revealHeaderLogo],
+  );
 
   // ciclo de posters no modo fallback
   useEffect(() => {
@@ -537,7 +538,7 @@ export function HeroReel({
       ref={heroRef}
       aria-label="25 Horas Agency"
       data-hero-reel="true"
-      className="relative w-full h-[110svh] md:h-[115svh] min-h-[640px] overflow-hidden bg-canvas-black"
+      className="relative w-full h-[100svh] min-h-[600px] overflow-hidden bg-canvas-black"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
@@ -624,7 +625,14 @@ export function HeroReel({
 
       {/* ── Match-cut de abertura (z-15): toca por baixo do logo e dissolve
             para o reel quando termina. O logo (z-20) fica fixo por cima. ── */}
-      {playMontage && <HeroMontage onDone={() => setPlayMontage(false)} />}
+      {playMontage && (
+        <HeroMontage
+          onDone={() => {
+            setPlayMontage(false);
+            startReveal();
+          }}
+        />
+      )}
 
       {/* ── Revelação one-time do logótipo (z-30, data-no-clone): aparece no
             centro depois da intro e DISSOLVE-SE; nesse instante o logótipo do
@@ -633,16 +641,26 @@ export function HeroReel({
         <div
           aria-hidden
           data-no-clone
-          className="absolute inset-x-0 top-0 h-[100svh] z-30 flex items-center justify-center px-6 pointer-events-none"
+          className="absolute inset-0 z-30 flex items-center justify-center px-6 pointer-events-none"
         >
+          {/* véu escuro p/ o logótipo (contorno branco) ler bem sobre o vídeo */}
           <div
-            className="relative w-[min(56vw,440px)] aspect-[3/2] will-change-transform"
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(120% 80% at 50% 46%, rgba(10,10,10,.82), rgba(10,10,10,.55) 55%, rgba(10,10,10,.25))",
+              opacity: reveal === "in" ? 1 : 0,
+              transition: "opacity 700ms ease",
+            }}
+          />
+          <div
+            className="relative w-[min(64vw,420px)] aspect-[3/2] will-change-transform"
             style={{
               opacity: reveal === "in" ? 1 : 0,
-              transform: reveal === "out" ? "scale(1.12)" : "scale(1)",
+              transform: reveal === "out" ? "scale(1.1)" : "scale(1)",
               filter: reveal === "out" ? "blur(8px)" : "blur(0)",
               transition:
-                "opacity 800ms ease, transform 900ms cubic-bezier(.7,0,.2,1), filter 900ms ease",
+                "opacity 700ms ease, transform 900ms cubic-bezier(.7,0,.2,1), filter 900ms ease",
             }}
           >
             <Image
@@ -650,8 +668,8 @@ export function HeroReel({
               alt=""
               fill
               priority
-              sizes="(min-width: 768px) 440px, 56vw"
-              quality={80}
+              sizes="(min-width: 768px) 420px, 64vw"
+              quality={90}
               className="object-contain drop-shadow-[0_10px_34px_rgba(0,0,0,0.6)]"
             />
           </div>
@@ -664,7 +682,7 @@ export function HeroReel({
       {!fallback && (
         <div
           aria-hidden
-          className="absolute z-[12] bottom-[16svh] right-6 md:bottom-[19svh] md:right-12 flex items-center gap-2.5 font-mono tabular-nums text-[12px] md:text-[13px] tracking-[0.14em] text-canvas-white/90"
+          className="absolute z-[12] bottom-[92px] right-5 lg:bottom-9 lg:right-10 flex items-center gap-2.5 font-mono tabular-nums text-[12px] md:text-[13px] tracking-[0.14em] text-canvas-white/90"
         >
           <span
             className="w-2 h-2 rounded-full bg-signal-live"
@@ -732,7 +750,7 @@ export function HeroReel({
                   ? "Turn sound off"
                   : "Desligar som"
           }
-          className="absolute z-20 bottom-[16svh] left-6 md:bottom-[19svh] md:left-12 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
+          className="absolute z-20 bottom-[92px] left-5 lg:bottom-9 lg:left-10 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
         >
           {muted ? <SpeakerOff /> : <SpeakerOn />}
         </button>
