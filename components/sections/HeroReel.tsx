@@ -371,15 +371,16 @@ export function HeroReel({
     revealTimers.current.push(t);
   }, [revealHeaderLogo]);
 
-  // Mostra o logótipo JÁ no centro (camada por CIMA da montagem) no arranque.
+  // Mostra o logótipo JÁ no centro (camada por CIMA da montagem) no arranque, e
+  // faz o handoff ~2s depois (pedido: o logótipo NÃO fica o vídeo todo). O
+  // onDone do match-cut é só fallback — finishHandoff é idempotente.
   const startCenterLogo = useCallback(() => {
     setReveal("hidden");
     requestAnimationFrame(() =>
       requestAnimationFrame(() => setReveal("in")),
     );
-    // rede de segurança: se o onDone do match-cut falhar, faz o handoff à mesma.
-    const safety = window.setTimeout(() => finishHandoff(), 12000);
-    revealTimers.current.push(safety);
+    const t = window.setTimeout(() => finishHandoff(), 2200);
+    revealTimers.current.push(t);
   }, [finishHandoff]);
 
   // Ao desmontar (sair da home): limpa timers e garante o logo do header visível.
