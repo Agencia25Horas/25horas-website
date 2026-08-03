@@ -22,6 +22,8 @@ type Body = {
   email?: string;
   phone?: string;
   company?: string;
+  /** Mensagem livre (opcional) — a ideia/contexto do projeto. */
+  message?: string;
   /** Honeypot — bots tendem a preencher. */
   website?: string;
   /** Timestamp (ms) do mount do form, para detetar submissões instantâneas. */
@@ -62,6 +64,7 @@ function logLead(reason: string, b: Body) {
       email: b.email,
       phone: b.phone,
       company: b.company,
+      message: b.message,
     }),
   );
 }
@@ -107,6 +110,13 @@ function htmlBody(b: Body) {
       ${row("Email", b.email)}
       ${row("Telefone", b.phone)}
       ${row("Empresa", b.company)}
+      ${
+        b.message
+          ? `<tr><td style="padding:8px 12px;color:#666;font-family:sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;vertical-align:top;width:160px">A ideia</td><td style="padding:8px 12px;color:#111;font-family:sans-serif;font-size:14px;white-space:pre-wrap">${escapeHtml(
+              b.message,
+            )}</td></tr>`
+          : ""
+      }
     </table>
     <p style="margin-top:24px;font-family:sans-serif;font-size:12px;color:#999">Enviado via formulário /orcamento — 25horasagency.com</p>
   </div>
@@ -191,6 +201,8 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+  // Mensagem livre: opcional, mas com teto (o form já limita a 2000).
+  body.message = (body.message || "").trim().slice(0, 2000);
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {

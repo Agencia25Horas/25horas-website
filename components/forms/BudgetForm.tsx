@@ -18,6 +18,8 @@ type State = {
   email: string;
   phone: string;
   company: string;
+  /** Mensagem livre (opcional) — a ideia/contexto do projeto. */
+  message: string;
   website: string;
 };
 
@@ -31,6 +33,7 @@ export function BudgetForm() {
     email: "",
     phone: "",
     company: "",
+    message: "",
     website: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -79,6 +82,7 @@ export function BudgetForm() {
           email: s.email,
           phone: s.phone,
           company: s.company,
+          message: s.message,
           website: s.website,
           _t: mountedAt.current,
         }),
@@ -359,6 +363,19 @@ function ContactStep({
           type="text"
           optional
         />
+        <label className="block">
+          <span className="flex items-center justify-between mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-canvas-white/55">
+            <span>{t("orcamento.form.mensagem")}</span>
+            <span className="opacity-60">{t("orcamento.form.opcional")}</span>
+          </span>
+          <textarea
+            value={state.message}
+            onChange={(e) => upd("message", e.target.value)}
+            rows={4}
+            maxLength={2000}
+            className="w-full bg-transparent border border-canvas-white/30 rounded-sm focus:border-canvas-white outline-none font-body text-[clamp(1rem,1.5vw,1.25rem)] text-canvas-white px-3 py-2 transition-colors resize-y"
+          />
+        </label>
 
         {/* Honeypot — invisível */}
         <div
