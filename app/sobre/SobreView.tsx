@@ -6,7 +6,7 @@ import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
 import { useLang } from "@/lib/language-context";
-import { LOGOS } from "@/lib/logos";
+import { LOGOS, logoSrcForLang } from "@/lib/logos";
 import type { SanitySiteContent } from "@/lib/sanity/types";
 
 export function SobreView({
@@ -152,7 +152,7 @@ export function SobreView({
                       <div className="relative aspect-[4/3] flex items-center justify-center p-4 md:p-6 rounded-lg bg-canvas-white/5 border border-canvas-white/10 group-hover:border-canvas-white/30 transition-colors">
                         <div className="relative w-full h-full">
                           <Image
-                            src={logo.src}
+                            src={logoSrcForLang(logo.src, lang)}
                             alt={`${niche.label} — sub-marca 25 Horas Agency`}
                             fill
                             sizes="(min-width: 768px) 30vw, 45vw"

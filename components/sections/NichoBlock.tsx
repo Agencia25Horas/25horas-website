@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ParallaxImage } from "@/components/effects/ParallaxImage";
 import { useLang } from "@/lib/language-context";
-import type { LogoEntry } from "@/lib/logos";
+import { logoSrcForLang, type LogoEntry } from "@/lib/logos";
 import type { Nicho } from "@/lib/servicos";
 
 /** Menu compacto de categorias oferecidas neste nicho. */
@@ -72,7 +72,7 @@ export function NichoBlock({
   photoFit?: "cover" | "contain";
 }) {
   const textOnLeft = alignment === "text-left";
-  const { t, tNiche } = useLang();
+  const { lang, t, tNiche } = useLang();
   const { label, tagline } = tNiche(nicho.slug);
   const accent = nicho.accentColor;
 
@@ -152,7 +152,7 @@ export function NichoBlock({
           {logo && (
             <div className="relative w-[min(80%,600px)] aspect-square drop-shadow-[0_12px_36px_rgba(0,0,0,0.5)]">
               <ParallaxImage
-                src={logo.src}
+                src={logoSrcForLang(logo.src, lang)}
                 alt={`${label} — sub-marca 25 Horas`}
                 sizes="(min-width: 768px) 45vw, 90vw"
                 strength={0.5}

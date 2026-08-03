@@ -9,7 +9,6 @@ import {
 } from "react";
 import Image from "next/image";
 import { useLang } from "@/lib/language-context";
-import { useAudio } from "@/lib/audio-context";
 import { HeroMontage } from "./HeroMontage";
 
 // Flag em memória (não persistida): o match-cut de abertura toca UMA vez por
@@ -50,21 +49,11 @@ const VIDEOS: {
   { src: "/hero/1educ.mp4", poster: "/hero/1educ.jpg" },
 ];
 const N = VIDEOS.length;
-const FADE_MS = 600; // fade de áudio + grayscale
+const FADE_MS = 600; // fade de grayscale
 const XFADE_MS = 500; // crossfade entre vídeos
 const VIDEO_PARALLAX = 0.12; // depth do vídeo (fundo, move devagar)
 const OVERSCAN = 24; // % que a camada de vídeo estica além do hero (sem gap)
 
-const SpeakerOn = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden>
-    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z" />
-  </svg>
-);
-const SpeakerOff = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor" aria-hidden>
-    <path d="M3 9v6h4l5 5V4L7 9H3zm18.3-.7-1.4-1.4L17 9.8 14.2 7l-1.4 1.4L15.6 11l-2.8 2.8 1.4 1.4L17 12.4l2.8 2.8 1.4-1.4L18.4 11l2.9-2.7z" />
-  </svg>
-);
 export function HeroReel({
   logoSrc = "/media/logos/b25agency.webp",
 }: {
@@ -74,7 +63,6 @@ export function HeroReel({
 }) {
   const { lang } = useLang();
   const en = lang === "en";
-  const { duck, registerDucker } = useAudio();
 
   const v0 = useRef<HTMLVideoElement>(null);
   const v1 = useRef<HTMLVideoElement>(null);
@@ -87,9 +75,6 @@ export function HeroReel({
 
   const [slots, setSlots] = useState<[number, number]>([0, 1]);
   const [front, setFront] = useState<0 | 1>(0);
-  // `muted` = o botão de som está em mute. Começa SEMPRE mudo em qualquer
-  // dispositivo — o vídeo só tem som depois de o utilizador tocar no botão.
-  const [muted, setMuted] = useState(true);
   const [hovering, setHovering] = useState(false);
   const [hasHover, setHasHover] = useState(false);
   const [fallback, setFallback] = useState(false);
@@ -100,8 +85,6 @@ export function HeroReel({
   const [clock, setClock] = useState("25:00:00");
 
   // espelhos para os handlers (evita closures obsoletos)
-  const mutedRef = useRef(muted);
-  mutedRef.current = muted;
   const hoveringRef = useRef(hovering);
   hoveringRef.current = hovering;
   const frontRef = useRef(front);
@@ -109,60 +92,12 @@ export function HeroReel({
   const hasHoverRef = useRef(hasHover);
   hasHoverRef.current = hasHover;
   const transitioning = useRef(false);
-  const fadeTimer = useRef<number | null>(null);
   const slotsRef = useRef(slots);
   slotsRef.current = slots;
 
   // SEMPRE a cores (pedido do cliente: "o vídeo deve vir a cores"). Mantemos o
   // tracking de hover para o áudio/clone, mas a cor já não depende dele.
   const colorOn = true;
-
-  // ── fade de áudio (helper) ──────────────────────────────────────
-  const fadeAudio = useCallback(
-    (el: HTMLVideoElement | null, target: number, duration: number) => {
-      if (!el) return;
-      // setInterval (não rAF) → o fade corre de forma fiável e suave em todo o
-      // lado (o rAF pode ser estrangulado e parecer instantâneo).
-      if (fadeTimer.current) clearInterval(fadeTimer.current);
-      const start = el.volume;
-      const t0 = performance.now();
-      if (target > 0) {
-        el.muted = false;
-        // Chrome pausa o vídeo se for desmutado sem nenhum gesto do utilizador
-        // (política de autoplay). Se isso acontecer, volta a mutar e retoma a
-        // reprodução — o vídeo NUNCA pode ficar congelado por causa do som.
-        window.setTimeout(() => {
-          if (el.paused) {
-            el.muted = true;
-            const p = el.play();
-            if (p && typeof p.catch === "function") p.catch(() => {});
-          }
-        }, 60);
-      }
-      const step = () => {
-        const t = Math.min(1, (performance.now() - t0) / duration);
-        el.volume = Math.max(0, Math.min(1, start + (target - start) * t));
-        if (t >= 1) {
-          if (fadeTimer.current) clearInterval(fadeTimer.current);
-          fadeTimer.current = null;
-          if (target === 0) el.muted = true; // só silencia DEPOIS do fade-out
-        }
-      };
-      step(); // primeiro passo imediato
-      fadeTimer.current = window.setInterval(step, 25); // ~40 fps
-    },
-    [],
-  );
-
-  // Caminho ÚNICO do áudio do vídeo da frente: começa SEMPRE em mute em
-  // qualquer dispositivo, e o botão de som é o ÚNICO controlo. O hover só
-  // muda a cor — nunca liga o áudio.
-  const applyAudio = useCallback(() => {
-    const fv = refOf(frontRef.current);
-    if (!fv) return;
-    const target = mutedRef.current ? 0 : 1;
-    fadeAudio(fv, target, FADE_MS);
-  }, [refOf, fadeAudio]);
 
   // ── arranque robusto do vídeo da frente ─────────────────────────
   // O vídeo tem `autoPlay muted` NATIVO (o `muted` vai no SSR, confirmado). Como
@@ -220,31 +155,6 @@ export function HeroReel({
     return () => evs.forEach((e) => window.removeEventListener(e, kick, opts));
   }, [kickFront]);
 
-  // ── mute da música de fundo: quando o vídeo do hero tem som, MUTA o site ──
-  const videoAudible = !muted;
-  useEffect(() => {
-    duck(videoAudible);
-  }, [videoAudible, duck]);
-  useEffect(() => () => duck(false), [duck]); // repõe ao desmontar
-
-  // ── mutuamente exclusivo: se o utilizador LIGA a música (botão SOM) enquanto
-  // o vídeo toca com som, o contexto chama esta função para silenciar o vídeo
-  // (em vez de ouvir-se música + vídeo ao mesmo tempo). Ao mutar, o efeito de
-  // cima corre duck(false) e a música retoma de onde estava. ──────────────────
-  useEffect(() => {
-    return registerDucker(() => {
-      if (mutedRef.current) return; // já está mudo → nada a fazer
-      const fv = refOf(frontRef.current);
-      if (fv) fv.muted = true; // corte imediato do som do vídeo
-      if (fadeTimer.current) {
-        clearInterval(fadeTimer.current);
-        fadeTimer.current = null;
-      }
-      mutedRef.current = true;
-      setMuted(true); // sincroniza o ícone do altifalante
-    });
-  }, [registerDucker, refOf]);
-
   // ── arranque + deteção de capacidades ───────────────────────────
   useEffect(() => {
     const conn = (
@@ -266,7 +176,7 @@ export function HeroReel({
     const hh = window.matchMedia("(hover: hover)").matches;
     setHasHover(hh);
     hasHoverRef.current = hh;
-    // começa sempre mudo — o botão é o único controlo de áudio
+    // vídeos do hero são SEMPRE mudos — o site não tem som de forma alguma
     const fv = refOf(0);
     if (fv) {
       fv.muted = true;
@@ -274,9 +184,6 @@ export function HeroReel({
       // o autoplay a ser permitido logo no 1.º paint, antes de qualquer retry.
       fv.defaultMuted = true;
     }
-    return () => {
-      if (fadeTimer.current) clearInterval(fadeTimer.current);
-    };
   }, [refOf]);
 
   // ── decide o match-cut de abertura (uma vez por carregamento) ────
@@ -373,7 +280,6 @@ export function HeroReel({
       const nxt = (cur === 0 ? 1 : 0) as 0 | 1;
       const oldVideo = refOf(cur);
       const nextVideo = refOf(nxt);
-      if (oldVideo) oldVideo.muted = true; // corta JÁ o áudio do que sai
       if (nextVideo) {
         // se o slot livre não tinha este vídeo pré-carregado (ex.: anterior),
         // troca a fonte e carrega; se já o tinha (próximo), arranca logo.
@@ -394,7 +300,6 @@ export function HeroReel({
       }
       setFront(nxt);
       frontRef.current = nxt;
-      applyAudio(); // áudio segue o vídeo visível + o hover atual
       window.setTimeout(() => {
         if (oldVideo) oldVideo.pause();
         setSlots((prev) => {
@@ -405,7 +310,7 @@ export function HeroReel({
         transitioning.current = false;
       }, XFADE_MS);
     },
-    [refOf, applyAudio],
+    [refOf],
   );
 
   const currentIdx = useCallback(() => slotsRef.current[frontRef.current], []);
@@ -453,25 +358,14 @@ export function HeroReel({
   }, []);
 
   // ── API global: o CLONE do SeamlessLoop (scroll infinito) chama isto p/
-  // accionar o MESMO hover no hero REAL — áudio + cor + ducking — mesmo que o
-  // hero real esteja fora do viewport (no topo). O onEnter/onLeave já guardam
-  // o estado 'muted' e o hasHover, por isso o botão de som continua a mandar. ──
+  // accionar o MESMO hover no hero REAL — mesmo que o hero real esteja fora
+  // do viewport (no topo). ──
   useEffect(() => {
     window.__heroHover = (active: boolean) => (active ? onEnter() : onLeave());
     return () => {
       delete window.__heroHover;
     };
   }, [onEnter, onLeave]);
-
-  // ── botão de som: liga/desliga o áudio do vídeo (único controlo) ──
-  const toggleMute = useCallback(() => {
-    setMuted((m) => {
-      const next = !m;
-      mutedRef.current = next;
-      applyAudio();
-      return next;
-    });
-  }, [applyAudio]);
 
   const videoStyle = (slot: 0 | 1): React.CSSProperties => {
     const v = VIDEOS[slotsRef.current[slot]];
@@ -637,29 +531,6 @@ export function HeroReel({
         </>
       )}
 
-      {/* ── Botão de som (z-20) — escondido no fallback ── */}
-      {!fallback && (
-        <button
-          type="button"
-          onClick={toggleMute}
-          aria-label={
-            muted
-              ? lang === "es"
-                ? "Activar sonido"
-                : en
-                  ? "Turn sound on"
-                  : "Ligar som"
-              : lang === "es"
-                ? "Silenciar"
-                : en
-                  ? "Turn sound off"
-                  : "Desligar som"
-          }
-          className="absolute z-40 bottom-[92px] left-5 lg:bottom-9 lg:left-10 w-11 h-11 inline-flex items-center justify-center rounded-full border border-canvas-white/40 bg-canvas-black/40 backdrop-blur-sm text-canvas-white hover:bg-canvas-black/70 transition-colors"
-        >
-          {muted ? <SpeakerOff /> : <SpeakerOn />}
-        </button>
-      )}
     </section>
   );
 }

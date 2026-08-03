@@ -19,6 +19,19 @@ export type LogoEntry = {
   external?: boolean;
 };
 
+// Sub-marcas cujo texto embutido na IMAGEM está em português → variante EN
+// gerada (mesma fonte/traço, palavra traduzida). ES mantém a versão PT.
+const EN_LOGO_SRC: Record<string, string> = {
+  "/media/logos/b25restaurantes.png": "/media/logos/b25restaurantes-en.png",
+  "/media/logos/b25eventos.png": "/media/logos/b25eventos-en.png",
+  "/media/logos/25saude.png": "/media/logos/25saude-en.png",
+};
+
+/** Devolve o src do logo adequado à língua ativa (EN troca a palavra na imagem). */
+export function logoSrcForLang(src: string, lang: string): string {
+  return lang === "en" ? (EN_LOGO_SRC[src] ?? src) : src;
+}
+
 export const LOGOS: LogoEntry[] = [
   {
     src: "/media/logos/b25restaurantes.png",

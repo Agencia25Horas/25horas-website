@@ -25,14 +25,6 @@ export const frames = {
 
 export const f = (n: number) => (n * FRAME_MS) / 1000; // seconds — for GSAP
 
-export const audio = {
-  bedDb: -24,
-  shutterDb: -18,
-  clapDb: -12,
-  hoverDb: -28,
-  duckDb: -6,
-} as const;
-
 // Hero sequence timing (seconds from page-ready)
 export const heroSequence = {
   projectorAt: 0.3,

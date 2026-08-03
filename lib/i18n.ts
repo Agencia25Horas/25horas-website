@@ -22,7 +22,6 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "cookie.saberMais": "Saber mais",
 
     // Chrome
-    "chrome.som": "SOM",
     "chrome.abrirMenu": "Abrir menu",
     "chrome.fecharMenu": "Fechar menu",
     "chrome.inicio": "25 Horas — Início",
@@ -187,7 +186,6 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "cookie.rejeitar": "Reject non-essential",
     "cookie.saberMais": "Learn more",
 
-    "chrome.som": "SOUND",
     "chrome.abrirMenu": "Open menu",
     "chrome.fecharMenu": "Close menu",
     "chrome.inicio": "25 Horas — Home",
@@ -342,7 +340,6 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "cookie.saberMais": "Saber más",
 
     // Chrome
-    "chrome.som": "SONIDO",
     "chrome.abrirMenu": "Abrir menú",
     "chrome.fecharMenu": "Cerrar menú",
     "chrome.inicio": "25 Horas — Inicio",

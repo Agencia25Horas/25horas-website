@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { AudioProvider } from "@/lib/audio-context";
 import { LanguageProvider } from "@/lib/language-context";
 import { LenisProvider } from "@/lib/lenis-provider";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { Analytics } from "@/components/chrome/Analytics";
 import { GoogleTags } from "@/components/chrome/GoogleTags";
 import { StickyCTA } from "@/components/chrome/StickyCTA";
@@ -182,15 +182,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <LenisProvider>
           <LanguageProvider>
-            <AudioProvider>
-              {children}
-              <StickyCTA />
-              <SeamlessLoop />
-            </AudioProvider>
+            {children}
+            <StickyCTA />
+            <SeamlessLoop />
           </LanguageProvider>
         </LenisProvider>
         <Analytics />
         <GoogleTags />
+        {/* Vercel Web Analytics — cookieless (sem dados pessoais, sem consent
+            banner necessário) → conta TODAS as visitas, mesmo sem aceitar
+            cookies. Dashboard: Vercel → projeto → Analytics. */}
+        <VercelAnalytics />
       </body>
     </html>
   );

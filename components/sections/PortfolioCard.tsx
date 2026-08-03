@@ -4,7 +4,6 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useState } from "react";
 import { useLang } from "@/lib/language-context";
-import { useAudio } from "@/lib/audio-context";
 import type { SanityPortfolioItem } from "@/lib/sanity/types";
 
 /**
@@ -54,7 +53,6 @@ export function PortfolioCard({
   onFocus?: () => void;
 }) {
   const { lang, t } = useLang();
-  const { duck } = useAudio();
   // Id por INSTÂNCIA (não item._id): o loop do carrossel duplica itens, e duas
   // cópias do mesmo item partilhariam o _id — tocavam as duas ao mesmo tempo.
   const uid = useId();
@@ -118,14 +116,6 @@ export function PortfolioCard({
       document.body.appendChild(s);
     }
   }, [open, media]);
-
-  // Duck da música de fundo quando um vídeo toca com som (YT a tocar, ou modal vimeo).
-  const videoSound = (active && playing) || (open && media?.kind === "vimeo");
-  useEffect(() => {
-    if (!videoSound) return;
-    duck(true);
-    return () => duck(false);
-  }, [videoSound, duck]);
 
   // Só um vídeo activo de cada vez: ao activar outro, este pára (volta à thumbnail).
   useEffect(() => {
@@ -271,12 +261,15 @@ export function PortfolioCard({
         className={`group relative ${ytWrap} overflow-hidden rounded-xl bg-canvas-black cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_0_2px_rgba(255,255,255,0.15),0_16px_48px_rgba(0,0,0,0.6)]`}
       >
         {active ? (
+          /* mute=1: o site nunca emite som sozinho. controls=1 (+ pointer
+             events) para o visitante poder ligar o som no próprio player,
+             por decisão explícita dele. */
           <iframe
             ref={iframeRef}
-            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
+            src={`https://www.youtube.com/embed/${media.id}?autoplay=1&mute=1&controls=1&modestbranding=1&playsinline=1&rel=0&enablejsapi=1`}
             title={title || t("cat.video")}
             allow="autoplay; encrypted-media; picture-in-picture"
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full"
           />
         ) : (
           <Image
@@ -370,7 +363,7 @@ export function PortfolioCard({
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
                 <iframe
                   className="absolute inset-0 w-full h-full"
-                  src={`https://player.vimeo.com/video/${media.id}?autoplay=1&dnt=1`}
+                  src={`https://player.vimeo.com/video/${media.id}?autoplay=1&muted=1&dnt=1`}
                   title={title || t("cat.video")}
                   allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen

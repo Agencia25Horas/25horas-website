@@ -84,20 +84,20 @@ export function CookiesView() {
                   <td className="p-4 leading-relaxed">
                     {tr(
                       <>
-                        Fazem o site funcionar: guardam a tua escolha de cookies,
-                        o idioma (PT/EN) e o som ligado/desligado. É{" "}
+                        Fazem o site funcionar: guardam a tua escolha de cookies
+                        e o idioma (PT/EN). É{" "}
                         <em>armazenamento local</em>, não te identifica e não
                         precisa de consentimento (é estritamente necessário).
                       </>,
                       <>
-                        They make the site work: they save your cookie choice,
-                        the language (PT/EN) and the sound on/off. It&apos;s{" "}
+                        They make the site work: they save your cookie choice
+                        and the language (PT/EN). It&apos;s{" "}
                         <em>local storage</em>, doesn&apos;t identify you and
                         needs no consent (it&apos;s strictly necessary).
                       </>,
                       <>
                         Hacen que el sitio funcione: guardan tu elección de
-                        cookies, el idioma (PT/EN) y el sonido activado/desactivado.
+                        cookies y el idioma (PT/EN).
                         Es <em>almacenamiento local</em>, no te identifica y no
                         necesita consentimiento (es estrictamente necesario).
                       </>,

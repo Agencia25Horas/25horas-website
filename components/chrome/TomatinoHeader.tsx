@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { CookieBanner } from "./CookieBanner";
 import { Timecode } from "./Timecode";
-import { AudioToggle } from "./AudioToggle";
 import { LangToggle } from "./LangToggle";
 import { useLang } from "@/lib/language-context";
 import { NICHOS } from "@/lib/servicos";
@@ -14,7 +13,7 @@ import { StableLabel } from "./StableLabel";
 /**
  * Header preto fixo:
  *   ESQUERDA:  logo 25Horas (alta resolução, sem scale CSS) + Timecode 25:00:XX
- *   CENTRO/DIR: LangToggle (PT·EN) · nav inline · AudioToggle (SOM)
+ *   CENTRO/DIR: LangToggle (PT·EN) · nav inline
  *   Cookie banner em cima (in-flow).
  *
  * Logo renderizado num inner-div maior que o container + overflow-hidden:
@@ -151,12 +150,6 @@ export function TomatinoHeader() {
             )}
           </nav>
 
-          {/* SOM no extremo direito de tudo */}
-          <div className="hidden sm:flex items-center gap-4">
-            <span className="w-px h-4 bg-canvas-white/20" aria-hidden />
-            <AudioToggle />
-          </div>
-
           <button
             className="lg:hidden flex flex-col gap-1.5 p-2 -mr-2"
             aria-label={open ? t("chrome.fecharMenu") : t("chrome.abrirMenu")}
@@ -203,7 +196,6 @@ export function TomatinoHeader() {
           </ul>
           <div className="flex items-center justify-between px-6 py-4 border-t border-canvas-white/10">
             <LangToggle />
-            <AudioToggle />
           </div>
         </nav>
       )}

@@ -6,6 +6,7 @@ import { TomatinoHeader } from "@/components/chrome/TomatinoHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
 import { useLang } from "@/lib/language-context";
+import { logoSrcForLang } from "@/lib/logos";
 import type { Nicho } from "@/lib/servicos";
 import type { NichePack, PackIcon } from "@/lib/packs";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -159,7 +160,7 @@ export function NichePackView({
               <RevealOnScroll>
                 <div className="relative w-[180px] md:w-[240px] aspect-[3/2] mb-8">
                   <Image
-                    src={data.logoSrc}
+                    src={logoSrcForLang(data.logoSrc, lang)}
                     alt={`25H ${nicho.label}`}
                     fill
                     sizes="240px"
@@ -386,7 +387,7 @@ export function NichePackView({
         <div className="max-w-[1320px] mx-auto flex flex-col md:flex-row md:items-center gap-6 md:gap-10 font-body text-[14px] text-canvas-white/75">
           <div className="relative w-[110px] h-10 shrink-0">
             <Image
-              src={data.logoSrc}
+              src={logoSrcForLang(data.logoSrc, lang)}
               alt={`25H ${nicho.label}`}
               fill
               sizes="110px"
