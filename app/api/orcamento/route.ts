@@ -3,9 +3,7 @@ import { Resend } from "resend";
 
 export const runtime = "nodejs";
 
-// POR ENQUANTO: gmail do cliente (o domínio 25horasagency.com ainda não está
-// live). Trocar para atendimento@25horasagency.com quando o cliente pedir.
-const TO_EMAIL = "agencia25horas@gmail.com";
+const TO_EMAIL = "servicos25horas@gmail.com";
 const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL || "25 Horas <onboarding@resend.dev>";
 
@@ -49,6 +47,23 @@ function escapeHtml(s: string) {
 // Limpa header de email (evita injeção via newlines no subject).
 function cleanHeader(s: string) {
   return s.replace(/[\r\n]+/g, " ").trim().slice(0, 120);
+}
+
+// Última linha de defesa: se o email não sair, o lead fica nos logs
+// (Vercel → Logs) em vez de desaparecer em silêncio.
+function logLead(reason: string, b: Body) {
+  console.error(
+    `[/api/orcamento] LEAD NÃO ENVIADO (${reason}):`,
+    JSON.stringify({
+      projectType: b.projectType,
+      deliverable: b.deliverable,
+      timeline: b.timeline,
+      name: b.name,
+      email: b.email,
+      phone: b.phone,
+      company: b.company,
+    }),
+  );
 }
 
 function getIp(req: Request): string {
@@ -179,10 +194,8 @@ export async function POST(req: Request) {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    // Dev fallback: log e considera enviado (enquanto o Resend não está configurado).
-    console.warn(
-      "[/api/orcamento] RESEND_API_KEY ausente — pedido NÃO enviado por email.",
-    );
+    // Fallback: aceita o pedido mas deixa o lead completo nos logs.
+    logLead("RESEND_API_KEY ausente", body);
     return NextResponse.json({ ok: true, devMode: true });
   }
 
@@ -199,6 +212,7 @@ export async function POST(req: Request) {
     });
     if (error) {
       console.error("[/api/orcamento] Resend error:", error);
+      logLead("erro Resend", body);
       return NextResponse.json(
         {
           ok: false,
@@ -210,6 +224,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[/api/orcamento] Unexpected error:", e);
+    logLead("erro inesperado", body);
     return NextResponse.json(
       { ok: false, error: "Erro inesperado." },
       { status: 500 },
