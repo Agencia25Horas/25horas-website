@@ -193,6 +193,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             banner necessário) → conta TODAS as visitas, mesmo sem aceitar
             cookies. Dashboard: Vercel → projeto → Analytics. */}
         <VercelAnalytics />
+        {/* Cloudflare Web Analytics — sem cookies, corre sempre. Junta este
+            site ao painel único da conta break0utro (Analytics › Web analytics). */}
+        <script
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "772612fe415d4d4daf18a51de0c8e42e"}'
+        />
       </body>
     </html>
   );
